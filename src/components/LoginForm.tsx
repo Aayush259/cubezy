@@ -1,8 +1,13 @@
 "use client";
 import { useState } from "react";
+import { useDispatch } from "react-redux";
+import { login } from "../store/userSlice";
+import { useRouter } from "next/navigation";
 
 export default function LoginForm() {
 
+    const dispatch = useDispatch();
+    const router = useRouter();
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
     const [formData, setFormData] = useState({
         email: "",
@@ -10,7 +15,7 @@ export default function LoginForm() {
     });
     const [error, setError] = useState<boolean>(false);
 
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setIsSubmitting(true);
 
@@ -19,12 +24,33 @@ export default function LoginForm() {
             setIsSubmitting(false);
             return;
         }
+
+        try {
+            const res = await fetch("/api/auth/login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(formData),
+            });
+
+            if (res.ok) {
+                const { token, user } = await res.json();
+                localStorage.setItem("token", token);
+                dispatch(login(user));
+                router.push("/");
+            } else {
+                console.log("Login failed");
+            }
+        } catch (error) {
+            console.log(error);
+        }
     }
 
     return (
         <form className="w-full flex flex-col gap-6" onSubmit={handleSubmit}>
             <label htmlFor="email" className="flex flex-col gap-2 text-lg">
-            <p className="flex items-center justify-between">
+                <p className="flex items-center justify-between">
                     <span>Email:</span>
                     {
                         error && !formData.email && <span className="text-sm text-red-500 font-semibold">Required*</span>
@@ -41,7 +67,7 @@ export default function LoginForm() {
             </label>
 
             <label htmlFor="name" className="flex flex-col gap-2 text-lg">
-            <p className="flex items-center justify-between">
+                <p className="flex items-center justify-between">
                     <span>Password:</span>
                     {
                         error && !formData.password && <span className="text-sm text-red-500 font-semibold">Required*</span>
