@@ -40,8 +40,8 @@ const AuthProvider: React.FC<{
 
                 if (response.ok) {
                     const data = await response.json();
-                    dispatch(login(data.user));
                     localStorage.setItem("token", data.token);
+                    dispatch(login(data.user));
                     router.push("/");
                 } else {
                     dispatch(logout());
