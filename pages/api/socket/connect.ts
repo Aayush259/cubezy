@@ -22,13 +22,14 @@ export default async function handler(_: NextApiRequest, res: ExtendedNextApiRes
         console.log("Initializing Socket.io");
 
         // Creating new Socket.IO server.
-        const io = new IOServer(res.socket.server, {
+        io = new IOServer(res.socket.server, {
             path: "/api/socket/connect",
         });
 
         // Middleware for jet authentication.
         io.use(async (socket, next) => {
             const token = socket.handshake.auth.token;
+            console.log(token)
 
             if (!token) {
                 return next(new Error("Unauthorized"));
@@ -58,7 +59,9 @@ export default async function handler(_: NextApiRequest, res: ExtendedNextApiRes
             }
         });
 
+        
         io.on("connection", (socket) => {
+            console.log(socket.data);
             console.log("User connected:", socket.data.user.name);
 
             socket.on("message", (data) => {
