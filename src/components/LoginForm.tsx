@@ -44,6 +44,8 @@ export default function LoginForm() {
             }
         } catch (error) {
             console.log(error);
+        } finally {
+            setIsSubmitting(false);
         }
     }
 
