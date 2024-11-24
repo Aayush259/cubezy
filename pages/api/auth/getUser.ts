@@ -22,7 +22,7 @@ export default async function getUser(req: NextApiRequest, res: NextApiResponse)
             return res.status(404).json({ message: "User not found" });
         }
 
-        const newJwt = jwt.sign({ userId: user._id }, process.env.JWT_SECRET!, { expiresIn: "7d" });
+        const newJwt = jwt.sign({ id: user._id }, process.env.JWT_SECRET!, { expiresIn: "7d" });
 
         res.status(200).json({ token: newJwt, user: {
             _id: user._id,
