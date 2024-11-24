@@ -1,12 +1,15 @@
 "use client";
+import { RootState } from "@/src/store/store";
 import { login, logout } from "@/src/store/userSlice";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 const AuthProvider: React.FC<{
     children: React.ReactNode;
 }> = ({ children }) => {
+
+    const { isLoggedIn, user } = useSelector((state: RootState) => state.user);
     const dispatch = useDispatch();
     const [loading, setLoading] = useState(true);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -40,6 +43,7 @@ const AuthProvider: React.FC<{
                 localStorage.setItem("token", data.token);
                 dispatch(login(data.user));
                 setIsAuthenticated(true);
+                router.push("/");
             } else {
                 dispatch(logout());
                 localStorage.removeItem("token");
@@ -59,7 +63,7 @@ const AuthProvider: React.FC<{
 
     useEffect(() => {
         getUser();
-    }, []);
+    }, [isLoggedIn]);
 
     if (loading) {
         return <div>Loading...</div>;
