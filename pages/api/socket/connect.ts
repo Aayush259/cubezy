@@ -5,8 +5,19 @@ import { Socket as NetSocket } from "net";
 import jwt from "jsonwebtoken";
 import connectMongoDb from "@/src/lib/mongodb";
 import User from "@/src/models/User";
+import createMessageModel from "@/src/models/Chat";
 
-let io;
+interface CustomSocket extends Socket {
+    data: {
+        user: {
+            _id: string;
+            email: string;
+            name: string;
+        };
+    };
+}
+
+let io: IOServer;
 
 interface ExtendedNextApiResponse extends NetSocket {
     socket: {
@@ -59,13 +70,44 @@ export default async function handler(_: NextApiRequest, res: ExtendedNextApiRes
             }
         });
 
-        
-        io.on("connection", (socket) => {
+
+        io.on("connection", (socket: CustomSocket) => {
             console.log(socket.data);
             console.log("User connected:", socket.data.user.name);
 
+            socket.on("sendMessage", async ({ senderId, receiverId, message }: { senderId: string, receiverId: string, message: string }) => {
+                try {
+                    // Generating a unique chat ID (sorted IDs ensure consistency).
+                    const chatId = senderId < receiverId ? `${senderId}_${receiverId}` : `${receiverId}_${senderId}`;
+
+                    // Creating or getting message model dynamically.
+                    const MessageModel = createMessageModel(chatId);
+
+                    // Saving the message to the database.
+                    const newMessage = await MessageModel.create({
+                        senderId,
+                        message,
+                    });
+
+                    // Emitting message only to receiver.
+                    const receiverSocket = Array.from(io.sockets.sockets.values()).find(
+                        (s) => (s as CustomSocket).data?.user._id === receiverId
+                    );
+
+                    if (receiverSocket) {
+                        (receiverSocket as CustomSocket).emit("receiveMessage", {
+                            senderId,
+                            message,
+                            sentAt: newMessage.sentAt,
+                        });
+                    }
+                } catch (error) {
+                    console.log("Error sending message:", error);
+                }
+            });
+
             socket.on("message", (data) => {
-                console.log("Message receiver:", data);
+                console.log("Message receiver jsehdw:", data);
                 socket.broadcast.emit("message", data);
             })
 
