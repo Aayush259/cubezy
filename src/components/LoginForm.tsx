@@ -38,7 +38,7 @@ export default function LoginForm() {
                 const { token, user } = await res.json();
                 localStorage.setItem("token", token);
                 dispatch(login(user));
-                router.push("/");
+                // router.push("/");
             } else {
                 console.log("Login failed");
             }
