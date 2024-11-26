@@ -1,18 +1,23 @@
 "use client";
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../store/store";
 import { CgArrowRightO } from "react-icons/cg";
 import { IoClose } from "react-icons/io5";
 import { MdOutlineContentCopy } from "react-icons/md";
 import { FaRegCircleCheck } from "react-icons/fa6";
+import { updateConnections } from "../store/userSlice";
+import { useIdBarContext } from "../contexts/IdBarContext";
 
 const IdBar: React.FC = () => {
 
     const { user } = useSelector((state: RootState) => state.user);
+    const dispatch = useDispatch();
 
-    const [idBarOpen, setIdBarOpen] = useState<boolean>(false);     // State to control the visibility of the ID bar.
+    const { idBarOpen, setIdBarOpen } = useIdBarContext();
+
     const [idCopied, setIdCopied] = useState<boolean>(false);   // State to track whether the ID has been copied.
+    const [idToAdd, setIdToAdd] = useState<string>("");   // State to store the ID to add.
     const [isAdding, setIsAdding] = useState<boolean>(false);   // State to track whether the user is adding a new ID.
 
     useEffect(() => {
@@ -39,8 +44,39 @@ const IdBar: React.FC = () => {
         setIdCopied(true);
     }
 
-    const addId = () => {
+    const addId = async () => {
         setIsAdding(true);
+
+        const token = localStorage.getItem("token");
+
+        try {
+            console.log("Adding ID:", idToAdd);
+            const response = await fetch("/api/auth/addConnection", {
+                method: "POST",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    idToAdd: idToAdd
+                })
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                const connections = data?.connections;
+
+                if (connections) {
+                    dispatch(updateConnections(connections));
+                    setIdToAdd("");
+                    setIsAdding(false);
+                }
+            } else {
+                console.log("Error adding ID. response:", response);
+            }
+        } catch (error) {
+            console.log(error);
+        }
     }
 
     return (
@@ -66,10 +102,24 @@ const IdBar: React.FC = () => {
                     </div>
                 </div>
 
-                <form className="my-16 flex flex-row items-center justify-center">
-                    <input type="text" placeholder="Enter your chatmate's Square ID" className="w-[70%] px-4 py-2 bg-gray-800 border-b-2 border-gray-800 focus:outline-none focus:border-orange-700 rounded-l-lg" />
+                <form className="my-16 flex flex-row items-center justify-center" onSubmit={(e) => {
+                    e.preventDefault();
+                    addId();
+                }}>
+                    <input
+                        type="text"
+                        value={idToAdd}
+                        placeholder="Enter your chatmate's Square ID"
+                        className={`w-[70%] px-4 py-2 bg-gray-800 border-b-2 border-gray-800 focus:outline-none focus:border-orange-700 rounded-l-lg ${isAdding ? "opacity-50" : "opacity-100"}`}
+                        onChange={(e) => setIdToAdd(e.target.value)}
+                        readOnly={isAdding}
+                    />
 
-                    <button className={`px-4 py-2 w-fit bg-orange-700 rounded-r-lg block duration-300 ${isAdding ? "opacity-50" : "opacity-100 hover:opacity-80"} border-b-2 border-orange-700`}>
+                    <button
+                        type="submit"
+                        className={`px-4 py-2 w-fit bg-orange-700 rounded-r-lg block duration-300 ${isAdding ? "opacity-50" : "opacity-100 hover:opacity-80"} border-b-2 border-orange-700`}
+                        disabled={isAdding}
+                    >
                         Add
                     </button>
                 </form>
