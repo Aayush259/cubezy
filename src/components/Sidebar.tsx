@@ -2,10 +2,14 @@
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "../store/store";
+import { IoIosArrowForward } from "react-icons/io";
+import { useIdBarContext } from "../contexts/IdBarContext";
 
 export default function Sidebar() {
 
     const { user } = useSelector((state: RootState) => state.user);
+
+    const { setIdBarOpen } = useIdBarContext();
 
     const [greeting, setGreeting] = useState<string>("");   // Greeting message based on the current time.
 
@@ -51,7 +55,27 @@ export default function Sidebar() {
             </p>
 
             <div className="h-full pb-28 overflow-y-auto">
-                <div></div>
+                {
+                    user?.connections.map(connection => (
+                        <button
+                            key={connection._id}
+                            className="w-full px-6 py-4 flex items-center justify-between hover:bg-black duration-300 border-b border-gray-800 text-xl"
+                        >
+                            {connection.name}
+                            <IoIosArrowForward size={20} />
+                        </button>
+                    ))
+                }
+
+                {
+                    user?.connections.length === 0 && (
+                        <div className="text-center text-xl w-full h-full flex items-center justify-center text-white/70">
+                            <button onClick={() => setIdBarOpen(true)} className="hover:text-white duration-300">
+                                {"Add your first friend " + getRandomEmoji()}
+                            </button>
+                        </div>
+                    )
+                }
             </div>
         </div>
     );
