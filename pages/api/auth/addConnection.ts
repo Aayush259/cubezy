@@ -51,7 +51,7 @@ export default async function addConnection(req: NextApiRequest, res: NextApiRes
 
         // If user is already connected, return 400.
         if (isAlreadyConnected) {
-            return res.status(400).json({ message: "User is already in your connections." });
+            return res.status(200).json({ message: "User is already in your connections.", connections: user.connections });
         }
 
         // Add user to connections.
