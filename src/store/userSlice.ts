@@ -17,9 +17,14 @@ const userSlice = createSlice({
         logout: (state) => {
             state.isLoggedIn = false;
             state.user = null;
+        },
+        updateConnections: (state, action) => {
+            const connections = action.payload;
+            const updatedUser = { ...state.user, connections } as IUserSlice["user"];
+            state.user = updatedUser;
         }
     }
 });
 
-export const { login, logout } = userSlice.actions;
+export const { login, logout, updateConnections } = userSlice.actions;
 export default userSlice.reducer;
