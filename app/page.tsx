@@ -3,11 +3,18 @@ import { io, Socket } from "socket.io-client";
 import { useEffect, useState } from "react";
 import Sidebar from "@/src/components/Sidebar";
 import IdBar from "@/src/components/IdBar";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "@/src/store/store";
+import { updateConnections } from "@/src/store/userSlice";
+import { IdBarContextProvider } from "@/src/contexts/IdBarContext";
 
 const SOCKET_PATH = "/api/socket/connect"
 
 export default function Home() {
 
+  const { user } = useSelector((state: RootState) => state.user);
+
+  const dispatch = useDispatch();
   // const 
   const [socket, setSocket] = useState<Socket | null>(null);
   const [messages, setMessages] = useState<string[]>([]);
@@ -27,6 +34,13 @@ export default function Home() {
       setMessages((prevMessages) => [...prevMessages, data]);
     });
 
+    newSocket.on("connectionUpdated", (newConnection) => {
+      if (user?.connections) {
+        const updatedConnectionsArray = [...user?.connections, newConnection];
+        dispatch(updateConnections(updatedConnectionsArray));
+      }
+    });
+
     setSocket(newSocket);
 
     // Clean up the socket connection when the component unmounts.
@@ -44,8 +58,10 @@ export default function Home() {
 
   return (
     <div className="h-screen flex flex-row overflow-hidden font-[family-name:var(--font-geist-sans)]">
-      <Sidebar />
-      <IdBar />
+      <IdBarContextProvider>
+        <Sidebar />
+        <IdBar />
+      </IdBarContextProvider>
 
       <button onClick={sendMessage}>Send</button>
     </div>
