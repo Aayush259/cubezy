@@ -6,6 +6,7 @@ import jwt from "jsonwebtoken";
 import connectMongoDb from "@/src/lib/mongodb";
 import User from "@/src/models/User";
 import createMessageModel from "@/src/models/Chat";
+import mongoose from "mongoose";
 
 interface CustomSocket extends Socket {
     data: {
@@ -77,6 +78,41 @@ export default async function handler(_: NextApiRequest, res: ExtendedNextApiRes
 
             socket.on("sendMessage", async ({ senderId, receiverId, message }: { senderId: string, receiverId: string, message: string }) => {
                 try {
+                    await connectMongoDb();
+
+                    // Fetching sender and receiver from the database.
+                    const sender = await User.findById(senderId);
+                    const receiver = await User.findById(receiverId);
+
+                    // Checking if sender and receiver exist.
+                    if (!sender || !receiver) {
+                        console.log("Sender or receiver not found");
+                        return socket.emit("error", {message: "Sender or receiver not found"});
+                    }
+
+                    // Check if the sender is in the receiver's connections.
+                    const isSenderInReceiverConnections = receiver.connections.some(connection => connection._id.toString() === senderId);
+
+                    if (!isSenderInReceiverConnections) {
+                        // Add sender to receiver's connections.
+                        receiver.connections.push({
+                            _id: sender._id as mongoose.Types.ObjectId,
+                            name: sender.name,
+                        });
+
+                        await receiver.save();
+
+                        // Emit a real-time update to the receiver.
+                        const receiverSocket = Array.from(io.sockets.sockets.values()).find((s) => (s as CustomSocket).data?.user._id === receiverId);
+
+                        if (receiverSocket) {
+                            (receiverSocket as CustomSocket).emit("connectionUpdated", {
+                                _id: sender._id,
+                                name: sender.name,
+                            });
+                        }
+                    }
+
                     // Generating a unique chat ID (sorted IDs ensure consistency).
                     const chatId = senderId < receiverId ? `${senderId}_${receiverId}` : `${receiverId}_${senderId}`;
 
