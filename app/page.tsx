@@ -7,6 +7,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/src/store/store";
 import { updateConnections } from "@/src/store/userSlice";
 import { IdBarContextProvider } from "@/src/contexts/IdBarContext";
+import { ChatContextProvider, useChatContext } from "@/src/contexts/ChatContext";
+import ChatWindow from "@/src/components/ChatWindow";
+import Image from "next/image";
 
 const SOCKET_PATH = "/api/socket/connect"
 
@@ -58,12 +61,25 @@ export default function Home() {
 
   return (
     <div className="h-screen flex flex-row overflow-hidden font-[family-name:var(--font-geist-sans)]">
-      <IdBarContextProvider>
-        <Sidebar />
-        <IdBar />
-      </IdBarContextProvider>
+      <ChatContextProvider>
+        <IdBarContextProvider>
+          <Sidebar />
+          <IdBar />
+        </IdBarContextProvider>
 
-      <button onClick={sendMessage}>Send</button>
+        <div className="h-full flex-grow relative">
+          <Image
+            src="/images/chat_window_bg.webp"
+            height={4160}
+            width={6240}
+            alt="Chat Window Background"
+            className="object-cover object-center absolute z-10 top-0 left-0 opacity-10 w-full h-full"
+          />
+          <ChatWindow />
+        </div>
+      </ChatContextProvider>
+
+      {/* <button onClick={sendMessage}>Send</button> */}
     </div>
   );
 }
