@@ -4,12 +4,14 @@ import { useSelector } from "react-redux";
 import { RootState } from "../store/store";
 import { IoIosArrowForward } from "react-icons/io";
 import { useIdBarContext } from "../contexts/IdBarContext";
+import { useChatContext } from "../contexts/ChatContext";
 
 export default function Sidebar() {
 
     const { user } = useSelector((state: RootState) => state.user);
 
     const { setIdBarOpen } = useIdBarContext();
+    const { receiverId, setReceiverId } = useChatContext();
 
     const [greeting, setGreeting] = useState<string>("");   // Greeting message based on the current time.
 
@@ -59,7 +61,8 @@ export default function Sidebar() {
                     user?.connections.map(connection => (
                         <button
                             key={connection._id}
-                            className="w-full px-6 py-4 flex items-center justify-between hover:bg-black duration-300 border-b border-gray-800 text-xl"
+                            className={`w-full px-6 py-4 flex items-center justify-between hover:bg-gray-900 duration-300 border-b border-gray-800 text-xl ${connection._id === receiverId ? "bg-black" : "bg-transparent"}`}
+                            onClick={() => setReceiverId(connection._id)}
                         >
                             {connection.name}
                             <IoIosArrowForward size={20} />
