@@ -81,11 +81,11 @@ const IdBar: React.FC = () => {
 
     return (
         <div className="w-fit h-fit">
-            <button className="w-fit rounded-full fixed top-1/2 -translate-y-1/2 -right-2 rotate-180 hover:opacity-70 hover:right-0 duration-300 z-20" onClick={() => setIdBarOpen(true)}>
+            <button className="w-fit rounded-full fixed top-1/2 -translate-y-1/2 -right-2 rotate-180 hover:opacity-70 hover:right-0 duration-300 z-40" onClick={() => setIdBarOpen(true)}>
                 <CgArrowRightO size={30} className="text-white" />
             </button>
 
-            <div className={`fixed right-0 top-0 z-30 w-screen h-screen max-w-[450px] border-l-2 border-gray-800 bg-black ${idBarOpen ? "translate-x-0" : "translate-x-full"} duration-300`}>
+            <div className={`fixed right-0 top-0 z-50 w-screen h-screen max-w-[450px] border-l-2 border-gray-800 bg-black ${idBarOpen ? "translate-x-0" : "translate-x-full"} duration-300`}>
 
                 <button className="absolute top-4 right-4 hover:opacity-80 duration-300" onClick={() => setIdBarOpen(false)}>
                     <IoClose size={30} className="text-white" />
