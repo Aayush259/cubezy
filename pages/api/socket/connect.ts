@@ -14,6 +14,11 @@ interface CustomSocket extends Socket {
             _id: string;
             email: string;
             name: string;
+            connections: {
+                chatId: string;
+                _id: string;
+                name: string;
+            }[];
         };
     };
 }
@@ -62,6 +67,7 @@ export default async function handler(_: NextApiRequest, res: ExtendedNextApiRes
                     _id: user._id,
                     email: user.email,
                     name: user.name,
+                    connections: user.connections,
                 };
 
                 next();
@@ -90,12 +96,16 @@ export default async function handler(_: NextApiRequest, res: ExtendedNextApiRes
                         return socket.emit("error", {message: "Sender or receiver not found"});
                     }
 
+                    // Generating a unique chat ID (sorted IDs ensure consistency).
+                    const chatId = senderId < receiverId ? `${senderId}_${receiverId}` : `${receiverId}_${senderId}`;
+
                     // Check if the sender is in the receiver's connections.
                     const isSenderInReceiverConnections = receiver.connections.some(connection => connection._id.toString() === senderId);
 
                     if (!isSenderInReceiverConnections) {
                         // Add sender to receiver's connections.
                         receiver.connections.push({
+                            chatId: chatId,
                             _id: sender._id as mongoose.Types.ObjectId,
                             name: sender.name,
                         });
@@ -107,14 +117,12 @@ export default async function handler(_: NextApiRequest, res: ExtendedNextApiRes
 
                         if (receiverSocket) {
                             (receiverSocket as CustomSocket).emit("connectionUpdated", {
+                                chatId: chatId,
                                 _id: sender._id,
                                 name: sender.name,
                             });
                         }
                     }
-
-                    // Generating a unique chat ID (sorted IDs ensure consistency).
-                    const chatId = senderId < receiverId ? `${senderId}_${receiverId}` : `${receiverId}_${senderId}`;
 
                     // Creating or getting message model dynamically.
                     const MessageModel = createMessageModel(chatId);
