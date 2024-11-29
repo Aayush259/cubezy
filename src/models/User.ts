@@ -5,7 +5,7 @@ interface IUser extends Document {
     name: string;
     email: string;
     password: string;
-    connections: {_id: mongoose.Types.ObjectId; name: string}[];
+    connections: {chatId: string, _id: mongoose.Types.ObjectId; name: string}[];
     comparePassword(password: string): Promise<boolean>;
 };
 
@@ -15,7 +15,8 @@ const userSchema = new Schema<IUser>({
     password: {type: String, required: true},
     connections: [
         {
-            _id: { type: mongoose.Types.ObjectId, ref: "User" },
+            chatId: String,
+            _id: { type: mongoose.Types.ObjectId, ref: "User" },    // Receiver's Chat ID.
             name: { type: String, required: true },
         },
     ],
