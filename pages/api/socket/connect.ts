@@ -82,7 +82,7 @@ export default async function handler(_: NextApiRequest, res: ExtendedNextApiRes
             console.log(socket.data);
             console.log("User connected:", socket.data.user.name);
 
-            socket.on("sendMessage", async ({ senderId, receiverId, message }: { senderId: string, receiverId: string, message: string }) => {
+            socket.on("sendMessage", async ({ senderId, receiverId, message, time }: { senderId: string, receiverId: string, message: string, time: number }) => {
                 try {
                     await connectMongoDb();
 
@@ -93,7 +93,7 @@ export default async function handler(_: NextApiRequest, res: ExtendedNextApiRes
                     // Checking if sender and receiver exist.
                     if (!sender || !receiver) {
                         console.log("Sender or receiver not found");
-                        return socket.emit("error", {message: "Sender or receiver not found"});
+                        return socket.emit("error", { message: "Sender or receiver not found" });
                     }
 
                     // Generating a unique chat ID (sorted IDs ensure consistency).
@@ -133,6 +133,14 @@ export default async function handler(_: NextApiRequest, res: ExtendedNextApiRes
                         message,
                     });
 
+                    // Emit a real-time update to the sender.
+                    socket.emit("messageSent", {
+                        chatId: chatId,
+                        _id: sender._id,
+                        receiverId: receiver._id,
+                        time: time,
+                    });
+
                     // Emitting message only to receiver.
                     const receiverSocket = Array.from(io.sockets.sockets.values()).find(
                         (s) => (s as CustomSocket).data?.user._id === receiverId
@@ -140,6 +148,7 @@ export default async function handler(_: NextApiRequest, res: ExtendedNextApiRes
 
                     if (receiverSocket) {
                         (receiverSocket as CustomSocket).emit("receiveMessage", {
+                            chatId,
                             senderId,
                             message,
                             sentAt: newMessage.sentAt,
@@ -150,9 +159,32 @@ export default async function handler(_: NextApiRequest, res: ExtendedNextApiRes
                 }
             });
 
-            socket.on("message", (data) => {
-                console.log("Message receiver jsehdw:", data);
-                socket.broadcast.emit("message", data);
+            socket.on("markAsRead", async ({ chatId, messageIds }: { chatId: string, messageIds: string[] }) => {
+
+                try {
+                    await connectMongoDb();
+                    const MessageModel = createMessageModel(chatId);
+
+                    // Update the message in the database.
+                    await MessageModel.updateMany(
+                        { _id: { $in: messageIds } },   // Match messages by their IDs.
+                        { isRead: true }      // Set isRead to true.
+                    );
+
+                    // Notify sender about read status.
+                    const senderSocket = Array.from(io.sockets.sockets.values()).find(
+                        (s) => (s as CustomSocket).data?.user._id === socket.data.user._id
+                    );
+
+                    if (senderSocket) {
+                        (senderSocket as CustomSocket).emit("messageRead", {
+                            chatId,
+                            messageIds,
+                        });
+                    }
+                } catch (error) {
+                    console.log("Error marking message as read:", error);
+                }
             })
 
             socket.on("disconnect", () => {
