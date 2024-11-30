@@ -1,17 +1,15 @@
+"use client";
 import { useSelector } from "react-redux";
 import { useChatContext } from "../contexts/ChatContext";
 import { RootState } from "../store/store";
 import { IoSend } from "react-icons/io5";
-import { useEffect, useMemo, useState } from "react";
-import { Socket } from "socket.io-client";
+import { useState } from "react";
 
-const ChatWindow: React.FC<{
-    socket: Socket | null
-}> = ({ socket }) => {
+const ChatWindow: React.FC = () => {
 
     const { user } = useSelector((state: RootState) => state.user);
 
-    const { receiverId } = useChatContext();
+    const { socket, receiverId } = useChatContext();
 
     const [message, setMessage] = useState<string>("");
     const [isSending, setIsSending] = useState<boolean>(false);
