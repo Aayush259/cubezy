@@ -8,6 +8,7 @@ export interface IUserSlice {
         connections: {
             _id: string;
             name: string;
+            chatId: string;
         }[];
     } | null;
 }
