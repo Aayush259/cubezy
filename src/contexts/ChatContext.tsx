@@ -3,27 +3,23 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../store/store";
 import { io, Socket } from "socket.io-client";
 import { updateConnections } from "../store/userSlice";
+import { v4 as uuidv4 } from "uuid";
+import { IChatMessage } from "../interfaces/interfaces";
 
 const SOCKET_PATH = "/api/socket/connect"
 
 const ChatContext = createContext<{
     receiverId: string | null;
     setReceiverId: (id: string) => void;
-    chats: {
-        _id: string;
-        senderId: string;
-        message: string;
-        sentAt: Date;
-        isRead: boolean;
-    }[] | null;
+    chats: IChatMessage[] | null;
     loadingChats: boolean;
-    socket: Socket | null;
+    sendMessage: (message: string) => void;
 }>({
     receiverId: null,
     setReceiverId: (id: string) => { },
     chats: null,
     loadingChats: false,
-    socket: null
+    sendMessage: (message: string) => { },
 })
 
 const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
@@ -36,21 +32,16 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
     const [socket, setSocket] = useState<Socket | null>(null);
 
     const [loadingChats, setLoadingChats] = useState<boolean>(false);
-    const [sendingMessage, setSendingMessage] = useState<{
-        chatId: string;
-        message: string;
-        isSent: boolean;
-        isError: boolean;
-        time: number;
-    }[]>([]);
 
-    const [chats, setChats] = useState<{
-        _id: string;
-        senderId: string;
-        message: string;
-        sentAt: Date;
-        isRead: boolean;
-    }[] | null>(null);
+    const [chats, setChats] = useState<IChatMessage[] | null>(null);
+
+    const chatId = useMemo(() => {
+        if (user?._id && receiverId) {
+            return user?._id < receiverId ? `${user?._id}_${receiverId}` : `${receiverId}_${user?._id}`
+        } else {
+            return null;
+        }
+    }, [user?._id, receiverId]);
 
     const getMessages = async (chatId: string) => {
 
@@ -84,20 +75,15 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
         } finally {
             setLoadingChats(false);
         }
-    }
-
-    const chatId = useMemo(() => {
-        if (user?._id && receiverId) {
-            return user?._id < receiverId ? `${user?._id}_${receiverId}` : `${receiverId}_${user?._id}`
-        } else {
-            return null;
-        }
-    }, [user?._id, receiverId]);
+    };
 
     useEffect(() => {
         if (chatId) {
             setChats(null);
             getMessages(chatId);
+
+            // Mark all messages as read when the user opens the chat.
+            markAsRead();
         }
     }, [chatId]);
 
@@ -117,16 +103,16 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
             }
         });
 
+        newSocket.on("receiveMessage", (messageDetails) => {
+            setChats(prevChats => prevChats ? [...prevChats, messageDetails] : [messageDetails]);
+        });
+
+        newSocket.on("messageRead", ({ chatId, messageIds }) => {
+            setChats(prevChats => prevChats?.map(chat => messageIds.includes(chat._id) ? { ...chat, isReadTrue: true, status: "sent" } : chat) || null);
+        })
+
         newSocket.on("messageSent", (messageDetails) => {
-            const { time } = messageDetails;
-            setSendingMessage((prev) => {
-                const updatedArray = [...prev];
-                const index = updatedArray.findIndex((item) => item.time === time);
-                if (index !== -1) {
-                    updatedArray[index].isSent = true;
-                }
-                return updatedArray;
-            });
+
         });
 
         setSocket(newSocket);
@@ -141,23 +127,43 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
         if (!message) return;
 
         if (socket && chatId) {
-            setSendingMessage((prev) => ([...prev, { chatId, message, isSent: false, isError: false, time: Date.now() }]));
+            const tempId = uuidv4();
+            const tempMessage: IChatMessage = {
+                _id: tempId,
+                senderId: user?._id as string,
+                message,
+                sentAt: new Date(),
+                isRead: false,
+                status: "sending",
+            };
+
+            setChats(prevChats => prevChats ? [...prevChats, tempMessage] : [tempMessage]);
+
             socket.emit("sendMessage", {
                 senderId: user?._id,
-                receiverId: receiverId,
-                message: message,
-                time: Date.now(),
-            });
+                receiverId,
+                message
+            }, (response: any) => {
+                setChats(prevChats => prevChats?.map(chat => chat._id === tempId ? { ...chat, _id: response._id, sentAt: response.sentAt, status: "sent" } : chat) || null);
+            })
         } else {
             // Todo: Handle the case where the socket or chatId is not available.
             console.error("Socket or chatId is not available.");
         }
     };
 
-    const markAsRead = async () => { };
+    const markAsRead = async (messageIds?: string[]) => {
+
+        if (socket && chatId) {
+            socket.emit("markAsRead", {
+                chatId: chatId,
+                messageIds: messageIds ? messageIds : chats?.map((chat) => chat._id),
+            })
+        }
+    };
 
     return (
-        <ChatContext.Provider value={{ receiverId, setReceiverId, chats, loadingChats, socket }}>
+        <ChatContext.Provider value={{ receiverId, setReceiverId, chats, loadingChats, sendMessage }}>
             {children}
         </ChatContext.Provider>
     )
