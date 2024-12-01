@@ -12,3 +12,12 @@ export interface IUserSlice {
         }[];
     } | null;
 }
+
+export interface IChatMessage {
+    _id: string;
+    senderId: string;
+    message: string;
+    sentAt: Date;
+    isRead: boolean;
+    status?: "sending" | "sent";
+}
