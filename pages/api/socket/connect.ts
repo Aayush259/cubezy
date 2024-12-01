@@ -82,7 +82,7 @@ export default async function handler(_: NextApiRequest, res: ExtendedNextApiRes
             console.log(socket.data);
             console.log("User connected:", socket.data.user.name);
 
-            socket.on("sendMessage", async ({ senderId, receiverId, message, time }: { senderId: string, receiverId: string, message: string, time: number }) => {
+            socket.on("sendMessage", async ({ senderId, receiverId, message }: { senderId: string, receiverId: string, message: string }, callback) => {
                 try {
                     await connectMongoDb();
 
@@ -133,12 +133,17 @@ export default async function handler(_: NextApiRequest, res: ExtendedNextApiRes
                         message,
                     });
 
+                    // Emit the new message ID and sent the timestamp to the sender.
+                    callback({
+                        _id: newMessage._id,
+                        sentAt: newMessage.sentAt,
+                    })
+
                     // Emit a real-time update to the sender.
                     socket.emit("messageSent", {
                         chatId: chatId,
                         _id: sender._id,
                         receiverId: receiver._id,
-                        time: time,
                     });
 
                     // Emitting message only to receiver.
