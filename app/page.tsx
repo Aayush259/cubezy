@@ -1,3 +1,4 @@
+"use client";
 import Sidebar from "@/src/components/Sidebar";
 import IdBar from "@/src/components/IdBar";
 import { IdBarContextProvider } from "@/src/contexts/IdBarContext";
