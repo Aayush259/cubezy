@@ -84,7 +84,6 @@ export default async function handler(_: NextApiRequest, res: ExtendedNextApiRes
 
             socket.on("sendMessage", async ({ senderId, receiverId, message }: { senderId: string, receiverId: string, message: string }, callback) => {
                 try {
-                    console.log("Sending...");
                     await connectMongoDb();
 
                     // Fetching sender and receiver from the database.
@@ -114,10 +113,9 @@ export default async function handler(_: NextApiRequest, res: ExtendedNextApiRes
                         await receiver.save();
 
                         // Emit a real-time update to the receiver.
-                        const receiverSocket = Array.from(io.sockets.sockets.values()).find((s) => (s as CustomSocket).data?.user._id === receiverId);
+                        const receiverSocket = Array.from(io.sockets.sockets.values()).find((s) => (s as CustomSocket).data?.user._id.toString() === receiverId);
 
                         if (receiverSocket) {
-                            console.log("Updating receiver connections, receiver found");
                             (receiverSocket as CustomSocket).emit("connectionUpdated", {
                                 chatId: chatId,
                                 _id: sender._id,
@@ -141,22 +139,15 @@ export default async function handler(_: NextApiRequest, res: ExtendedNextApiRes
                         sentAt: newMessage.sentAt,
                     })
 
-                    console.log("Message sent successfully");
-                    // Emit a real-time update to the sender.
-                    socket.emit("messageSent", {
-                        chatId: chatId,
-                        _id: sender._id,
-                        receiverId: receiver._id,
-                    });
-
                     // Emitting message only to receiver.
                     const receiverSocket = Array.from(io.sockets.sockets.values()).find(
-                        (s) => (s as CustomSocket).data?.user._id === receiverId
+                        (s) => {
+                            const userId = (s as CustomSocket).data?.user._id.toString();
+                            return userId === receiverId;
+                        }
                     );
 
-                    console.log("Sent, looking for receiver", receiverSocket);
                     if (receiverSocket) {
-                        console.log("Found receiver", receiverSocket);
                         (receiverSocket as CustomSocket).emit("receiveMessage", {
                             _id: newMessage._id,
                             senderId,
@@ -164,11 +155,8 @@ export default async function handler(_: NextApiRequest, res: ExtendedNextApiRes
                             sentAt: newMessage.sentAt,
                             isRead: false,
                         });
-                    } else {
-                        console.log("Receiver socket not found", receiverId);
                     }
 
-                    console.log("Done");
                 } catch (error) {
                     console.log("Error sending message:", error);
                 }
@@ -176,17 +164,20 @@ export default async function handler(_: NextApiRequest, res: ExtendedNextApiRes
 
             socket.on("markAsRead", async ({ chatId, messageIds }: { chatId: string, messageIds: string[] }) => {
 
-                console.log("Mark as read event received");
-                console.log(chatId, messageIds);
+                if (!chatId || !messageIds || messageIds.length === 0) {
+                    console.log("Invalid chatId or messageIds");
+                    return;
+                }
 
                 try {
                     await connectMongoDb();
 
-                    console.log("All Ids", messageIds);
-
                     const validMessageIds = messageIds.filter((id) => mongoose.Types.ObjectId.isValid(id));
 
-                    console.log("Valid ids", validMessageIds);
+                    if (validMessageIds.length === 0) {
+                        console.log("No valid message IDs provided");
+                        return;
+                    }
 
                     const MessageModel = createMessageModel(chatId);
 
@@ -199,12 +190,17 @@ export default async function handler(_: NextApiRequest, res: ExtendedNextApiRes
                         { isRead: true }      // Set isRead to true.
                     );
 
+                    const [id1, id2] = chatId.split("_");
+
+                    const senderId = id1 === socket.data.user._id.toString() ? id2 : id1;
+
                     // Notify sender about read status.
                     const senderSocket = Array.from(io.sockets.sockets.values()).find(
-                        (s) => (s as CustomSocket).data?.user._id === socket.data.user._id
+                        (s) => (s as CustomSocket).data?.user._id.toString() === senderId
                     );
 
                     if (senderSocket) {
+                        // Emitting update to sender.
                         (senderSocket as CustomSocket).emit("messageRead", {
                             chatId,
                             messageIds,
