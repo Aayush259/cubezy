@@ -42,10 +42,18 @@ const ChatWindow: React.FC = () => {
         date = new Date(date);
 
         // Get hours and minutes.
-        const hours = date.getHours().toString().padStart(2, "0");
+        let hours = date.getHours();
         const minutes = date.getMinutes().toString().padStart(2, "0");
 
-        return `${hours}:${minutes}`;
+        // Determine AM or PM.
+        const period = hours >= 12 ? "PM" : "AM";
+
+        // Convert to 12-hour format.
+        hours = hours % 12;
+        // Adjust for 0 hour (midnight case).
+        hours = hours === 0 ? 12 : hours;
+
+        return `${hours}:${minutes} ${period}`;
     };
 
     return (
@@ -62,7 +70,7 @@ const ChatWindow: React.FC = () => {
                         <div className="h-fit flex flex-col justify-end gap-2">
                             {
                                 chats?.map(chat => (
-                                    <div key={chat._id} className={`md:max-w-[300px] max-w-[90%] pr-16 py-1 px-2 rounded-lg w-fit text-xl relative ${chat.senderId === user?._id ? "self-end bg-blue-700" : "self-start bg-slate-800"}`}>
+                                    <div key={chat._id} className={`md:max-w-[300px] max-w-[90%] pr-20 py-1 px-2 rounded-lg w-fit text-xl relative ${chat.senderId === user?._id ? "self-end bg-blue-700" : "self-start bg-slate-800"}`}>
                                         {chat.message}
 
                                         <div className="flex items-center gap-1 text-sm text-white bottom-1 right-1 absolute">
