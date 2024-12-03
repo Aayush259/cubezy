@@ -6,7 +6,7 @@ import { IoSend } from "react-icons/io5";
 import { IoCheckmarkDone } from "react-icons/io5";
 import { IoMdCheckmark } from "react-icons/io";
 import { GoClock } from "react-icons/go";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const ChatWindow: React.FC = () => {
 
@@ -18,11 +18,19 @@ const ChatWindow: React.FC = () => {
 
     const receiver = user?.connections.find((connection) => connection._id === receiverId);
 
+    const chatScrollRef = useRef<HTMLDivElement | null>(null);
+
+    useEffect(() => {
+        if (chatScrollRef.current) {
+            chatScrollRef.current.scrollTop = chatScrollRef.current.scrollHeight;
+        }
+    }, [chats]);
+
     const handleMessageSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         sendMessage(message);
         setMessage("");
-    }
+    };
 
     if (!receiverId) return (
         <div className="w-full h-full flex items-center justify-center relative z-20 text-2xl font-semibold">
@@ -38,7 +46,7 @@ const ChatWindow: React.FC = () => {
         const minutes = date.getMinutes().toString().padStart(2, "0");
 
         return `${hours}:${minutes}`;
-    }
+    };
 
     return (
         <div className="w-full h-full z-20 relative">
@@ -50,39 +58,41 @@ const ChatWindow: React.FC = () => {
                 loadingChats ? (
                     <>Loading...</>
                 ) : (
-                    <div className="h-full md:px-32 pb-24 overflow-y-auto flex flex-col justify-end gap-2">
-                        {
-                            chats?.map(chat => (
-                                <div key={chat._id} className={`md:max-w-[300px] max-w-[90%] pr-16 py-1 px-2 rounded-lg w-fit text-xl relative ${chat.senderId === user?._id ? "self-end bg-blue-700" : "self-start bg-slate-800"}`}>
-                                    {chat.message}
+                    <div className="h-[88%] md:px-32 pt-10 pb-4 overflow-y-auto scroll-smooth" ref={chatScrollRef}>
+                        <div className="h-fit flex flex-col justify-end gap-2">
+                            {
+                                chats?.map(chat => (
+                                    <div key={chat._id} className={`md:max-w-[300px] max-w-[90%] pr-16 py-1 px-2 rounded-lg w-fit text-xl relative ${chat.senderId === user?._id ? "self-end bg-blue-700" : "self-start bg-slate-800"}`}>
+                                        {chat.message}
 
-                                    <div className="flex items-center gap-1 text-sm text-white bottom-1 right-1 absolute">
-                                        <p className="text-[10px] leading-none">
+                                        <div className="flex items-center gap-1 text-sm text-white bottom-1 right-1 absolute">
+                                            <p className="text-[10px] leading-none">
+                                                {
+                                                    formatDate(chat.sentAt)
+                                                }
+                                            </p>
+
                                             {
-                                                formatDate(chat.sentAt)
-                                            }
-                                        </p>
-
-                                        {
-                                            chat.isRead && user?._id === chat.senderId && (
-                                                <IoCheckmarkDone className="text-green-300" />
-                                            )
-                                        }
-
-                                        {
-                                            chat.status === "sending" ? (
-                                                <GoClock className="text-white" />
-                                            )
-                                                : !chat.isRead && user?._id === chat.senderId && (
-                                                    <IoMdCheckmark className="text-white" />
+                                                chat.isRead && user?._id === chat.senderId && (
+                                                    <IoCheckmarkDone className="text-green-300" />
                                                 )
-                                        }
+                                            }
+
+                                            {
+                                                chat.status === "sending" ? (
+                                                    <GoClock className="text-white" />
+                                                )
+                                                    : !chat.isRead && user?._id === chat.senderId && (
+                                                        <IoMdCheckmark className="text-white" />
+                                                    )
+                                            }
+                                        </div>
+
+
                                     </div>
-
-
-                                </div>
-                            ))
-                        }
+                                ))
+                            }
+                        </div>
                     </div>
                 )
             }

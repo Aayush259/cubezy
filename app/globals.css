@@ -2,6 +2,18 @@
 @tailwind components;
 @tailwind utilities;
 
+::-webkit-scrollbar {
+    @apply w-1;
+}
+  
+::-webkit-scrollbar-track {
+    @apply shadow bg-slate-800;
+}
+
+::-webkit-scrollbar-thumb {
+    @apply bg-slate-700 hover:bg-black transition-all duration-200;
+}
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
