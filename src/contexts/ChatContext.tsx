@@ -77,6 +77,49 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
         }
     };
 
+    const sendMessage = (message: string) => {
+        if (!message) return;
+
+        if (socket && chatId) {
+            const tempId = uuidv4();
+            const tempMessage: IChatMessage = {
+                _id: tempId,
+                senderId: user?._id as string,
+                message,
+                sentAt: new Date(),
+                isRead: false,
+                status: "sending",
+            };
+
+            setChats(prevChats => prevChats ? [...prevChats, tempMessage] : [tempMessage]);
+
+            socket.emit("sendMessage", {
+                senderId: user?._id,
+                receiverId,
+                message
+            }, (response: any) => {
+                setChats(prevChats => {
+                    const updatedChats = prevChats?.map(chat => chat._id === tempId ? { ...chat, _id: response._id, sentAt: response.sentAt, status: "sent" } as IChatMessage : chat) || null;
+
+                    return updatedChats;
+                });
+            })
+        } else {
+            // Todo: Handle the case where the socket or chatId is not available.
+            console.error("Socket or chatId is not available.");
+        }
+    };
+
+    const markAsRead = async (messageIds?: string[]) => {
+
+        if (socket && chatId) {
+            socket.emit("markAsRead", {
+                chatId: chatId,
+                messageIds: messageIds ? messageIds : chats?.map((chat) => chat._id),
+            });
+        }
+    };
+
     useEffect(() => {
         if (chatId) {
             setChats(null);
@@ -108,11 +151,7 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
         });
 
         newSocket.on("messageRead", ({ chatId, messageIds }) => {
-            setChats(prevChats => prevChats?.map(chat => messageIds.includes(chat._id) ? { ...chat, isReadTrue: true, status: "sent" } : chat) || null);
-        })
-
-        newSocket.on("messageSent", (messageDetails) => {
-
+            setChats(prevChats => prevChats?.map(chat => messageIds?.includes(chat._id) ? { ...chat, isRead: true, status: "sent" } : chat) || null);
         });
 
         setSocket(newSocket);
@@ -123,44 +162,15 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
         };
     }, []);
 
-    const sendMessage = (message: string) => {
-        if (!message) return;
-
+    useEffect(() => {
         if (socket && chatId) {
-            const tempId = uuidv4();
-            const tempMessage: IChatMessage = {
-                _id: tempId,
-                senderId: user?._id as string,
-                message,
-                sentAt: new Date(),
-                isRead: false,
-                status: "sending",
-            };
-
-            setChats(prevChats => prevChats ? [...prevChats, tempMessage] : [tempMessage]);
-
-            socket.emit("sendMessage", {
-                senderId: user?._id,
-                receiverId,
-                message
-            }, (response: any) => {
-                setChats(prevChats => prevChats?.map(chat => chat._id === tempId ? { ...chat, _id: response._id, sentAt: response.sentAt, status: "sent" } : chat) || null);
-            })
-        } else {
-            // Todo: Handle the case where the socket or chatId is not available.
-            console.error("Socket or chatId is not available.");
+            const messageIds = chats?.filter(chat => chat.isRead === false && chat.senderId !== user?._id)
+            .map(chat => chat._id);
+            if (messageIds && messageIds?.length > 0) {
+                markAsRead(messageIds);
+            }
         }
-    };
-
-    const markAsRead = async (messageIds?: string[]) => {
-
-        if (socket && chatId) {
-            socket.emit("markAsRead", {
-                chatId: chatId,
-                messageIds: messageIds ? messageIds : chats?.map((chat) => chat._id),
-            })
-        }
-    };
+    }, [chats]);
 
     return (
         <ChatContext.Provider value={{ receiverId, setReceiverId, chats, loadingChats, sendMessage }}>
