@@ -11,13 +11,13 @@ const SOCKET_PATH = "/api/socket/connect"
 const ChatContext = createContext<{
     receiverId: string | null;
     setReceiverId: (id: string) => void;
-    chats: IChatMessage[] | null;
+    chats: IChatMessage[];
     loadingChats: boolean;
     sendMessage: (message: string) => void;
 }>({
     receiverId: null,
     setReceiverId: (id: string) => { },
-    chats: null,
+    chats: [],
     loadingChats: false,
     sendMessage: (message: string) => { },
 })
@@ -33,7 +33,7 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
 
     const [loadingChats, setLoadingChats] = useState<boolean>(false);
 
-    const [chats, setChats] = useState<IChatMessage[] | null>(null);
+    const [chats, setChats] = useState<IChatMessage[]>([]);
 
     const chatId = useMemo(() => {
         if (user?._id && receiverId) {
@@ -117,12 +117,23 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
                 chatId: chatId,
                 messageIds: messageIds ? messageIds : chats?.map((chat) => chat._id),
             });
+
+            setChats(prevChats => {
+                const updatedChats = prevChats?.map(chat => {
+                    if (messageIds && messageIds.includes(chat._id)) {
+                        return { ...chat, isRead: true };
+                    }
+                    return chat;
+                });
+                return updatedChats;
+            });
         }
     };
 
     useEffect(() => {
         if (chatId) {
-            setChats(null);
+            console.log("Chat Id use effect");
+            setChats([]);
             getMessages(chatId);
 
             // Mark all messages as read when the user opens the chat.
@@ -164,7 +175,7 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
 
     useEffect(() => {
         if (socket && chatId) {
-            const messageIds = chats?.filter(chat => chat.isRead === false && chat.senderId !== user?._id)
+            const messageIds = chats.filter(chat => chat.isRead === false && chat.senderId !== user?._id)
             .map(chat => chat._id);
             if (messageIds && messageIds?.length > 0) {
                 markAsRead(messageIds);
