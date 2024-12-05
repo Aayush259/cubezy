@@ -1,11 +1,11 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "../store/store";
 import { IoIosArrowForward } from "react-icons/io";
 import { useIdBarContext } from "../contexts/IdBarContext";
 import { useChatContext } from "../contexts/ChatContext";
-import { formatDate } from "../funcs/funcs";
+import { formatDate, getRandomEmoji } from "../funcs/funcs";
 
 export default function Sidebar() {
 
@@ -15,6 +15,8 @@ export default function Sidebar() {
     const { receiverId, setReceiverId, lastMessages } = useChatContext();
 
     const [greeting, setGreeting] = useState<string>("");   // Greeting message based on the current time.
+
+    const randomEmoji = useMemo(() => getRandomEmoji(), []);
 
     useEffect(() => {
         // Function to update the greeting based on the current time.
@@ -39,22 +41,11 @@ export default function Sidebar() {
         return () => clearInterval(intervalId);
     }, []);
 
-    // Function to generate a random emoji.
-    const getRandomEmoji = () => {
-        const emojis = [
-            "😃", "😄", "😘", "🤓", "😉", "🤗", "🥳", "🙃", "😊", "😎", "🤠", "😁"
-        ];
-
-        const randomIndex = Math.floor(Math.random() * emojis.length);
-
-        return emojis[randomIndex];
-    }
-
     return (
         <div className="py-4 h-full w-full max-w-[450px] border-r-2 border-gray-800">
 
-            <p className="px-4 pb-4 font-semibold text-2xl h-14 flex items-center border-b-2 border-gray-800">
-                {greeting}{", "}{user?.name.split(" ")[0]}{" "}{getRandomEmoji()}
+            <p className="px-4 pt-4 pb-8 font-semibold text-2xl flex items-center border-b-2 border-gray-800">
+                {greeting}{", "}{user?.name.split(" ")[0]}{" "}{randomEmoji}
             </p>
 
             <div className="h-full pb-28 overflow-y-auto">
