@@ -54,8 +54,11 @@ export default async function addConnection(req: NextApiRequest, res: NextApiRes
             return res.status(200).json({ message: "User is already in your connections.", connections: user.connections });
         }
 
+        const chatId = user._id as string < idToAdd ? `${user._id}_${idToAdd}` : `${idToAdd}_${user._id}`;
+
         // Add user to connections.
         user.connections.push({
+            chatId: chatId,
             _id: userToAdd._id as mongoose.Types.ObjectId,
             name: userToAdd.name,
         });
