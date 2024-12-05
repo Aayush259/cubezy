@@ -7,6 +7,7 @@ import { IoCheckmarkDone } from "react-icons/io5";
 import { IoMdCheckmark } from "react-icons/io";
 import { GoClock } from "react-icons/go";
 import { useEffect, useRef, useState } from "react";
+import { formatDate } from "../funcs/funcs";
 
 const ChatWindow: React.FC = () => {
 
@@ -38,24 +39,6 @@ const ChatWindow: React.FC = () => {
         </div>
     );
 
-    const formatDate = (date: Date) => {
-        date = new Date(date);
-
-        // Get hours and minutes.
-        let hours = date.getHours();
-        const minutes = date.getMinutes().toString().padStart(2, "0");
-
-        // Determine AM or PM.
-        const period = hours >= 12 ? "PM" : "AM";
-
-        // Convert to 12-hour format.
-        hours = hours % 12;
-        // Adjust for 0 hour (midnight case).
-        hours = hours === 0 ? 12 : hours;
-
-        return `${hours}:${minutes} ${period}`;
-    };
-
     return (
         <div className="w-full h-full z-20 relative">
             <button className="w-fit py-[1.3rem] px-8 text-xl text-right absolute top-0 right-0 hover:bg-slate-800 duration-300 rounded-bl-2xl">
@@ -66,14 +49,14 @@ const ChatWindow: React.FC = () => {
                 loadingChats ? (
                     <>Loading...</>
                 ) : (
-                    <div className="h-[88%] md:px-32 pt-10 pb-4 overflow-y-auto scroll-smooth" ref={chatScrollRef}>
-                        <div className="h-fit flex flex-col justify-end gap-2">
+                    <div className="h-[88%] md:px-32 pt-10 pb-4 overflow-y-auto scroll-smooth grid [place-items:end]" ref={chatScrollRef}>
+                        <div className="h-fit flex flex-col justify-end gap-1 w-full">
                             {
                                 chats?.map(chat => (
-                                    <div key={chat._id} className={`md:max-w-[300px] max-w-[90%] pr-20 py-1 px-2 rounded-lg w-fit text-xl relative ${chat.senderId === user?._id ? "self-end bg-blue-700" : "self-start bg-slate-800"}`}>
+                                    <div key={chat._id} className={`flex items-end md:max-w-[350px] max-w-[90%] py-1 px-2 rounded-lg w-fit text-xl relative ${chat.senderId === user?._id ? "self-end bg-blue-700" : "self-start bg-slate-800"}`}>
                                         {chat.message}
 
-                                        <div className="flex items-center gap-1 text-sm text-white bottom-1 right-1 absolute">
+                                        <div className="flex items-center justify-end gap-1 text-sm text-white whitespace-nowrap pl-4">
                                             <p className="text-[10px] leading-none">
                                                 {
                                                     formatDate(chat.sentAt)
@@ -117,7 +100,7 @@ const ChatWindow: React.FC = () => {
 
                 <button
                     type="submit"
-                    className={`p-2 w-fit bg-orange-700 rounded-full block duration-300 hover:opacity-70`}
+                    className={`p-2 w-fit bg-blue-700 rounded-full block duration-300 hover:opacity-70`}
                 >
                     <IoSend size={24} />
                 </button>
