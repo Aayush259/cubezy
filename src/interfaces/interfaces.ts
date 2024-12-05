@@ -21,3 +21,8 @@ export interface IChatMessage {
     isRead: boolean;
     status?: "sending" | "sent";
 }
+
+export interface ILastMessage {
+    chatId: string;
+    lastMessage: IChatMessage;
+}
