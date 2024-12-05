@@ -4,7 +4,7 @@ import { RootState } from "../store/store";
 import { io, Socket } from "socket.io-client";
 import { updateConnections } from "../store/userSlice";
 import { v4 as uuidv4 } from "uuid";
-import { IChatMessage } from "../interfaces/interfaces";
+import { IChatMessage, ILastMessage } from "../interfaces/interfaces";
 
 const SOCKET_PATH = "/api/socket/connect"
 
@@ -12,11 +12,13 @@ const ChatContext = createContext<{
     receiverId: string | null;
     setReceiverId: (id: string) => void;
     chats: IChatMessage[];
+    lastMessages: ILastMessage[];
     loadingChats: boolean;
     sendMessage: (message: string) => void;
 }>({
     receiverId: null,
     setReceiverId: (id: string) => { },
+    lastMessages: [],
     chats: [],
     loadingChats: false,
     sendMessage: (message: string) => { },
@@ -34,6 +36,10 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
     const [loadingChats, setLoadingChats] = useState<boolean>(false);
 
     const [chats, setChats] = useState<IChatMessage[]>([]);
+
+    const [lastMessages, setLastMessages] = useState<ILastMessage[]>([]);
+    const [loadingLastMessages, setLoadingLastMessages] = useState<boolean>(false);
+    const [error, setError] = useState<string | null>(null);
 
     const chatId = useMemo(() => {
         if (user?._id && receiverId) {
@@ -103,6 +109,30 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
 
                     return updatedChats;
                 });
+
+                setLastMessages(prevMessages => {
+                    const existingIndex = prevMessages.findIndex(pmessage => pmessage.chatId === chatId);
+                    const newLastMessage = {
+                        chatId,
+                        lastMessage: {
+                            _id: response._id,
+                            senderId: user?._id as string,
+                            message: message,
+                            sentAt: response.sentAt,
+                            isRead: false,
+                        },
+                    };
+                
+                    if (existingIndex !== -1) {
+                        // Update existing entry
+                        return prevMessages.map((msg, idx) =>
+                            idx === existingIndex ? newLastMessage : msg
+                        );
+                    } else {
+                        // Add new entry if it doesn't exist
+                        return [...prevMessages, newLastMessage];
+                    }
+                });
             })
         } else {
             // Todo: Handle the case where the socket or chatId is not available.
@@ -127,12 +157,27 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
                 });
                 return updatedChats;
             });
+
+            setLastMessages(prevLastMessages => {
+                const updatedLastMessages = prevLastMessages.map(lastMessage => {
+                    if (lastMessage.chatId === chatId) {
+                        return {
+                            ...lastMessage,
+                            lastMessage: {
+                                ...lastMessage.lastMessage,
+                                isRead: true
+                            }
+                        };
+                    }
+                    return lastMessage;
+                });
+                return updatedLastMessages;
+            });
         }
     };
 
     useEffect(() => {
         if (chatId) {
-            console.log("Chat Id use effect");
             setChats([]);
             getMessages(chatId);
 
@@ -141,6 +186,38 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
         }
     }, [chatId]);
 
+    const fetchLastMessages = async () => {
+        setLoadingLastMessages(true);
+        const token = localStorage.getItem("token");
+
+        if (!token) {
+            console.log("No token found");
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/messages/getLastMessages', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            const data = await response.json();
+            console.log("Fetched last messages:", data.lastMessages);
+            setLastMessages(data.lastMessages);
+        } catch (error) {
+            setError("Error fetching last messages");
+        } finally {
+            setLoadingLastMessages(false);
+        }
+    }
+
+    useEffect(() => {
+        fetchLastMessages();
+    }, []);
+
     useEffect(() => {
         // Connect to the backend Socket.IO server.
         const newSocket = io("http://localhost:3000", {
@@ -148,21 +225,6 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
             auth: {
                 token: localStorage.getItem("token"),
             }
-        });
-
-        newSocket.on("connectionUpdated", (newConnection) => {
-            if (user?.connections) {
-                const updatedConnectionsArray = [...user?.connections, newConnection];
-                dispatch(updateConnections(updatedConnectionsArray));
-            }
-        });
-
-        newSocket.on("receiveMessage", (messageDetails) => {
-            setChats(prevChats => prevChats ? [...prevChats, messageDetails] : [messageDetails]);
-        });
-
-        newSocket.on("messageRead", ({ chatId, messageIds }) => {
-            setChats(prevChats => prevChats?.map(chat => messageIds?.includes(chat._id) ? { ...chat, isRead: true, status: "sent" } : chat) || null);
         });
 
         setSocket(newSocket);
@@ -174,9 +236,45 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
     }, []);
 
     useEffect(() => {
+        if (socket) {
+            socket.on("connectionUpdated", (newConnection) => {
+                if (user?.connections) {
+                    const updatedConnectionsArray = [...user?.connections, newConnection];
+                    dispatch(updateConnections(updatedConnectionsArray));
+                }
+            });
+
+            socket.on("receiveMessage", (messageDetails) => {
+                const senderId = messageDetails.senderId;
+                if (senderId === receiverId) {
+                    setChats(prevChats => prevChats ? [...prevChats, messageDetails] : [messageDetails]);
+                }
+
+                const nChatId = user?._id as string < messageDetails.senderId ? `${user?._id}_${messageDetails.senderId}` : `${messageDetails.senderId}_${user?._id}`;
+                setLastMessages(prevLastMessages => {
+                    const updatedLastMessages = prevLastMessages?.map(lastMessage => {
+                        if (lastMessage.chatId === nChatId) {
+                            return {
+                                ...lastMessage,
+                                lastMessage: messageDetails,
+                            };
+                        }
+                        return lastMessage;
+                    });
+                    return updatedLastMessages;
+                });
+            });
+
+            socket.on("messageRead", ({ chatId, messageIds }) => {
+                setChats(prevChats => prevChats?.map(chat => messageIds?.includes(chat._id) ? { ...chat, isRead: true, status: "sent" } : chat) || null);
+            });
+        }
+    }, [chatId, socket, receiverId]);
+
+    useEffect(() => {
         if (socket && chatId) {
             const messageIds = chats.filter(chat => chat.isRead === false && chat.senderId !== user?._id)
-            .map(chat => chat._id);
+                .map(chat => chat._id);
             if (messageIds && messageIds?.length > 0) {
                 markAsRead(messageIds);
             }
@@ -184,8 +282,10 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
     }, [chats]);
 
     return (
-        <ChatContext.Provider value={{ receiverId, setReceiverId, chats, loadingChats, sendMessage }}>
-            {children}
+        <ChatContext.Provider value={{ receiverId, setReceiverId, lastMessages, chats, loadingChats, sendMessage }}>
+            {
+                loadingLastMessages ? <p>LOading...</p> : children
+            }
         </ChatContext.Provider>
     )
 }
