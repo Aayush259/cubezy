@@ -33,12 +33,12 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
 
     const [socket, setSocket] = useState<Socket | null>(null);
 
-    const [loadingChats, setLoadingChats] = useState<boolean>(false);
+    const [loadingChats, setLoadingChats] = useState<boolean>(true);
 
     const [chats, setChats] = useState<IChatMessage[]>([]);
 
     const [lastMessages, setLastMessages] = useState<ILastMessage[]>([]);
-    const [loadingLastMessages, setLoadingLastMessages] = useState<boolean>(false);
+    const [loadingLastMessages, setLoadingLastMessages] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
 
     const chatId = useMemo(() => {
