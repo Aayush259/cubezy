@@ -16,3 +16,14 @@ export const formatDate = (date: Date) => {
 
     return `${hours}:${minutes} ${period}`;
 };
+
+// Function to generate a random emoji.
+export const getRandomEmoji = () => {
+    const emojis = [
+        "😃", "😄", "😘", "🤓", "😉", "🤗", "🥳", "🙃", "😊", "😎", "🤠", "😁"
+    ];
+
+    const randomIndex = Math.floor(Math.random() * emojis.length);
+
+    return emojis[randomIndex];
+};
