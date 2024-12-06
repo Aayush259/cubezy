@@ -17,6 +17,16 @@ export const formatDate = (date: Date) => {
     return `${hours}:${minutes} ${period}`;
 };
 
+export const formatDate2 = (date: Date) => {
+    date = new Date(date);
+
+    const day = date.getDate();
+    const month = date.toLocaleString('default', { month: 'long' }); // Gets full month name
+    const year = date.getFullYear();
+
+    return `${day} ${month} ${year}`;
+};
+
 // Function to generate a random emoji.
 export const getRandomEmoji = () => {
     const emojis = [
@@ -27,3 +37,8 @@ export const getRandomEmoji = () => {
 
     return emojis[randomIndex];
 };
+
+// Function to copy the user's ID to the clipboard.
+export const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+}
