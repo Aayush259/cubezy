@@ -1,12 +1,40 @@
 import { Server as HTTPServer } from "http";
 import { Server as IOServer, Socket } from "socket.io";
-import { NextApiRequest } from "next";
+import { NextApiRequest, NextApiResponse } from "next";
 import { Socket as NetSocket } from "net";
 import jwt from "jsonwebtoken";
-import connectMongoDb from "@/src/lib/mongodb";
+import cloudinary from "cloudinary";
+import multer from "multer";
+import { Readable } from "stream";
+import mongoose, { connection } from "mongoose";
 import User from "@/src/models/User";
+import connectMongoDb from "@/src/lib/mongodb";
 import createMessageModel from "@/src/models/Chat";
-import mongoose from "mongoose";
+
+const cloudName = process.env.CLOUD_NAME;
+const apiKey = process.env.API_KEY;
+const apiSecret = process.env.API_SECRET;
+
+cloudinary.v2.config({
+    cloud_name: cloudName,
+    api_key: apiKey,
+    api_secret: apiSecret,
+    secure: true
+});
+
+const runMiddleware = (req: NextApiRequest, res: NextApiResponse, fn: any) => (
+    new Promise((resolve, reject) => {
+        fn(req, res, (result: any) => {
+            if (result instanceof Error) {
+                return reject(result);
+            }
+            return resolve(result);
+        });
+    }));
+
+// Set up multer with memory storage.
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
 
 interface CustomSocket extends Socket {
     data: {
@@ -14,10 +42,12 @@ interface CustomSocket extends Socket {
             _id: string;
             email: string;
             name: string;
+            dp: string | null;
             connections: {
                 chatId: string;
                 _id: string;
                 name: string;
+                dp: string | null;
             }[];
         };
     };
@@ -67,6 +97,7 @@ export default async function handler(_: NextApiRequest, res: ExtendedNextApiRes
                     _id: user._id,
                     email: user.email,
                     name: user.name,
+                    dp: user.dp,
                     connections: user.connections,
                 };
 
@@ -81,6 +112,83 @@ export default async function handler(_: NextApiRequest, res: ExtendedNextApiRes
         io.on("connection", (socket: CustomSocket) => {
             console.log(socket.data);
             console.log("User connected:", socket.data.user.name);
+
+            socket.on("setProfilePicture", async ({ file }: { file: Buffer }, callback) => {
+                try {
+                    // Validate the file.
+                    if (!file) {
+                        return callback({ success: false, message: "No file provided" });
+                    }
+
+                    await connectMongoDb();
+
+                    const user = await User.findById(socket.data.user._id);
+
+                    if (!user) {
+                        return callback({ success: false, message: "User not found" });
+                    }
+
+                    // Convert the file buffer to a Readable stream.
+                    const stream = Readable.from(file);
+
+                    // Upload image to cloudinary.
+                    const uploadStream = cloudinary.v2.uploader.upload_stream(
+                        { folder: "Square" },
+                        async (error, result) => {
+                            if (error) {
+                                console.log("Cloudinary upload error:", error);
+                                return callback({ success: false, message: "Cloudinary upload error" });
+                            }
+
+                            // Update user's profile picture in the database.
+                            user.dp = result?.secure_url || null;
+                            await user.save();
+
+                            // Update user data in socket.
+                            socket.data.user.dp = user.dp;
+
+                            // Notify the user.
+                            callback({ success: true, message: "Profile picture updated successfully", dp: user.dp });
+
+                            // Update the user's profile picture in all receiver's connections.
+                            for (const connection of user.connections) {
+                                // Get the receiver.
+                                const receiver = await User.findById(connection._id);
+
+                                if (receiver) {
+                                    // Update the profile picture in the receiver's connections array.
+                                    const connectionToUpdate = receiver.connections.find(
+                                        conn => conn._id.toString() === socket.data.user._id.toString()
+                                    );
+
+                                    if (connectionToUpdate) {
+                                        connectionToUpdate.dp = user.dp;
+                                        await receiver.save();
+                                    };
+
+                                    // Notify the receiver in real time.
+                                    const receiverSocket = Array.from(io.sockets.sockets.values()).find(
+                                        (s) => (s as CustomSocket).data?.user._id.toString() === (receiver._id as string).toString()
+                                    );
+
+                                    if (receiverSocket) {
+                                        (receiverSocket as CustomSocket).emit("profilePictureUpdated", {
+                                            userId: user._id,
+                                            dp: user.dp
+                                        });
+                                    }
+                                }
+                            }
+                        }
+                    );
+
+                    // Pipe the file stream to cloudinary.
+                    stream.pipe(uploadStream);
+                } catch (error) {
+                    console.log("Error setting profile picture:", error);
+                    callback({ success: false, message: "Internal server error" });
+                }
+            });
 
             socket.on("sendMessage", async ({ senderId, receiverId, message }: { senderId: string, receiverId: string, message: string }, callback) => {
                 try {
@@ -108,6 +216,7 @@ export default async function handler(_: NextApiRequest, res: ExtendedNextApiRes
                             chatId: chatId,
                             _id: sender._id as mongoose.Types.ObjectId,
                             name: sender.name,
+                            dp: sender.dp,
                         });
 
                         await receiver.save();
@@ -120,6 +229,7 @@ export default async function handler(_: NextApiRequest, res: ExtendedNextApiRes
                                 chatId: chatId,
                                 _id: sender._id,
                                 name: sender.name,
+                                dp: sender.dp,
                             });
                         }
                     }
@@ -135,6 +245,7 @@ export default async function handler(_: NextApiRequest, res: ExtendedNextApiRes
 
                     // Emit the new message ID and sent the timestamp to the sender.
                     callback({
+                        success: true,
                         _id: newMessage._id,
                         sentAt: newMessage.sentAt,
                     })
@@ -159,6 +270,7 @@ export default async function handler(_: NextApiRequest, res: ExtendedNextApiRes
 
                 } catch (error) {
                     console.log("Error sending message:", error);
+                    callback({ success: false, message: "Internal server error" });
                 }
             });
 
