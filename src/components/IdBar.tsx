@@ -8,6 +8,7 @@ import { MdOutlineContentCopy } from "react-icons/md";
 import { FaRegCircleCheck } from "react-icons/fa6";
 import { updateConnections } from "../store/userSlice";
 import { useIdBarContext } from "../contexts/IdBarContext";
+import { copyToClipboard } from "../funcs/funcs";
 
 const IdBar: React.FC = () => {
 
@@ -36,11 +37,11 @@ const IdBar: React.FC = () => {
                 clearTimeout(intervalId);
             }
         };
-    }, [idCopied])
+    }, [idCopied]);
 
     // Function to copy the user's ID to the clipboard.
     const copyIdToClipboard = () => {
-        navigator.clipboard.writeText(user?._id as string);
+        copyToClipboard(user?._id as string);
         setIdCopied(true);
     }
 
@@ -92,7 +93,7 @@ const IdBar: React.FC = () => {
                 </button>
 
                 <div className="text-2xl text-center my-10 overflow-hidden">
-                    <p>Your Square ID:</p>
+                    <p>Your ID:</p>
                     <div className="w-[80%] mx-auto my-1 flex items-center justify-between">
                         <p className="max-w-[85%] overflow-hidden overflow-ellipsis">{user?._id}</p>
 
@@ -110,14 +111,14 @@ const IdBar: React.FC = () => {
                         type="text"
                         value={idToAdd}
                         placeholder="Enter your chatmate's Square ID"
-                        className={`w-[70%] px-4 py-2 bg-gray-800 border-b-2 border-gray-800 focus:outline-none focus:border-orange-700 rounded-l-lg ${isAdding ? "opacity-50" : "opacity-100"}`}
+                        className={`w-[70%] px-4 py-2 bg-gray-800 border-b-2 border-gray-800 focus:outline-none focus:border-blue-700 rounded-l-lg ${isAdding ? "opacity-50" : "opacity-100"}`}
                         onChange={(e) => setIdToAdd(e.target.value)}
                         readOnly={isAdding}
                     />
 
                     <button
                         type="submit"
-                        className={`px-4 py-2 w-fit bg-orange-700 rounded-r-lg block duration-300 ${isAdding ? "opacity-50" : "opacity-100 hover:opacity-80"} border-b-2 border-orange-700`}
+                        className={`px-4 py-2 w-fit bg-blue-700 rounded-r-lg block duration-300 ${isAdding ? "opacity-50" : "opacity-100 hover:opacity-80"} border-b-2 border-blue-700`}
                         disabled={isAdding}
                     >
                         Add
