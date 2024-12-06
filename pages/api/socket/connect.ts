@@ -1,12 +1,11 @@
 import { Server as HTTPServer } from "http";
 import { Server as IOServer, Socket } from "socket.io";
-import { NextApiRequest, NextApiResponse } from "next";
+import { NextApiRequest } from "next";
 import { Socket as NetSocket } from "net";
 import jwt from "jsonwebtoken";
 import cloudinary from "cloudinary";
-import multer from "multer";
 import { Readable } from "stream";
-import mongoose, { connection } from "mongoose";
+import mongoose from "mongoose";
 import User from "@/src/models/User";
 import connectMongoDb from "@/src/lib/mongodb";
 import createMessageModel from "@/src/models/Chat";
@@ -21,20 +20,6 @@ cloudinary.v2.config({
     api_secret: apiSecret,
     secure: true
 });
-
-const runMiddleware = (req: NextApiRequest, res: NextApiResponse, fn: any) => (
-    new Promise((resolve, reject) => {
-        fn(req, res, (result: any) => {
-            if (result instanceof Error) {
-                return reject(result);
-            }
-            return resolve(result);
-        });
-    }));
-
-// Set up multer with memory storage.
-const storage = multer.memoryStorage();
-const upload = multer({ storage });
 
 interface CustomSocket extends Socket {
     data: {
