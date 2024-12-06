@@ -5,10 +5,12 @@ export interface IUserSlice {
         _id: string;
         name: string;
         email: string;
+        dp: string | null;
         connections: {
             _id: string;
             name: string;
             chatId: string;
+            dp: string | null;
         }[];
     } | null;
 }
@@ -25,4 +27,18 @@ export interface IChatMessage {
 export interface ILastMessage {
     chatId: string;
     lastMessage: IChatMessage;
+}
+
+export interface IProfileInfo {
+    _id: string;
+    name: string;
+    email: string;
+    dp: string | null;
+    connections: {
+        _id: string;
+        name: string;
+        chatId: string;
+        dp: string | null;
+    }[];
+    createdAt: Date;
 }
