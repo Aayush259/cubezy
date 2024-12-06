@@ -104,6 +104,10 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
                 receiverId,
                 message
             }, (response: any) => {
+                if (!response.success) {
+                    // Todo: Handle error
+                    return;
+                }
                 setChats(prevChats => {
                     const updatedChats = prevChats?.map(chat => chat._id === tempId ? { ...chat, _id: response._id, sentAt: response.sentAt, status: "sent" } as IChatMessage : chat) || null;
 
