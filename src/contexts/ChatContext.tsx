@@ -252,16 +252,26 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
 
                 const nChatId = user?._id as string < messageDetails.senderId ? `${user?._id}_${messageDetails.senderId}` : `${messageDetails.senderId}_${user?._id}`;
                 setLastMessages(prevLastMessages => {
-                    const updatedLastMessages = prevLastMessages?.map(lastMessage => {
-                        if (lastMessage.chatId === nChatId) {
-                            return {
-                                ...lastMessage,
+                    // Check if the chat ID already exists in the lastMessages array
+                    const existingIndex = prevLastMessages.findIndex(lastMessage => lastMessage.chatId === nChatId);
+
+                    if (existingIndex !== -1) {
+                        // Update the existing lastMessage for this chat
+                        return prevLastMessages.map((lastMessage, idx) =>
+                            idx === existingIndex
+                                ? { ...lastMessage, lastMessage: messageDetails }
+                                : lastMessage
+                        );
+                    } else {
+                        // Add a new entry for this chat if it doesn't exist
+                        return [
+                            ...prevLastMessages,
+                            {
+                                chatId: nChatId,
                                 lastMessage: messageDetails,
-                            };
-                        }
-                        return lastMessage;
-                    });
-                    return updatedLastMessages;
+                            },
+                        ];
+                    }
                 });
             });
 
