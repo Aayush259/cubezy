@@ -3,9 +3,12 @@ import { useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "../store/store";
 import { IoIosArrowForward } from "react-icons/io";
+import { FaUser } from "react-icons/fa6";
 import { useIdBarContext } from "../contexts/IdBarContext";
 import { useChatContext } from "../contexts/ChatContext";
 import { formatDate, getRandomEmoji } from "../funcs/funcs";
+import { useProfileContext } from "../contexts/ProfileContext";
+import Image from "next/image";
 
 export default function Sidebar() {
 
@@ -13,6 +16,7 @@ export default function Sidebar() {
 
     const { setIdBarOpen } = useIdBarContext();
     const { receiverId, setReceiverId, lastMessages } = useChatContext();
+    const { openProfile, closeProfile } = useProfileContext();
 
     const [greeting, setGreeting] = useState<string>("");   // Greeting message based on the current time.
 
@@ -42,11 +46,32 @@ export default function Sidebar() {
     }, []);
 
     return (
-        <div className="py-4 h-full w-full max-w-[450px] border-r-2 border-gray-800">
+        <div className="pb-4 h-full w-full max-w-[450px] border-r-2 border-gray-800">
 
-            <p className="px-4 pt-4 pb-8 font-semibold text-2xl flex items-center border-b-2 border-gray-800">
-                {greeting}{", "}{user?.name.split(" ")[0]}{" "}{randomEmoji}
-            </p>
+            <div className="h-24 text-2xl flex items-center justify-between border-b-2 border-gray-800 px-4">
+                <p className="font-semibold">
+                    {greeting}{", "}{user?.name.split(" ")[0]}{" "}{randomEmoji}
+                </p>
+
+                <button
+                    className="w-[60px] h-[60px] rounded-full overflow-hidden border-2 border-gray-800 flex items-end"
+                    onClick={() => {
+                        if (user?._id) openProfile(user._id);
+                    }}
+                >
+                    {
+                        user?.dp ? (
+                            <Image
+                                src={user.dp}
+                                alt={user.name}
+                                width={60}
+                                height={60}
+                                className="rounded-full object-cover object-top"
+                            />
+                        ) : <FaUser className="mx-auto h-[75%] w-full text-gray-600" />
+                    }
+                </button>
+            </div>
 
             <div className="h-full pb-28 overflow-y-auto">
                 {
@@ -56,13 +81,30 @@ export default function Sidebar() {
                         return (
                             <button
                                 key={connection._id}
-                                className={`w-full px-6 py-4 flex items-center justify-between hover:bg-gray-900 duration-300 border-b border-gray-800 text-xl ${connection._id === receiverId ? "bg-black" : "bg-transparent"}`}
-                                onClick={() => setReceiverId(connection._id)}
+                                className={`w-full px-6 py-4 flex items-center justify-between hover:bg-gray-900 duration-300 border-b border-gray-800 text-xl ${connection._id === receiverId ? "bg-slate-900" : "bg-transparent"}`}
+                                onClick={() => {
+                                    setReceiverId(connection._id);
+                                    closeProfile();
+                                }}
                             >
                                 <span className="flex items-center gap-4 flex-grow pr-7">
-                                    <span className="flex items-center justify-center h-[50px] w-[50px] bg-blue-700 text-white text-2xl rounded-full overflow-hidden">
-                                        {connection.name[0]}
-                                    </span>
+                                    {
+                                        connection.dp ? (
+                                            <Image
+                                                src={connection.dp}
+                                                alt={connection.name}
+                                                width={50}
+                                                height={50}
+                                                className="rounded-full object-cover object-top"
+                                            />
+                                        ) : (
+                                            <span className="flex items-center justify-center h-[50px] w-[50px] bg-blue-700 text-white text-2xl rounded-full overflow-hidden">
+                                                {connection.name[0]}
+                                            </span>
+                                        )
+                                    }
+
+
                                     <span className="flex flex-col flex-grow justify-between items-start gap-[3px]">
                                         <span className="block">{connection.name}</span>
                                         <span className={`text-sm flex items-center justify-between w-full whitespace-nowrap ${lastMessage && !lastMessage.isRead && lastMessage.senderId !== user._id ? "font-bold" : "opacity-70"}`}>
