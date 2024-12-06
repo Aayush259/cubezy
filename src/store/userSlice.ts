@@ -22,9 +22,13 @@ const userSlice = createSlice({
             const connections = action.payload;
             const updatedUser = { ...state.user, connections } as IUserSlice["user"];
             state.user = updatedUser;
+        },
+        updateUser: (state, action) => {
+            const updatedUser = action.payload;
+            state.user = updatedUser;
         }
     }
 });
 
-export const { login, logout, updateConnections } = userSlice.actions;
+export const { login, logout, updateConnections, updateUser } = userSlice.actions;
 export default userSlice.reducer;
