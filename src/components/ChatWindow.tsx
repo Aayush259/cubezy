@@ -47,6 +47,7 @@ const ChatWindow: React.FC = () => {
             <button className="absolute top-0 left-0 w-full px-6 py-4 flex items-center justify-between hover:bg-gray-900 duration-300 border-b border-gray-800 text-xl" onClick={() => openProfile(receiverId)}>
                 <span className="items-center gap-4 flex">
                     {receiver?.dp ? (
+                        <span className="w-[40px] h-[40px] rounded-full overflow-hidden">
                         <Image
                             src={receiver.dp}
                             alt={receiver.name}
@@ -54,6 +55,7 @@ const ChatWindow: React.FC = () => {
                             height={40}
                             className="rounded-full h-full w-full object-cover object-top"
                         />
+                        </span>
                     ) : (
                         <span className="h-[40px] w-[40px] flex items-center justify-center bg-blue-700 text-white text-xl rounded-full overflow-hidden">
                             {receiver?.name[0]}

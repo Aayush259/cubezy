@@ -71,10 +71,11 @@ const ProfileContextProvider = ({ children }: { children: React.ReactNode }) => 
                 dp: user.dp,
             });
         }
-    }, [user, profileInfo]);
+    }, [user]);
 
     // Function to open the profile.
     const openProfile = (id: string) => {
+        console.log(id);
         setProfileId(id);
         setIsProfileOpen(true);
     };

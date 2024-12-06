@@ -71,16 +71,20 @@ const Profile = () => {
                                                 alt={profileInfo.name}
                                                 width={100}
                                                 height={100}
-                                                className="rounded-full object-cover object-top"
+                                                className="rounded-full h-full w-full object-cover object-top"
                                             />
                                         </label>
-                                    ) : <Image
-                                        src={profileInfo.dp}
-                                        alt={profileInfo.name}
-                                        width={100}
-                                        height={100}
-                                        className="rounded-full object-cover object-top"
-                                    />
+                                    ) : (
+                                        <span className="block w-[100px] h-[100px] rounded-full overflow-hidden">
+                                            <Image
+                                                src={profileInfo.dp}
+                                                alt={profileInfo.name}
+                                                width={100}
+                                                height={100}
+                                                className="rounded-full w-full h-full object-cover object-top"
+                                            />
+                                        </span>
+                                    )
                                 ) : (
                                     <div className={`h-[100px] w-[100px] flex items-center justify-center text-white text-5xl rounded-full overflow-hidden ${user?._id !== profileInfo._id ? "bg-blue-700" : "border-2 border-gray-800"}`}>
                                         {
@@ -118,13 +122,15 @@ const Profile = () => {
                                             profileInfo.connections.map(connection => (
                                                 <div className="flex items-center justify-center flex-col gap-2" key={connection._id}>
                                                     {connection.dp ? (
-                                                        <Image
-                                                            src={connection.dp}
-                                                            alt={connection.name}
-                                                            width={50}
-                                                            height={50}
-                                                            className="rounded-full h-full w-full object-cover object-top"
-                                                        />
+                                                        <span className="block w-[50px] h-[50px] rounded-full overflow-hidden">
+                                                            <Image
+                                                                src={connection.dp}
+                                                                alt={connection.name}
+                                                                width={50}
+                                                                height={50}
+                                                                className="rounded-full h-full w-full object-cover object-top"
+                                                            />
+                                                        </span>
                                                     ) : (
                                                         <div className="h-[50px] w-[50px] flex items-center justify-center bg-blue-700 text-white text-xl rounded-full overflow-hidden">
                                                             {connection.name[0]}

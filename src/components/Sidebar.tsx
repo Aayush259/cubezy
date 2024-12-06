@@ -90,13 +90,15 @@ export default function Sidebar() {
                                 <span className="flex items-center gap-4 flex-grow pr-7">
                                     {
                                         connection.dp ? (
-                                            <Image
-                                                src={connection.dp}
-                                                alt={connection.name}
-                                                width={50}
-                                                height={50}
-                                                className="rounded-full object-cover object-top"
-                                            />
+                                            <span className="w-[50px] h-[50px] rounded-full overflow-hidden">
+                                                <Image
+                                                    src={connection.dp}
+                                                    alt={connection.name}
+                                                    width={50}
+                                                    height={50}
+                                                    className="rounded-full w-full h-full object-cover object-top"
+                                                />
+                                            </span>
                                         ) : (
                                             <span className="flex items-center justify-center h-[50px] w-[50px] bg-blue-700 text-white text-2xl rounded-full overflow-hidden">
                                                 {connection.name[0]}
