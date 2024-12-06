@@ -61,6 +61,7 @@ export default async function addConnection(req: NextApiRequest, res: NextApiRes
             chatId: chatId,
             _id: userToAdd._id as mongoose.Types.ObjectId,
             name: userToAdd.name,
+            dp: userToAdd.dp,
         });
 
         // Save user.
