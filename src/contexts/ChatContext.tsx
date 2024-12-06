@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../store/store";
 import { io, Socket } from "socket.io-client";
-import { updateConnections } from "../store/userSlice";
+import { updateConnections, updateUser } from "../store/userSlice";
 import { v4 as uuidv4 } from "uuid";
 import { IChatMessage, ILastMessage } from "../interfaces/interfaces";
 
@@ -15,6 +15,7 @@ const ChatContext = createContext<{
     lastMessages: ILastMessage[];
     loadingChats: boolean;
     sendMessage: (message: string) => void;
+    addDp: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }>({
     receiverId: null,
     setReceiverId: (id: string) => { },
@@ -22,24 +23,23 @@ const ChatContext = createContext<{
     chats: [],
     loadingChats: false,
     sendMessage: (message: string) => { },
+    addDp: (event: React.ChangeEvent<HTMLInputElement>) => { },
 })
 
 const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
 
     const dispatch = useDispatch();
 
+    // User state from store.
     const { user } = useSelector((state: RootState) => state.user);
-    const [receiverId, setReceiverId] = useState<string | null>(null);
 
-    const [socket, setSocket] = useState<Socket | null>(null);
-
-    const [loadingChats, setLoadingChats] = useState<boolean>(true);
-
-    const [chats, setChats] = useState<IChatMessage[]>([]);
-
-    const [lastMessages, setLastMessages] = useState<ILastMessage[]>([]);
-    const [loadingLastMessages, setLoadingLastMessages] = useState<boolean>(true);
-    const [error, setError] = useState<string | null>(null);
+    const [receiverId, setReceiverId] = useState<string | null>(null);      // Receiver ID.
+    const [socket, setSocket] = useState<Socket | null>(null);      // Socket.
+    const [loadingChats, setLoadingChats] = useState<boolean>(true);    // Loading chats state.
+    const [chats, setChats] = useState<IChatMessage[]>([]);     // Chats state.
+    const [lastMessages, setLastMessages] = useState<ILastMessage[]>([]);       // Last messages state.
+    const [loadingLastMessages, setLoadingLastMessages] = useState<boolean>(true);      // Loading last messages state.
+    const [error, setError] = useState<string | null>(null);    // Error state.
 
     const chatId = useMemo(() => {
         if (user?._id && receiverId) {
@@ -49,11 +49,14 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
         }
     }, [user?._id, receiverId]);
 
+    // Function to get messages.
     const getMessages = async (chatId: string) => {
 
+        // Set loading state to true and get the token.
         setLoadingChats(true);
         const token = localStorage.getItem("token");
 
+        // Check if token exists.
         if (!token) {
             console.log("No token found");
             return
@@ -83,11 +86,16 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
         }
     };
 
+    // Function to send a message.
     const sendMessage = (message: string) => {
+        // Check if message is empty.
         if (!message) return;
 
         if (socket && chatId) {
+            // Create a temporary message id.
             const tempId = uuidv4();
+
+            // Create a temporary message.
             const tempMessage: IChatMessage = {
                 _id: tempId,
                 senderId: user?._id as string,
@@ -97,23 +105,29 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
                 status: "sending",
             };
 
+            // Add the temporary message to the chats state.
             setChats(prevChats => prevChats ? [...prevChats, tempMessage] : [tempMessage]);
 
+            // Emit the message to the server.
             socket.emit("sendMessage", {
                 senderId: user?._id,
                 receiverId,
                 message
             }, (response: any) => {
+                // Check if the response is successful.
                 if (!response.success) {
                     // Todo: Handle error
                     return;
                 }
+
+                // Update the temporary message with the response.
                 setChats(prevChats => {
                     const updatedChats = prevChats?.map(chat => chat._id === tempId ? { ...chat, _id: response._id, sentAt: response.sentAt, status: "sent" } as IChatMessage : chat) || null;
 
                     return updatedChats;
                 });
 
+                // Update the last message in the last messages state.
                 setLastMessages(prevMessages => {
                     const existingIndex = prevMessages.findIndex(pmessage => pmessage.chatId === chatId);
                     const newLastMessage = {
@@ -126,7 +140,7 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
                             isRead: false,
                         },
                     };
-                
+
                     if (existingIndex !== -1) {
                         // Update existing entry
                         return prevMessages.map((msg, idx) =>
@@ -144,14 +158,17 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
         }
     };
 
+    // Function to mark a message as read.
     const markAsRead = async (messageIds?: string[]) => {
 
         if (socket && chatId) {
+            // Emit the messageIds to the server to mark it as read.
             socket.emit("markAsRead", {
                 chatId: chatId,
                 messageIds: messageIds ? messageIds : chats?.map((chat) => chat._id),
             });
 
+            // Update the chats state to mark the messages as read.
             setChats(prevChats => {
                 const updatedChats = prevChats?.map(chat => {
                     if (messageIds && messageIds.includes(chat._id)) {
@@ -162,6 +179,7 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
                 return updatedChats;
             });
 
+            // Update the last messages state to mark the last message as read.
             setLastMessages(prevLastMessages => {
                 const updatedLastMessages = prevLastMessages.map(lastMessage => {
                     if (lastMessage.chatId === chatId) {
@@ -180,6 +198,41 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
         }
     };
 
+    // Function to add DP.
+    const addDp = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        if (!socket || !user) return;
+
+        // Get the selected file from the input element.
+        const input = event.target;
+        if (!input.files || input.files.length === 0) {
+            console.error("No file selected");
+            return;
+        }
+
+        const dp = input.files[0];
+
+        // Check if the file is an image.
+        if (dp && dp.type.startsWith('image/')) {
+            console.log('File accepted:', dp);
+        } else {
+            // Todo: Handle error.
+            console.log("Invalid file type");
+        };
+
+        // Convert the file to a buffer.
+        const buffer = await dp.arrayBuffer();
+
+        // Emit the buffer to the server.
+        socket.emit("setProfilePicture", { file: buffer }, (response: any) => {
+            if (response.success) {
+                console.log("Dp Updated", response.dp);
+                dispatch(updateUser({ ...user, dp: response.dp }));
+            } else {
+                console.log("Error updating dp", response);
+            }
+        })
+    };
+
     useEffect(() => {
         if (chatId) {
             setChats([]);
@@ -190,7 +243,9 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
         }
     }, [chatId]);
 
+    // Function to fetch the last messages.
     const fetchLastMessages = async () => {
+        // Set loading state to true and get the token.
         setLoadingLastMessages(true);
         const token = localStorage.getItem("token");
 
@@ -200,6 +255,7 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
         }
 
         try {
+            // Fetch the last messages from the server.
             const response = await fetch('/api/messages/getLastMessages', {
                 method: 'GET',
                 headers: {
@@ -216,7 +272,7 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
         } finally {
             setLoadingLastMessages(false);
         }
-    }
+    };
 
     useEffect(() => {
         fetchLastMessages();
@@ -241,6 +297,7 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
 
     useEffect(() => {
         if (socket) {
+            // Listen for the "connectionUpdated" event from the server.
             socket.on("connectionUpdated", (newConnection) => {
                 if (user?.connections) {
                     const updatedConnectionsArray = [...user?.connections, newConnection];
@@ -248,6 +305,7 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
                 }
             });
 
+            // Listen for the "receiveMessage" event from the server.
             socket.on("receiveMessage", (messageDetails) => {
                 const senderId = messageDetails.senderId;
                 if (senderId === receiverId) {
@@ -279,8 +337,16 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
                 });
             });
 
+            // Listen for the "messageRead" event from the server.
             socket.on("messageRead", ({ chatId, messageIds }) => {
                 setChats(prevChats => prevChats?.map(chat => messageIds?.includes(chat._id) ? { ...chat, isRead: true, status: "sent" } : chat) || null);
+            });
+
+            // Listen for the "profilePictureUpdated" event from the server.
+            socket.on("profilePictureUpdated", ({ userId, dp }) => {
+                const updatedConnections = user?.connections?.map(connection => (connection._id === userId ? { ...connection, dp } : connection));
+
+                dispatch(updateUser({ ...user, connections: updatedConnections }));
             });
         }
     }, [chatId, socket, receiverId]);
@@ -296,7 +362,7 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
     }, [chats]);
 
     return (
-        <ChatContext.Provider value={{ receiverId, setReceiverId, lastMessages, chats, loadingChats, sendMessage }}>
+        <ChatContext.Provider value={{ receiverId, setReceiverId, lastMessages, chats, loadingChats, sendMessage, addDp }}>
             {
                 loadingLastMessages ? <p>LOading...</p> : children
             }
