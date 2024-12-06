@@ -10,7 +10,7 @@ const SOCKET_PATH = "/api/socket/connect"
 
 const ChatContext = createContext<{
     receiverId: string | null;
-    setReceiverId: (id: string) => void;
+    setReceiverId: (id: string | null) => void;
     chats: IChatMessage[];
     lastMessages: ILastMessage[];
     loadingChats: boolean;
@@ -18,7 +18,7 @@ const ChatContext = createContext<{
     addDp: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }>({
     receiverId: null,
-    setReceiverId: (id: string) => { },
+    setReceiverId: (id: string | null) => { },
     lastMessages: [],
     chats: [],
     loadingChats: false,

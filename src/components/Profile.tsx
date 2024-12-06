@@ -46,8 +46,8 @@ const Profile = () => {
     };
 
     return (
-        <div className={`py-8 h-full w-full absolute top-0 left-0 duration-300 z-[100] overflow-hidden bg-[#0A0A0A] ${isProfileOpen ? "translate-x-0" : "translate-x-full"}`}>
-            <button className="absolute top-4 right-4 hover:opacity-80 duration-300" onClick={() => setIsProfileOpen(false)}>
+        <div className={`py-8 h-full w-full fixed lg:absolute top-0 left-0 duration-300 z-[100] overflow-hidden bg-[#0A0A0A] ${isProfileOpen ? "translate-x-0" : "translate-x-full"}`}>
+            <button className="absolute top-4 right-4 lg:hover:opacity-80 duration-300" onClick={() => setIsProfileOpen(false)}>
                 <IoClose size={30} className="text-white" />
             </button>
             {
@@ -57,7 +57,7 @@ const Profile = () => {
                             {
                                 profileInfo.dp ? (
                                     user?._id === profileInfo._id ? (
-                                        <label htmlFor="addDp" className="cursor-pointer h-[100px] w-[100px] flex items-center justify-center hover:opacity-40 duration-200">
+                                        <label htmlFor="addDp" className="cursor-pointer h-[100px] w-[100px] flex items-center justify-center lg:hover:opacity-40 duration-200">
                                             <input
                                                 type="file"
                                                 name="addDp"
@@ -89,7 +89,7 @@ const Profile = () => {
                                     <div className={`h-[100px] w-[100px] flex items-center justify-center text-white text-5xl rounded-full overflow-hidden ${user?._id !== profileInfo._id ? "bg-blue-700" : "border-2 border-gray-800"}`}>
                                         {
                                             user?._id === profileInfo._id ? (
-                                                <label htmlFor="addDp" className="cursor-pointer h-full w-full flex items-center justify-center hover:opacity-40 duration-200">
+                                                <label htmlFor="addDp" className="cursor-pointer h-full w-full flex items-center justify-center lg:hover:opacity-40 duration-200">
                                                     <input
                                                         type="file"
                                                         name="addDp"
@@ -148,7 +148,7 @@ const Profile = () => {
                             <div className="w-full flex items-center justify-between gap-4 px-4 md:px-8">
                                 {profileInfo._id}
                                 <button className="w-fit" onClick={copyIdToClipboard}>
-                                    {idCopied ? <FaRegCircleCheck size={20} /> : <MdOutlineContentCopy size={20} className="hover:opacity-80 duration-300" />}
+                                    {idCopied ? <FaRegCircleCheck size={20} /> : <MdOutlineContentCopy size={20} className="lg:hover:opacity-80 duration-300" />}
                                 </button>
                             </div>
 
