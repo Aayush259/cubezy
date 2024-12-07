@@ -43,41 +43,41 @@ const ChatWindow: React.FC = () => {
     );
 
     return (
-        <div className={`w-screen h-screen lg:w-full lg:h-full z-20 fixed top-0 left-0 lg:relative bg-[#0A0A0A] lg:bg-none`}>
-            <div className="absolute top-0 left-0 w-full lg:px-6 lg:py-4 flex items-center justify-between lg:hover:bg-gray-900 duration-300 border-b border-gray-800 text-xl">
-                <button
-                    className="lg:hidden rounded-full outline-none mx-4"
-                    onClick={() => setReceiverId(null)}
-                >
-                    <IoIosArrowBack size={24} />
-                </button>
+        <div className={`w-screen h-screen lg:w-full z-20 fixed top-0 left-0 lg:relative bg-[#0A0A0A] lg:bg-none`}>
+            <div className="h-[85%] w-full overflow-y-auto scroll-smooth flex flex-col" ref={chatScrollRef}>
+                <div className="sticky top-0 left-0 z-10 w-full lg:px-6 lg:py-4 flex items-center justify-between bg-[#0A0A0A] lg:hover:bg-gray-900 duration-300 border-b border-gray-800 text-xl">
+                    <button
+                        className="lg:hidden rounded-full outline-none mx-4"
+                        onClick={() => setReceiverId(null)}
+                    >
+                        <IoIosArrowBack size={24} />
+                    </button>
 
-                <button className="items-center py-4 px-6 lg:px-0 lg:py-0 gap-4 flex-grow flex flex-row-reverse lg:flex-row" onClick={() => openProfile(receiverId)}>
-                    {receiver?.dp ? (
-                        <span className="w-[40px] h-[40px] rounded-full overflow-hidden">
-                            <Image
-                                src={receiver.dp}
-                                alt={receiver.name}
-                                width={40}
-                                height={40}
-                                className="rounded-full h-full w-full object-cover object-top"
-                            />
-                        </span>
+                    <button className="items-center py-4 px-6 lg:px-0 lg:py-0 gap-4 flex-grow flex flex-row-reverse lg:flex-row" onClick={() => openProfile(receiverId)}>
+                        {receiver?.dp ? (
+                            <span className="w-[40px] h-[40px] rounded-full overflow-hidden">
+                                <Image
+                                    src={receiver.dp}
+                                    alt={receiver.name}
+                                    width={40}
+                                    height={40}
+                                    className="rounded-full h-full w-full object-cover object-top"
+                                />
+                            </span>
+                        ) : (
+                            <span className="h-[40px] w-[40px] flex items-center justify-center bg-blue-700 text-white text-xl rounded-full overflow-hidden">
+                                {receiver?.name[0]}
+                            </span>
+                        )}
+                        {receiver?.name}
+                    </button>
+                </div>
+
+                {
+                    loadingChats ? (
+                        <>Loading...</>
                     ) : (
-                        <span className="h-[40px] w-[40px] flex items-center justify-center bg-blue-700 text-white text-xl rounded-full overflow-hidden">
-                            {receiver?.name[0]}
-                        </span>
-                    )}
-                    {receiver?.name}
-                </button>
-            </div>
-
-            {
-                loadingChats ? (
-                    <>Loading...</>
-                ) : (
-                    <div className="h-[88%] px-4 lg:px-32 pt-10 pb-4 overflow-y-auto scroll-smooth grid [place-items:end]" ref={chatScrollRef}>
-                        <div className="h-fit pt-40 flex flex-col justify-end gap-1 w-full">
+                        <div className="flex-grow h-fit pt-2 px-4 lg:px-32 flex flex-col justify-end gap-1.5 w-full">
                             {
                                 chats?.map(chat => (
                                     <div key={chat._id} className={`flex items-end md:max-w-[350px] max-w-[90%] py-1 px-2 rounded-lg w-fit lg:text-xl relative ${chat.senderId === user?._id ? "self-end bg-blue-700" : "self-start bg-slate-800"}`}>
@@ -109,11 +109,11 @@ const ChatWindow: React.FC = () => {
                                 ))
                             }
                         </div>
-                    </div>
-                )
-            }
+                    )
+                }
+            </div>
 
-            <form className="w-full absolute bottom-8 left-0 flex items-center justify-center gap-3" onSubmit={handleMessageSubmit}>
+            <form className="w-full h-[15%] flex items-start pt-2 justify-center gap-3" onSubmit={handleMessageSubmit}>
                 <input
                     type="text"
                     value={message}
