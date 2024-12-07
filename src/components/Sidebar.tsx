@@ -45,6 +45,21 @@ export default function Sidebar() {
         return () => clearInterval(intervalId);
     }, []);
 
+    const sortedConnections = useMemo(() => {
+        if (!user || !lastMessages.length) return user?.connections || [];
+
+        return [...user.connections].sort((a, b) => {
+            const lastMessageA = lastMessages.find(m => m.chatId === a.chatId)?.lastMessage;
+            const lastMessageB = lastMessages.find(m => m.chatId === b.chatId)?.lastMessage;
+
+            const dateA = lastMessageA ? new Date(lastMessageA.sentAt).getTime() : 0;
+            const dateB = lastMessageB ? new Date(lastMessageB.sentAt).getTime() : 0;
+
+            // Sort in descending order (newest first) by date.
+            return dateB - dateA;
+        });
+    }, [user, lastMessages]);
+
     return (
         <div className="pb-4 h-full w-screen lg:max-w-[450px] border-r-2 border-gray-800 relative">
 
@@ -75,7 +90,7 @@ export default function Sidebar() {
 
             <div className="h-full pb-28 overflow-y-auto">
                 {
-                    user?.connections.map(connection => {
+                    sortedConnections.map(connection => {
                         const lastMessage = lastMessages.find(message => message.chatId === connection.chatId)?.lastMessage;
 
                         return (
@@ -109,7 +124,7 @@ export default function Sidebar() {
 
                                     <span className="flex flex-col flex-grow justify-between items-start gap-[1px] lg:gap-[3px]">
                                         <span className="block">{connection.name}</span>
-                                        <span className={`text-sm flex items-center justify-between w-full whitespace-nowrap ${lastMessage && !lastMessage.isRead && lastMessage.senderId !== user._id ? "font-bold" : "opacity-70"}`}>
+                                        <span className={`text-sm flex items-center justify-between w-full whitespace-nowrap ${lastMessage && !lastMessage.isRead && lastMessage.senderId !== user?._id ? "font-bold" : "opacity-70"}`}>
                                             <span className="block max-w-[200px] overflow-ellipsis overflow-hidden">
                                                 {lastMessage?.message}
                                             </span>
@@ -125,7 +140,7 @@ export default function Sidebar() {
 
                                 <span className="flex items-center gap-2">
                                     {
-                                        lastMessage && !lastMessage.isRead && lastMessage.senderId !== user._id && (
+                                        lastMessage && !lastMessage.isRead && lastMessage.senderId !== user?._id && (
                                             <span className="block h-4 w-4 rounded-full bg-blue-500" />
                                         )
                                     }
@@ -146,7 +161,7 @@ export default function Sidebar() {
                 }
             </div>
 
-            <button className={`w-fit rounded-full absolute bottom-8 right-8 lg:hover:opacity-70 lg:hover:rotate-45 duration-300 z-40 bg-blue-700 flex items-center justify-center p-2.5 ${idBarOpen && "rotate-45"}`} onClick={() => setIdBarOpen(prev => !prev)}>
+            <button className={`w-fit rounded-full absolute bottom-16 right-8 lg:hover:opacity-70 lg:hover:rotate-45 duration-300 z-20 bg-blue-700 flex items-center justify-center p-2.5 ${idBarOpen && "rotate-45"}`} onClick={() => setIdBarOpen(prev => !prev)}>
                 <IoMdAdd size={28} />
             </button>
         </div>
