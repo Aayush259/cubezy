@@ -1,9 +1,13 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import { RootState } from "../store/store";
+import Loader from "./Loader";
 
 export default function SignupForm() {
 
+    const { isLoggedIn, user } = useSelector((state: RootState) => state.user);
     const router = useRouter();
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
     const [formData, setFormData] = useState({
@@ -12,6 +16,12 @@ export default function SignupForm() {
         password: "",
     });
     const [error, setError] = useState<boolean>(false);
+
+    useEffect(() => {
+        if (isLoggedIn && user) {
+            router.push("/");
+        }
+    }, []);
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -42,7 +52,13 @@ export default function SignupForm() {
         } finally {
             setIsSubmitting(false);
         }
-    }
+    };
+
+    if (isLoggedIn && user) return (
+        <div className="w-full h-full">
+            <Loader />
+        </div>
+    );
 
     return (
         <form className="w-full flex flex-col gap-6" onSubmit={handleSubmit}>
