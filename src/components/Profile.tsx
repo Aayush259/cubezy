@@ -110,14 +110,14 @@ const Profile = () => {
                                 <span className="font-semibold">{profileInfo.name}</span><span className="opacity-70">{user?._id === profileInfo._id && " (You)"}</span>
                             </p>
 
-                            <p>{profileInfo.email}</p>
+                            <p className="mb-4 lg:mb-0">{profileInfo.email}</p>
 
                             {
                                 profileInfo._id === user?._id && profileInfo.connections.length > 0 && <div className="w-full px-4 md:px-8 py-4 border-t border-b border-t-gray-800 border-b-gray-800 my-3">
 
                                     <p className="text-xl mb-2">Your Connections:</p>
 
-                                    <div className="flex items-center gap-3 w-full overflow-x-auto">
+                                    <div className="flex items-center gap-5 w-full overflow-x-auto">
                                         {
                                             profileInfo.connections.map(connection => (
                                                 <div className="flex items-center justify-center flex-col gap-2" key={connection._id}>
@@ -137,7 +137,7 @@ const Profile = () => {
                                                         </div>
                                                     )}
 
-                                                    <p>{connection.name}</p>
+                                                    <p>{connection.name.split(" ")[0]}</p>
                                                 </div>
                                             ))
                                         }

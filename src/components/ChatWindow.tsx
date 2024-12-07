@@ -15,7 +15,7 @@ const ChatWindow: React.FC = () => {
 
     const { user } = useSelector((state: RootState) => state.user);
 
-    const { receiverId, setReceiverId, chats, loadingChats, sendMessage } = useChatContext();
+    const { receiverId, updateReceiverId, chats, loadingChats, sendMessage } = useChatContext();
     const { openProfile } = useProfileContext();
 
     const [message, setMessage] = useState<string>("");
@@ -48,7 +48,7 @@ const ChatWindow: React.FC = () => {
                 <div className="sticky top-0 left-0 z-10 w-full lg:px-6 lg:py-4 flex items-center justify-between bg-[#0A0A0A] lg:hover:bg-gray-900 duration-300 border-b border-gray-800 text-xl">
                     <button
                         className="lg:hidden rounded-full outline-none mx-4"
-                        onClick={() => setReceiverId(null)}
+                        onClick={() => updateReceiverId(null)}
                     >
                         <IoIosArrowBack size={24} />
                     </button>
@@ -66,7 +66,7 @@ const ChatWindow: React.FC = () => {
                             </span>
                         ) : (
                             <span className="h-[40px] w-[40px] flex items-center justify-center bg-blue-700 text-white text-xl rounded-full overflow-hidden">
-                                {receiver?.name[0]}
+                                {receiver?.name[0].split(" ")[0]}
                             </span>
                         )}
                         {receiver?.name}

@@ -15,7 +15,7 @@ export default function Sidebar() {
     const { user } = useSelector((state: RootState) => state.user);
 
     const { setIdBarOpen, idBarOpen } = useIdBarContext();
-    const { receiverId, setReceiverId, lastMessages } = useChatContext();
+    const { receiverId, updateReceiverId, lastMessages } = useChatContext();
     const { openProfile, closeProfile } = useProfileContext();
 
     const [greeting, setGreeting] = useState<string>("");   // Greeting message based on the current time.
@@ -88,9 +88,9 @@ export default function Sidebar() {
                 </button>
             </div>
 
-            <div className="h-full pb-28 overflow-y-auto">
+            <div className="h-full pb-48 overflow-y-auto">
                 {
-                    sortedConnections.map(connection => {
+                    ...sortedConnections.map(connection => {
                         const lastMessage = lastMessages.find(message => message.chatId === connection.chatId)?.lastMessage;
 
                         return (
@@ -98,7 +98,7 @@ export default function Sidebar() {
                                 key={connection._id}
                                 className={`w-full px-6 py-4 flex items-center justify-between lg:hover:bg-gray-900 duration-300 border-b border-gray-800 text-lg lg:text-xl ${connection._id === receiverId ? "bg-slate-900" : "bg-transparent"}`}
                                 onClick={() => {
-                                    setReceiverId(connection._id);
+                                    updateReceiverId(connection._id);
                                     closeProfile();
                                 }}
                             >
