@@ -6,11 +6,11 @@ import { updateConnections, updateUser } from "../store/userSlice";
 import { v4 as uuidv4 } from "uuid";
 import { IChatMessage, ILastMessage } from "../interfaces/interfaces";
 
-const SOCKET_PATH = "/api/socket/connect"
+const SOCKET_PATH = "/api/socket/connect";
 
 const ChatContext = createContext<{
     receiverId: string | null;
-    setReceiverId: (id: string | null) => void;
+    updateReceiverId: (id: string | null) => void;
     chats: IChatMessage[];
     lastMessages: ILastMessage[];
     loadingChats: boolean;
@@ -18,7 +18,7 @@ const ChatContext = createContext<{
     addDp: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }>({
     receiverId: null,
-    setReceiverId: (id: string | null) => { },
+    updateReceiverId: () => { },
     lastMessages: [],
     chats: [],
     loadingChats: false,
@@ -48,6 +48,12 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
             return null;
         }
     }, [user?._id, receiverId]);
+
+    // Function to update the receiver ID.
+    const updateReceiverId = (id: string | null) => {
+        setLoadingChats(true);
+        setReceiverId(id);
+    };
 
     // Function to get messages.
     const getMessages = async (chatId: string) => {
@@ -280,7 +286,7 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
 
     useEffect(() => {
         // Connect to the backend Socket.IO server.
-        const newSocket = io("http://localhost:3000", {
+        const newSocket = io("", {
             path: SOCKET_PATH,
             auth: {
                 token: localStorage.getItem("token"),
@@ -362,7 +368,7 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
     }, [chats]);
 
     return (
-        <ChatContext.Provider value={{ receiverId, setReceiverId, lastMessages, chats, loadingChats, sendMessage, addDp }}>
+        <ChatContext.Provider value={{ receiverId, updateReceiverId, lastMessages, chats, loadingChats, sendMessage, addDp }}>
             {
                 loadingLastMessages ? <p>LOading...</p> : children
             }
