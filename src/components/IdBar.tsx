@@ -2,8 +2,6 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../store/store";
-import { CgArrowRightO } from "react-icons/cg";
-import { IoIosArrowBack } from "react-icons/io";
 import { IoClose } from "react-icons/io5";
 import { MdOutlineContentCopy } from "react-icons/md";
 import { FaRegCircleCheck } from "react-icons/fa6";

@@ -90,7 +90,7 @@ export default function Sidebar() {
 
             <div className="h-full pb-48 overflow-y-auto">
                 {
-                    ...sortedConnections.map(connection => {
+                    sortedConnections.map(connection => {
                         const lastMessage = lastMessages.find(message => message.chatId === connection.chatId)?.lastMessage;
 
                         return (
@@ -141,10 +141,10 @@ export default function Sidebar() {
                                 <span className="flex items-center gap-2">
                                     {
                                         lastMessage && !lastMessage.isRead && lastMessage.senderId !== user?._id && (
-                                            <span className="block h-4 w-4 rounded-full bg-blue-500" />
+                                            <span className="relative block h-3 w-3 rounded-full bg-blue-500 before:h-3 before:w-3 before:inset-0 before:absolute before:rounded-full before:bg-blue-500 before:animate-ping" />
                                         )
                                     }
-                                    <IoIosArrowForward size={20} />
+                                    {/* <IoIosArrowForward size={20} /> */}
                                 </span>
                             </button>
                         )

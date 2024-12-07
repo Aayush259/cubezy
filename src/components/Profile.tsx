@@ -9,6 +9,7 @@ import { copyToClipboard, formatDate2 } from "../funcs/funcs";
 import { useSelector } from "react-redux";
 import { RootState } from "../store/store";
 import { useChatContext } from "../contexts/ChatContext";
+import Loader from "./Loader";
 
 const Profile = () => {
 
@@ -51,7 +52,7 @@ const Profile = () => {
                 <IoClose size={30} className="text-white" />
             </button>
             {
-                isLoading ? <div>Loading...</div> : <div className="h-full w-full">{
+                isLoading ? <Loader /> : <div className="h-full w-full">{
                     profileInfo && (
                         <div className="h-full w-full flex flex-col items-center gap-2 overflow-y-auto">
                             {

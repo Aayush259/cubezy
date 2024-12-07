@@ -10,6 +10,7 @@ import { useEffect, useRef, useState } from "react";
 import { formatDate } from "../funcs/funcs";
 import Image from "next/image";
 import { useProfileContext } from "../contexts/ProfileContext";
+import Loader from "./Loader";
 
 const ChatWindow: React.FC = () => {
 
@@ -75,7 +76,7 @@ const ChatWindow: React.FC = () => {
 
                 {
                     loadingChats ? (
-                        <>Loading...</>
+                        <Loader />
                     ) : (
                         <div className="flex-grow h-fit pt-2 px-4 lg:px-32 flex flex-col justify-end gap-1.5 w-full">
                             {

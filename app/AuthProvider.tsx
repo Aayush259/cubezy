@@ -1,4 +1,5 @@
 "use client";
+import Loader from "@/src/components/Loader";
 import { RootState } from "@/src/store/store";
 import { login, logout } from "@/src/store/userSlice";
 import { usePathname, useRouter } from "next/navigation";
@@ -66,7 +67,11 @@ const AuthProvider: React.FC<{
     }, [isLoggedIn]);
 
     if (loading) {
-        return <div>Loading...</div>;
+        return (
+            <div className="w-screen h-screen">
+                <Loader />
+            </div>
+        );
     }
 
     if (!isAuthenticated && pathname !== "/signup" && pathname !== "/login") {

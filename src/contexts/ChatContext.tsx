@@ -5,6 +5,7 @@ import { io, Socket } from "socket.io-client";
 import { updateConnections, updateUser } from "../store/userSlice";
 import { v4 as uuidv4 } from "uuid";
 import { IChatMessage, ILastMessage } from "../interfaces/interfaces";
+import Loader from "../components/Loader";
 
 const SOCKET_PATH = "/api/socket/connect";
 
@@ -370,7 +371,7 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
     return (
         <ChatContext.Provider value={{ receiverId, updateReceiverId, lastMessages, chats, loadingChats, sendMessage, addDp }}>
             {
-                loadingLastMessages ? <p>LOading...</p> : children
+                loadingLastMessages ? <Loader /> : children
             }
         </ChatContext.Provider>
     )
