@@ -1,11 +1,14 @@
 "use client";
-import { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { login } from "../store/userSlice";
 import { useRouter } from "next/navigation";
+import { RootState } from "../store/store";
+import Loader from "./Loader";
 
 export default function LoginForm() {
 
+    const { isLoggedIn, user } = useSelector((state: RootState) => state.user);
     const dispatch = useDispatch();
     const router = useRouter();
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -14,6 +17,12 @@ export default function LoginForm() {
         password: "",
     });
     const [error, setError] = useState<boolean>(false);
+
+    useEffect(() => {
+        if (isLoggedIn && user) {
+            router.push("/");
+        }
+    }, []);
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -38,7 +47,6 @@ export default function LoginForm() {
                 const { token, user } = await res.json();
                 localStorage.setItem("token", token);
                 dispatch(login(user));
-                // router.push("/");
             } else {
                 console.log("Login failed");
             }
@@ -48,6 +56,12 @@ export default function LoginForm() {
             setIsSubmitting(false);
         }
     }
+
+    if (isLoggedIn && user) return (
+        <div className="w-full h-full">
+            <Loader />
+        </div>
+    );
 
     return (
         <form className="w-full flex flex-col gap-6" onSubmit={handleSubmit}>
@@ -85,7 +99,7 @@ export default function LoginForm() {
                 />
             </label>
 
-            <button type="submit" className={`px-4 py-2 my-2 w-full bg-orange-700 rounded-lg mx-auto ${isSubmitting ? "opacity-50" : "opacity-100"}`}>
+            <button type="submit" className={`px-4 py-2 my-2 w-full bg-blue-700 rounded-lg mx-auto ${isSubmitting ? "opacity-50" : "opacity-100"}`}>
                 Sign In
             </button>
         </form>
