@@ -1,4 +1,3 @@
-"use client";
 import Sidebar from "@/src/components/Sidebar";
 import IdBar from "@/src/components/IdBar";
 import { IdBarContextProvider } from "@/src/contexts/IdBarContext";
@@ -7,6 +6,12 @@ import ChatWindow from "@/src/components/ChatWindow";
 import Image from "next/image";
 import Profile from "@/src/components/Profile";
 import { ProfileContextProvider } from "@/src/contexts/ProfileContext";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Square",
+  description: "Square - A modern and intuitive chat application for seamless communication and connection.",
+};
 
 export default function Home() {
 

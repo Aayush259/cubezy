@@ -1,6 +1,12 @@
 import SignupForm from "@/src/components/SignupForm";
 import Image from "next/image";
 import Link from "next/link";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+    title: "Square - Signup",
+    description: "Join Square today to experience a modern and intuitive chat application for connecting with friends and family.",
+};
 
 export default function SignupPage() {
 

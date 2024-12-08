@@ -1,6 +1,12 @@
 import LoginForm from "@/src/components/LoginForm";
 import Image from "next/image";
 import Link from "next/link";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+    title: "Square - Login",
+    description: "Login to Square and connect with friends through a seamless and intuitive chat experience.",
+};
 
 export default function LoginPage() {
 
