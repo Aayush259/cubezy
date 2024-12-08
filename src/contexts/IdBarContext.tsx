@@ -1,3 +1,4 @@
+"use client";
 import { createContext, useContext, useState } from "react";
 
 const IdBarContext = createContext<{ idBarOpen: boolean; setIdBarOpen: React.Dispatch<React.SetStateAction<boolean>> }>({

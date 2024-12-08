@@ -1,3 +1,4 @@
+"use client";
 import { createContext, useContext, useEffect, useState } from "react";
 import { IProfileInfo } from "../interfaces/interfaces";
 import { useSelector } from "react-redux";
