@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import connectMongoDb from "@/src/lib/mongodb";
-import User from "@/src/models/User";
+import connectMongoDb from "@/utils/lib/mongodb";
+import User from "@/utils/models/User";
 import jwt from "jsonwebtoken";
 
 export default async function getUser(req: NextApiRequest, res: NextApiResponse) {

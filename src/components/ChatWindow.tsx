@@ -7,7 +7,7 @@ import { IoCheckmarkDone } from "react-icons/io5";
 import { IoMdCheckmark, IoIosArrowBack } from "react-icons/io";
 import { GoClock } from "react-icons/go";
 import { useEffect, useRef, useState } from "react";
-import { formatDate } from "../funcs/funcs";
+import { formatDate } from "../../utils/funcs/funcs";
 import Image from "next/image";
 import { useProfileContext } from "../contexts/ProfileContext";
 import Loader from "./Loader";

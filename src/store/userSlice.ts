@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { IUserSlice } from "../interfaces/interfaces";
+import { IUserSlice } from "../../utils/interfaces/interfaces";
 
 const initialState: IUserSlice = {
     isLoggedIn: false,

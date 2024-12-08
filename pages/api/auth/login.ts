@@ -1,13 +1,12 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import connectMongoDb from "@/src/lib/mongodb";
-import User from "@/src/models/User";
+import connectMongoDb from "@/utils/lib/mongodb";
+import User from "@/utils/models/User";
 import jwt from "jsonwebtoken";
 
 export default async function login(req: NextApiRequest, res: NextApiResponse) {
     if (req.method !== "POST") {
         return res.status(405).json({ message: "Method not allowed" });
     };
-
 
     const { email, password } = req.body;
 

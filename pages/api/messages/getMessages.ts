@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import jwt from "jsonwebtoken";
-import connectMongoDb from "@/src/lib/mongodb";
-import createMessageModel from "@/src/models/Chat";
+import connectMongoDb from "@/utils/lib/mongodb";
+import createMessageModel from "@/utils/models/Chat";
 
 export default async function getMessages(req: NextApiRequest, res: NextApiResponse) {
     if (req.method !== "POST") {

@@ -7,7 +7,7 @@ import { MdOutlineContentCopy } from "react-icons/md";
 import { FaRegCircleCheck } from "react-icons/fa6";
 import { updateConnections } from "../store/userSlice";
 import { useIdBarContext } from "../contexts/IdBarContext";
-import { copyToClipboard } from "../funcs/funcs";
+import { copyToClipboard } from "../../utils/funcs/funcs";
 
 const IdBar: React.FC = () => {
 

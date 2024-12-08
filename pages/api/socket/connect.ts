@@ -6,9 +6,9 @@ import jwt from "jsonwebtoken";
 import cloudinary from "cloudinary";
 import { Readable } from "stream";
 import mongoose from "mongoose";
-import User from "@/src/models/User";
-import connectMongoDb from "@/src/lib/mongodb";
-import createMessageModel from "@/src/models/Chat";
+import User from "@/utils/models/User";
+import connectMongoDb from "@/utils/lib/mongodb";
+import createMessageModel from "@/utils/models/Chat";
 
 const cloudName = process.env.CLOUD_NAME;
 const apiKey = process.env.API_KEY;

@@ -5,7 +5,7 @@ import { MdOutlineContentCopy } from "react-icons/md";
 import { IoClose, IoCameraSharp } from "react-icons/io5";
 import { useEffect, useState } from "react";
 import { FaRegCircleCheck } from "react-icons/fa6";
-import { copyToClipboard, formatDate2 } from "../funcs/funcs";
+import { copyToClipboard, formatDate2 } from "../../utils/funcs/funcs";
 import { useSelector } from "react-redux";
 import { RootState } from "../store/store";
 import { useChatContext } from "../contexts/ChatContext";

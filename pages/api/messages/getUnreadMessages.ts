@@ -1,8 +1,8 @@
-import connectMongoDb from "@/src/lib/mongodb";
-import User from "@/src/models/User";
+import connectMongoDb from "@/utils/lib/mongodb";
+import User from "@/utils/models/User";
 import { NextApiRequest, NextApiResponse } from "next";
 import jwt from "jsonwebtoken";
-import createMessageModel from "@/src/models/Chat";
+import createMessageModel from "@/utils/models/Chat";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method !== "GET") {

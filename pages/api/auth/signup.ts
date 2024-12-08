@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import connectMongoDb from "@/src/lib/mongodb";
-import User from "@/src/models/User";
+import connectMongoDb from "@/utils/lib/mongodb";
+import User from "@/utils/models/User";
 
 export default async function signup(req: NextApiRequest, res: NextApiResponse) {
     if (req.method !== "POST") {
