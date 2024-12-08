@@ -38,8 +38,16 @@ const ChatWindow: React.FC = () => {
     };
 
     if (!receiverId) return (
-        <div className="w-full h-full hidden lg:flex items-center justify-center relative z-20 text-2xl font-semibold">
-            Welcome Back
+        <div className="w-full h-full hidden lg:flex lg:flex-col items-center justify-center gap-6 relative z-20 text-xl font-[200]">
+            <Image
+                src="/images/group.webp"
+                alt="Start a new chat"
+                width={889}
+                height={787}
+                className="w-[80%] max-w-[400px] h-auto"
+            />
+
+            <p className="text-center">Welcome Back</p>
         </div>
     );
 
