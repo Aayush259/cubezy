@@ -56,6 +56,7 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
         if (receiverId === id) return;
         setLoadingChats(true);
         setReceiverId(id);
+        console.log('Done:', receiverId);
     };
 
     // Function to get messages.
@@ -318,6 +319,7 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
             socket.on("receiveMessage", (messageDetails) => {
                 const senderId = messageDetails.senderId;
                 if (senderId === receiverId) {
+                    console.log(senderId, receiverId);
                     setChats(prevChats => prevChats ? [...prevChats, messageDetails] : [messageDetails]);
                 }
 
