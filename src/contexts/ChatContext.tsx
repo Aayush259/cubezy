@@ -7,6 +7,7 @@ import { updateConnections, updateUser } from "../store/userSlice";
 import { v4 as uuidv4 } from "uuid";
 import { IChatMessage, ILastMessage } from "../../utils/interfaces/interfaces";
 import Loader from "../components/Loader";
+import { useToast } from "./ToastContext";
 
 const SOCKET_PATH = "/api/socket/connect";
 
@@ -34,6 +35,8 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
 
     // User state from store.
     const { user } = useSelector((state: RootState) => state.user);
+
+    const { addToast } = useToast();
 
     // const [receiverId, setReceiverId] = useState<string | null>(null);      // Receiver ID.
     const [socket, setSocket] = useState<Socket | null>(null);      // Socket.
@@ -77,6 +80,7 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
         // Check if token exists.
         if (!token) {
             console.log("No token found");
+            addToast("Something went wrong", false);
             return
         };
 
@@ -92,12 +96,14 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
 
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
+                addToast("Something went wrong", false);
             }
 
             const data = await response.json();
             setChats(data.chats);
         } catch (error) {
             console.log(error);
+            addToast("Something went wrong", false);
         } finally {
             setLoadingChats(false);
         }
@@ -133,7 +139,11 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
             }, (response: any) => {
                 // Check if the response is successful.
                 if (!response.success) {
-                    // Todo: Handle error
+                    // Show error message
+                    addToast("Failed to send", false);
+
+                    // Remove temporary message from chats state.
+                    setChats(prevChats => prevChats?.filter(chat => chat._id !== tempId) || null);
                     return;
                 }
 
@@ -172,6 +182,7 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
         } else {
             // Todo: Handle the case where the socket or chatId is not available.
             console.error("Socket or chatId is not available.");
+            addToast("Something went wrong", false);
         }
     };
 
@@ -223,6 +234,7 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
         const input = event.target;
         if (!input.files || input.files.length === 0) {
             console.error("No file selected");
+            addToast("No file selected", false);
             return;
         }
 
@@ -232,7 +244,7 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
         if (dp && dp.type.startsWith('image/')) {
             console.log('File accepted:', dp);
         } else {
-            // Todo: Handle error.
+            addToast("Invalid Image", false);
             console.log("Invalid file type");
         };
 
@@ -245,6 +257,7 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
                 dispatch(updateUser({ ...user, dp: response.dp }));
             } else {
                 console.log("Error updating dp", response);
+                addToast("Something went wrong", false);
             }
         })
     };
@@ -267,6 +280,7 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
 
         if (!token) {
             console.log("No token found");
+            addToast("Something went wrong", false);
             return;
         }
 
@@ -285,6 +299,7 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
             setLastMessages(data.lastMessages);
         } catch (error) {
             setError("Error fetching last messages");
+            addToast("Something went wrong", false);
         } finally {
             setLoadingLastMessages(false);
         }
@@ -328,6 +343,8 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
                     console.log("Received message:", messageDetails);
                     console.log(receiverIdRef.current);
                     setChats(prevChats => prevChats ? [...prevChats, messageDetails] : [messageDetails]);
+                } else {
+                    addToast(`New message from ${user?.connections.find(connection => connection._id === senderId)?.name.split(" ")[0]}`, true);
                 }
 
                 const nChatId = user?._id as string < messageDetails.senderId ? `${user?._id}_${messageDetails.senderId}` : `${messageDetails.senderId}_${user?._id}`;
