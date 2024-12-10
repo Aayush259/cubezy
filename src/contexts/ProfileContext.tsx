@@ -3,6 +3,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { IProfileInfo } from "../../utils/interfaces/interfaces";
 import { useSelector } from "react-redux";
 import { RootState } from "../store/store";
+import { useToast } from "./ToastContext";
 
 const ProfileContext = createContext<{
     isProfileOpen: boolean;
@@ -29,6 +30,8 @@ const ProfileContextProvider = ({ children }: { children: React.ReactNode }) => 
     // User state from store.
     const { user } = useSelector((state: RootState) => state.user);
 
+    const { addToast } = useToast();
+
     const [isProfileOpen, setIsProfileOpen] = useState<boolean>(false);     // Whether the profile is open or not.
     const [profileId, setProfileId] = useState<string | null>(null);    // The id of the profile to be opened.
     const [isLoading, setIsLoading] = useState<boolean>(true);      // Whether the profile is loading or not.
@@ -38,7 +41,7 @@ const ProfileContextProvider = ({ children }: { children: React.ReactNode }) => 
     const fetchProfileInfo = async (id: string) => {
         setIsLoading(true);
         if (!id) {
-            // Todo: Handle error
+            addToast("Something went wrong", false);
             return
         };
 
@@ -54,7 +57,7 @@ const ProfileContextProvider = ({ children }: { children: React.ReactNode }) => 
         });
         const data = await res.json();
         if (data.message) {
-            // Todo: Handle error
+            addToast("Something went wrong", false);
             return;
         }
         setProfileInfo(data);
