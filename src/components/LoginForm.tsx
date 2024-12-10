@@ -5,9 +5,11 @@ import { login } from "../store/userSlice";
 import { useRouter } from "next/navigation";
 import { RootState } from "../store/store";
 import Loader from "./Loader";
+import { useToast } from "../contexts/ToastContext";
 
 export default function LoginForm() {
 
+    const { addToast } = useToast();
     const { isLoggedIn, user } = useSelector((state: RootState) => state.user);
     const dispatch = useDispatch();
     const router = useRouter();
@@ -48,9 +50,11 @@ export default function LoginForm() {
                 localStorage.setItem("token", token);
                 dispatch(login(user));
             } else {
+                addToast("Something went wrong", false);
                 console.log("Login failed");
             }
         } catch (error) {
+            addToast("Incorrect email or password!", false);
             console.log(error);
         } finally {
             setIsSubmitting(false);

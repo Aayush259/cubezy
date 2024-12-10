@@ -4,9 +4,11 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "../store/store";
 import Loader from "./Loader";
+import { useToast } from "../contexts/ToastContext";
 
 export default function SignupForm() {
 
+    const { addToast } = useToast();
     const { isLoggedIn, user } = useSelector((state: RootState) => state.user);
     const router = useRouter();
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -46,9 +48,11 @@ export default function SignupForm() {
                 router.push("/login");
             } else {
                 console.log("Signup failed");
+                addToast("Something went wrong", false);
             }
         } catch (error) {
             console.log(error);
+            addToast("Something went wrong", false);
         } finally {
             setIsSubmitting(false);
         }
@@ -80,7 +84,7 @@ export default function SignupForm() {
             </label>
 
             <label htmlFor="email" className="flex flex-col gap-2 text-lg">
-            <p className="flex items-center justify-between">
+                <p className="flex items-center justify-between">
                     <span>Email:</span>
                     {
                         error && !formData.email && <span className="text-sm text-red-500 font-semibold">Required*</span>
@@ -97,7 +101,7 @@ export default function SignupForm() {
             </label>
 
             <label htmlFor="name" className="flex flex-col gap-2 text-lg">
-            <p className="flex items-center justify-between">
+                <p className="flex items-center justify-between">
                     <span>Password:</span>
                     {
                         error && !formData.password && <span className="text-sm text-red-500 font-semibold">Required*</span>
