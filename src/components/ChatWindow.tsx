@@ -122,22 +122,25 @@ const ChatWindow: React.FC = () => {
                 }
             </div>
 
-            <form className="w-full h-[15%] flex items-start pt-2 justify-center gap-3" onSubmit={handleMessageSubmit}>
-                <input
-                    type="text"
-                    value={message}
-                    placeholder="Message"
-                    className={`w-[80%] lg:w-[70%] px-4 py-2 bg-gray-800 focus:outline-none rounded-full`}
-                    onChange={(e) => setMessage(e.target.value)}
-                />
+            {
+                !loadingChats && (
+                    <form className="w-full h-[15%] flex items-start pt-2 justify-center gap-3" onSubmit={handleMessageSubmit}>
+                        <input
+                            type="text"
+                            value={message}
+                            placeholder="Message"
+                            className={`w-[80%] lg:w-[70%] px-4 py-2 bg-gray-800 focus:outline-none rounded-full`}
+                            onChange={(e) => setMessage(e.target.value)}
+                        />
 
-                <button
-                    type="submit"
-                    className={`p-2 w-fit bg-blue-700 rounded-full block duration-300 lg:hover:opacity-70`}
-                >
-                    <IoSend size={24} />
-                </button>
-            </form>
+                        <button
+                            type="submit"
+                            className={`p-2 w-fit bg-blue-700 rounded-full block duration-300 lg:hover:opacity-70`}
+                        >
+                            <IoSend size={24} />
+                        </button>
+                    </form>
+                )}
         </div>
     );
 };
