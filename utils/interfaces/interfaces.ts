@@ -42,3 +42,9 @@ export interface IProfileInfo {
     }[];
     createdAt: Date;
 }
+
+export interface IToast {
+    id: string;
+    message: string;
+    success: boolean;
+}
