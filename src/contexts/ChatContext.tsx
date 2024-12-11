@@ -25,8 +25,8 @@ const ChatContext = createContext<{
     lastMessages: [],
     chats: [],
     loadingChats: false,
-    sendMessage: (message: string) => { },
-    addDp: (event: React.ChangeEvent<HTMLInputElement>) => { },
+    sendMessage: () => { },
+    addDp: () => { },
 })
 
 const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
@@ -298,6 +298,7 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
             console.log("Fetched last messages:", data.lastMessages);
             setLastMessages(data.lastMessages);
         } catch (error) {
+            console.log(error);
             setError("Error fetching last messages");
             addToast("Something went wrong", false);
         } finally {
@@ -374,6 +375,7 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
 
             // Listen for the "messageRead" event from the server.
             socket.on("messageRead", ({ chatId, messageIds }) => {
+                console.log(chatId);
                 setChats(prevChats => prevChats?.map(chat => messageIds?.includes(chat._id) ? { ...chat, isRead: true, status: "sent" } : chat) || null);
             });
 
@@ -399,7 +401,7 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
     return (
         <ChatContext.Provider value={{ receiverId: receiverId, updateReceiverId, lastMessages, chats, loadingChats, sendMessage, addDp }}>
             {
-                loadingLastMessages ? <Loader /> : children
+                loadingLastMessages ? <Loader /> : error ? <p>Something went wrong</p> : children
             }
         </ChatContext.Provider>
     )

@@ -16,11 +16,11 @@ const ProfileContext = createContext<{
     closeProfile: () => void;
 }>({
     isProfileOpen: false,
-    setIsProfileOpen: (isOpen: boolean) => { },
+    setIsProfileOpen: () => { },
     profileId: null,
-    setProfileId: (id: string) => { },
+    setProfileId: () => { },
     isLoading: true,
-    openProfile: (id: string) => { },
+    openProfile: () => { },
     profileInfo: null,
     closeProfile: () => { },
 })

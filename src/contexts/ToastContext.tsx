@@ -6,7 +6,7 @@ import Toast from "../components/Toast";
 const ToastContext = createContext<{
     addToast: (message: string, success: boolean) => void;
 }>({
-    addToast: (message, success) => { },
+    addToast: () => { },
 });
 
 export const ToastProvider = ({ children }: { children: React.ReactNode }) => {

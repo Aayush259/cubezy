@@ -26,7 +26,7 @@ export default function LoginPage() {
                     <LoginForm />
 
                     <p className="text-lg my-10 text-center">
-                        Don't have an account?{" "}
+                        Don&apos;t have an account?{" "}
                         <Link href="/signup" className="text-blue-500">Sign Up</Link>
                     </p>
                 </div>

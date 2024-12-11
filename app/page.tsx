@@ -3,7 +3,7 @@ import IdBar from "@/src/components/IdBar";
 import { IdBarContextProvider } from "@/src/contexts/IdBarContext";
 import { ChatContextProvider } from "@/src/contexts/ChatContext";
 import ChatWindow from "@/src/components/ChatWindow";
-import Image from "next/image";
+// import Image from "next/image";
 import Profile from "@/src/components/Profile";
 import { ProfileContextProvider } from "@/src/contexts/ProfileContext";
 import { Metadata } from "next";

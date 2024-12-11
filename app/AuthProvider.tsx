@@ -10,7 +10,7 @@ const AuthProvider: React.FC<{
     children: React.ReactNode;
 }> = ({ children }) => {
 
-    const { isLoggedIn, user } = useSelector((state: RootState) => state.user);
+    const { isLoggedIn } = useSelector((state: RootState) => state.user);
     const dispatch = useDispatch();
     const [loading, setLoading] = useState(true);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
