@@ -19,6 +19,7 @@ const ChatContext = createContext<{
     loadingChats: boolean;
     sendMessage: (message: string) => void;
     addDp: (event: React.ChangeEvent<HTMLInputElement>) => void;
+    onlineConnections: string[];
 }>({
     receiverId: null,
     updateReceiverId: () => { },
@@ -27,6 +28,7 @@ const ChatContext = createContext<{
     loadingChats: false,
     sendMessage: () => { },
     addDp: () => { },
+    onlineConnections: [],
 })
 
 const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
@@ -44,11 +46,23 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
     const [chats, setChats] = useState<IChatMessage[]>([]);     // Chats state.
     const [lastMessages, setLastMessages] = useState<ILastMessage[]>([]);       // Last messages state.
     const [loadingLastMessages, setLoadingLastMessages] = useState<boolean>(true);      // Loading last messages state.
+    const [onlineConnections, setOnlineConnections] = useState<string[]>([]);      // Online connections state.
     const [error, setError] = useState<string | null>(null);    // Error state.
 
+    // Reference to the receiver ID.
     const receiverIdRef = useRef<string | null>(null);
     const [receiverId, setReceiverId] = useState<string | null>(null);
 
+    // Reference to the active connections.
+    const activeConnections = useRef<string[]>([]);
+
+    // Function to update the active connections.
+    const setActiveConnections = (connections: string[]) => {
+        activeConnections.current = connections;
+        setOnlineConnections(connections);
+    };
+
+    // Function to update the receiver ID.
     const setReceiverIdRef = (id: string | null) => {
         if (receiverIdRef.current === id) return;
         receiverIdRef.current = id;
@@ -329,6 +343,22 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
 
     useEffect(() => {
         if (socket) {
+
+            // Listen for the "userActive" event from the server.
+            socket.on("userActive", ({ userId }) => {
+                setActiveConnections([...activeConnections.current, userId]);
+            });
+
+            // Listen for the "userInactive" event from the server.
+            socket.on("userInactive", ({ userId }) => {
+                setActiveConnections(activeConnections.current.filter((id) => id !== userId));
+            });
+
+            // Listen for the "activeConnections" event from the server.
+            socket.on("activeConnections", ({ activeUserIds }) => {
+                setActiveConnections(activeUserIds);
+            });
+
             // Listen for the "connectionUpdated" event from the server.
             socket.on("connectionUpdated", (newConnection) => {
                 if (user?.connections) {
@@ -399,7 +429,7 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
     }, [chats]);
 
     return (
-        <ChatContext.Provider value={{ receiverId: receiverId, updateReceiverId, lastMessages, chats, loadingChats, sendMessage, addDp }}>
+        <ChatContext.Provider value={{ receiverId: receiverId, updateReceiverId, lastMessages, chats, loadingChats, sendMessage, addDp, onlineConnections }}>
             {
                 loadingLastMessages ? <Loader /> : error ? <p>Something went wrong</p> : children
             }
