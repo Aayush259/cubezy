@@ -17,10 +17,15 @@ const config: Config = {
         'toast': {
           '0%': { width: '100%' },
           '100%': { width: '0%' }
+        },
+        'heightActive': {
+          '0%': { height: '0px' },
+          '100%': { height: '16px' }
         }
       },
       animation: {
-        toast: 'toast 4s linear forwards'
+        toast: 'toast 4s linear forwards',
+        heightActive: 'heightActive 0.2s linear forwards'
       }
     },
   },
