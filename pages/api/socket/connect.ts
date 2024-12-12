@@ -5,7 +5,7 @@ import { Socket as NetSocket } from "net";
 import jwt from "jsonwebtoken";
 import cloudinary from "cloudinary";
 import { Readable } from "stream";
-import mongoose from "mongoose";
+import mongoose, { connection } from "mongoose";
 import User from "@/utils/models/User";
 import connectMongoDb from "@/utils/lib/mongodb";
 import createMessageModel from "@/utils/models/Chat";
@@ -97,6 +97,27 @@ export default async function handler(_: NextApiRequest, res: ExtendedNextApiRes
         io.on("connection", (socket: CustomSocket) => {
             console.log(socket.data);
             console.log("User connected:", socket.data.user.name);
+
+            // Notify the connected user's connections  that they are active.
+            socket.data.user.connections.forEach(async (connection) => {
+                const receiverSocket = Array.from(io.sockets.sockets.values()).find((s) => (s as CustomSocket).data.user._id.toString() === connection._id.toString());
+
+                if (receiverSocket) {
+                    (receiverSocket as CustomSocket).emit("userActive", {
+                        userId: socket.data.user._id,
+                    })
+                }
+            });
+
+            // Gather active connections for the connected user.
+            const activeConnections = socket.data.user.connections.filter(
+                (connection) => Array.from(io.sockets.sockets.values()).some(
+                    (s) => (s as CustomSocket).data.user._id.toString() === connection._id.toString()
+                )
+            ).map((connection) => connection._id.toString());
+
+            // Send the active connections to the connected user.
+            socket.emit("activeConnections", { activeUserIds: activeConnections });
 
             socket.on("setProfilePicture", async ({ file }: { file: Buffer }, callback) => {
                 try {
@@ -310,6 +331,19 @@ export default async function handler(_: NextApiRequest, res: ExtendedNextApiRes
 
             socket.on("disconnect", () => {
                 console.log("User disconnected:", socket.id);
+
+                // Notify connections that the user is inactive.
+                socket.data.user.connections.forEach(async (connection) => {
+                    const receiverSocket = Array.from(io.sockets.sockets.values()).find(
+                        (s) => (s as CustomSocket).data?.user._id.toString() === connection._id.toString()
+                    );
+
+                    if (receiverSocket) {
+                        (receiverSocket as CustomSocket).emit("userInactive", {
+                            userId: socket.data.user._id,
+                        });
+                    }
+                });
             })
         })
 
