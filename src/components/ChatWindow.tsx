@@ -16,7 +16,7 @@ const ChatWindow: React.FC = () => {
 
     const { user } = useSelector((state: RootState) => state.user);
 
-    const { receiverId, updateReceiverId, chats, loadingChats, sendMessage } = useChatContext();
+    const { receiverId, updateReceiverId, chats, loadingChats, sendMessage, onlineConnections } = useChatContext();
     const { openProfile } = useProfileContext();
 
     const [message, setMessage] = useState<string>("");
@@ -78,7 +78,21 @@ const ChatWindow: React.FC = () => {
                                 {receiver?.name[0].split(" ")[0]}
                             </span>
                         )}
-                        {receiver?.name}
+
+                        <span className="flex flex-col gap-1">
+                            <span>
+                                {receiver?.name}
+                            </span>
+
+                            {
+                                onlineConnections.includes(receiverId) && (
+                                    <span className="text-xs flex items-center gap-2 animate-heightActive">
+                                        <span className="h-2 w-2 bg-blue-700 rounded-full block" />
+                                        {" Online"}
+                                    </span>
+                                )
+                            }
+                        </span>
                     </button>
                 </div>
 
