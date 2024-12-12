@@ -5,7 +5,7 @@ import { Socket as NetSocket } from "net";
 import jwt from "jsonwebtoken";
 import cloudinary from "cloudinary";
 import { Readable } from "stream";
-import mongoose, { connection } from "mongoose";
+import mongoose from "mongoose";
 import User from "@/utils/models/User";
 import connectMongoDb from "@/utils/lib/mongodb";
 import createMessageModel from "@/utils/models/Chat";
