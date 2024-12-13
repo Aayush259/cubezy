@@ -7,6 +7,7 @@ import cloudinary from "cloudinary";
 import { Readable } from "stream";
 import mongoose from "mongoose";
 import User from "@/utils/models/User";
+import DeletedChats from "@/utils/models/DeletedChats";
 import connectMongoDb from "@/utils/lib/mongodb";
 import createMessageModel from "@/utils/models/Chat";
 
@@ -329,6 +330,55 @@ export default async function handler(_: NextApiRequest, res: ExtendedNextApiRes
                 }
             })
 
+            socket.on("deleteMessage", async ({ chatId, messageIds }: { chatId: string, messageIds: string[] }) => {
+                if (!chatId || !messageIds || messageIds.length === 0) {
+                    console.log("Invalid chatId or messageIds");
+                    return;
+                };
+
+                try {
+                    await connectMongoDb();
+
+                    const validMessageIds = messageIds.filter((id) => mongoose.Types.ObjectId.isValid(id));
+
+                    if (validMessageIds.length === 0) {
+                        console.log("No valid message IDs provided");
+                        return;
+                    }
+
+                    // Find the record for the given chatId and userId.
+                    let userDeletedChat = await DeletedChats.findOne({ chatId, userId: socket.data.user._id });
+
+                    if (userDeletedChat) {
+                        // Add only unique message IDs to the deletedMessages array.
+                        const newDeletedMessages = validMessageIds.filter((id) => !userDeletedChat.deletedMessages.includes(id));
+
+                        if (newDeletedMessages.length > 0) {
+                            userDeletedChat.deletedMessages.push(...newDeletedMessages);
+                            await userDeletedChat.save();
+
+                            console.log(`Messages added to deleted list for user ${socket.data.user._id} in chat ${chatId}`);
+                        } else {
+                            console.log("No new messages to add to the deleted list");
+                        }
+                    } else {
+                        // Create a new record for this user and chat
+                        await DeletedChats.create({
+                            chatId,
+                            userId: socket.data.user._id,
+                            deletedMessages: validMessageIds,
+                        });
+
+                        console.log(`Deleted chats record created for user ${socket.data.user._id} in chat ${chatId}`);
+                    }
+
+                    socket.emit("messageDeleted", { chatId, messageIds: validMessageIds, success: true });
+                } catch (error) {
+                    console.error("Error handling deleteMessage socket event:", error);
+                    socket.emit("messageDeleted", { success: false });
+                }
+            })
+
             socket.on("disconnect", () => {
                 console.log("User disconnected:", socket.id);
 
@@ -344,8 +394,8 @@ export default async function handler(_: NextApiRequest, res: ExtendedNextApiRes
                         });
                     }
                 });
-            })
-        })
+            });
+        });
 
         res.socket.server.io = io;
     }
