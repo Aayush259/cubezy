@@ -328,7 +328,7 @@ export default async function handler(_: NextApiRequest, res: ExtendedNextApiRes
                 } catch (error) {
                     console.log("Error marking message as read:", error);
                 }
-            })
+            });
 
             socket.on("deleteMessage", async ({ chatId, messageIds }: { chatId: string, messageIds: string[] }) => {
                 if (!chatId || !messageIds || messageIds.length === 0) {
@@ -347,7 +347,7 @@ export default async function handler(_: NextApiRequest, res: ExtendedNextApiRes
                     }
 
                     // Find the record for the given chatId and userId.
-                    let userDeletedChat = await DeletedChats.findOne({ chatId, userId: socket.data.user._id });
+                    const userDeletedChat = await DeletedChats.findOne({ chatId, userId: socket.data.user._id });
 
                     if (userDeletedChat) {
                         // Add only unique message IDs to the deletedMessages array.
