@@ -161,7 +161,13 @@ export default function Sidebar() {
                 }
             </div>
 
-            <button className={`w-fit rounded-full absolute bottom-16 right-8 lg:hover:opacity-70 lg:hover:rotate-45 duration-300 z-20 bg-blue-700 flex items-center justify-center p-2.5 ${idBarOpen && "rotate-45"}`} onClick={() => setIdBarOpen(prev => !prev)}>
+            <button
+                className={`w-fit rounded-full absolute bottom-16 right-8 lg:hover:opacity-70 lg:hover:rotate-45 duration-300 z-20 bg-blue-700 flex items-center justify-center p-2.5 ${idBarOpen && "rotate-45"}`}
+                onClick={(e) => {
+                    e.stopPropagation();
+                    setIdBarOpen(prev => !prev)
+                }}
+            >
                 <IoMdAdd size={28} />
             </button>
         </div>

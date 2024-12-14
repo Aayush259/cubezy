@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 export default function Home() {
 
   return (
-    <div className="h-screen flex flex-row overflow-hidden font-[family-name:var(--font-geist-sans)]">
+    <div className="h-screen flex flex-row overflow-hidden font-[family-name:var(--font-geist-sans)] select-none">
       <ChatContextProvider>
         <ProfileContextProvider>
           <IdBarContextProvider>

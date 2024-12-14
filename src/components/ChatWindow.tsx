@@ -53,7 +53,7 @@ const ChatWindow: React.FC = () => {
 
     return (
         <div className={`w-screen h-screen lg:w-full z-20 fixed top-0 left-0 lg:relative bg-[#0A0A0A] lg:bg-none`}>
-            <div className="h-[90%] lg:h-[85%] w-full overflow-y-auto scroll-smooth flex flex-col" ref={chatScrollRef}>
+            <div className="h-[85%] w-full overflow-y-auto scroll-smooth flex flex-col" ref={chatScrollRef}>
                 <div className="sticky top-0 left-0 z-10 w-full lg:px-6 lg:py-4 flex items-center justify-between bg-[#0A0A0A] lg:hover:bg-gray-900 duration-300 border-b border-gray-800 text-xl">
                     <button
                         className="lg:hidden rounded-full outline-none mx-4"
@@ -147,7 +147,7 @@ const ChatWindow: React.FC = () => {
 
             {
                 !loadingChats && (
-                    <form className="w-full lg:h-[15%] flex items-start pt-2 justify-center gap-3" onSubmit={handleMessageSubmit}>
+                    <form className="w-full h-[15%] flex items-start pt-2 justify-center gap-3" onSubmit={handleMessageSubmit}>
                         <input
                             type="text"
                             value={message}

@@ -3,11 +3,9 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../store/store";
 import { IoClose } from "react-icons/io5";
-import { MdOutlineContentCopy } from "react-icons/md";
-import { FaRegCircleCheck } from "react-icons/fa6";
 import { updateConnections } from "../store/userSlice";
 import { useIdBarContext } from "../contexts/IdBarContext";
-import { copyToClipboard, getRandomEmoji } from "../../utils/funcs/funcs";
+import { getRandomEmoji } from "../../utils/funcs/funcs";
 
 const IdBar: React.FC = () => {
 
@@ -37,6 +35,21 @@ const IdBar: React.FC = () => {
             }
         };
     }, [idCopied]);
+
+    useEffect(() => {
+
+        const closeIdBar = () => {
+            if (idBarOpen) {
+                setIdBarOpen(false);
+            }
+        };
+
+        window.addEventListener("click", closeIdBar);
+
+        return () => {
+            window.removeEventListener("click", closeIdBar);
+        };
+    }, []);
 
     const addFriend = async () => {
         setIsAdding(true);
@@ -71,10 +84,10 @@ const IdBar: React.FC = () => {
         } catch (error) {
             console.log(error);
         }
-    }
+    };
 
     return (
-        <div className="w-fit h-fit">
+        <div className="w-fit h-fit" onClick={(e) => e.stopPropagation()}>
 
             <div className={`fixed right-0 top-0 z-50 w-screen h-screen lg:max-w-[450px] border-l-2 border-gray-800 bg-black ${idBarOpen ? "translate-x-0" : "translate-x-full"} duration-300`}>
 
