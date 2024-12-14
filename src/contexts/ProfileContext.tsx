@@ -41,8 +41,7 @@ const ProfileContextProvider = ({ children }: { children: React.ReactNode }) => 
     const fetchProfileInfo = async (id: string) => {
         setIsLoading(true);
         if (!id) {
-            addToast("Something went wrong", false);
-            return
+            return;
         };
 
         // Getting token from local storage.

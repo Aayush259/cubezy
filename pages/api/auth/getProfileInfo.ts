@@ -48,7 +48,7 @@ export default async function getProfileInfo(req: NextApiRequest, res: NextApiRe
 
             profileInfo = {
                 _id: profileUser._id,
-                email: "",
+                email: profileUser.email,
                 name: profileUser.name,
                 dp: profileUser.dp,
                 connections: [],

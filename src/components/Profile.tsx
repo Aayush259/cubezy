@@ -114,7 +114,7 @@ const Profile = () => {
                             <p className="mb-4 lg:mb-0">{profileInfo.email}</p>
 
                             {
-                                profileInfo._id === user?._id && profileInfo.connections.length > 0 && <div className="w-full px-4 md:px-8 py-4 border-t border-b border-t-gray-800 border-b-gray-800 my-3">
+                                profileInfo._id === user?._id && profileInfo.connections.length > 0 && <div className="w-full px-4 md:px-8 py-4 border-t border-b border-t-gray-800 border-b-gray-800 mt-3">
 
                                     <p className="text-xl mb-2">Your Connections:</p>
 
@@ -146,14 +146,7 @@ const Profile = () => {
                                 </div>
                             }
 
-                            <div className="w-full flex items-center justify-between gap-4 px-4 md:px-8">
-                                {profileInfo._id}
-                                <button className="w-fit" onClick={copyIdToClipboard}>
-                                    {idCopied ? <FaRegCircleCheck size={20} /> : <MdOutlineContentCopy size={20} className="lg:hover:opacity-80 duration-300" />}
-                                </button>
-                            </div>
-
-                            <div className="w-full px-4 md:px-8 py-3 border-t border-b border-t-gray-800 border-b-gray-800 my-3">
+                            <div className={`w-full px-4 md:px-8 pt-1 pb-3 border-b border-t-gray-800 border-b-gray-800 ${profileInfo._id !== user?._id && "border-t !pt-3 mt-3"}`}>
                                 <p>Joined on: {formatDate2(profileInfo.createdAt)}</p>
                             </div>
                         </div>
