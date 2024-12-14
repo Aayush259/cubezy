@@ -7,7 +7,7 @@ import { IoCheckmarkDone } from "react-icons/io5";
 import { IoMdCheckmark, IoIosArrowBack } from "react-icons/io";
 import { GoClock } from "react-icons/go";
 import { useEffect, useRef, useState } from "react";
-import { formatDate } from "../../utils/funcs/funcs";
+import { compareDates, formatDate } from "../../utils/funcs/funcs";
 import Image from "next/image";
 import { useProfileContext } from "../contexts/ProfileContext";
 import Loader from "./Loader";
@@ -87,7 +87,7 @@ const ChatWindow: React.FC = () => {
                             {
                                 onlineConnections.includes(receiverId) && (
                                     <span className="text-xs flex items-center gap-2 animate-heightActive">
-                                        <span className="h-2 w-2 bg-blue-700 rounded-full block" />
+                                        <span className="h-2 w-2 bg-green-500 rounded-full block" />
                                         {" Online"}
                                     </span>
                                 )
@@ -102,31 +102,40 @@ const ChatWindow: React.FC = () => {
                     ) : (
                         <div className="flex-grow h-fit pt-2 px-4 lg:px-32 flex flex-col justify-end gap-1.5 w-full">
                             {
-                                chats?.map(chat => (
-                                    <div key={chat._id} className={`flex items-end md:max-w-[350px] max-w-[90%] py-1 px-2 rounded-lg w-fit lg:text-xl relative ${chat.senderId === user?._id ? "self-end bg-blue-700" : "self-start bg-slate-800"}`}>
-                                        {chat.message}
+                                chats?.map((chat, index) => (
+                                    <div key={chat._id} className="w-full">
+                                        {
+                                            compareDates(chats[index - 1]?.sentAt, chat.sentAt) && (
+                                                <div key={chat._id} className="gap-2 w-fit mx-auto text-sm my-1 px-4 py-1 rounded-full bg-slate-800">
+                                                    {compareDates(chats[index - 1]?.sentAt, chat.sentAt)}
+                                                </div>
+                                            )
+                                        }
+                                        <div className={`flex items-end md:max-w-[350px] max-w-[90%] py-1 px-2 rounded-lg w-fit lg:text-xl relative ${chat.senderId === user?._id ? "ml-auto bg-blue-700" : "self-start bg-slate-800"}`}>
+                                            {chat.message}
 
-                                        <div className="flex items-center justify-end gap-1 text-sm text-white whitespace-nowrap pl-4">
-                                            <p className="text-[10px] leading-none">
+                                            <div className="flex items-center justify-end gap-1 text-sm text-white whitespace-nowrap pl-4">
+                                                <p className="text-[10px] leading-none">
+                                                    {
+                                                        formatDate(chat.sentAt)
+                                                    }
+                                                </p>
+
                                                 {
-                                                    formatDate(chat.sentAt)
-                                                }
-                                            </p>
-
-                                            {
-                                                chat.isRead && user?._id === chat.senderId && (
-                                                    <IoCheckmarkDone className="text-green-300" />
-                                                )
-                                            }
-
-                                            {
-                                                chat.status === "sending" ? (
-                                                    <GoClock className="text-white" />
-                                                )
-                                                    : !chat.isRead && user?._id === chat.senderId && (
-                                                        <IoMdCheckmark className="text-white" />
+                                                    chat.isRead && user?._id === chat.senderId && (
+                                                        <IoCheckmarkDone className="text-green-300" />
                                                     )
-                                            }
+                                                }
+
+                                                {
+                                                    chat.status === "sending" ? (
+                                                        <GoClock className="text-white" />
+                                                    )
+                                                        : !chat.isRead && user?._id === chat.senderId && (
+                                                            <IoMdCheckmark className="text-white" />
+                                                        )
+                                                }
+                                            </div>
                                         </div>
                                     </div>
                                 ))
