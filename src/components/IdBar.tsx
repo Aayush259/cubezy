@@ -7,7 +7,7 @@ import { MdOutlineContentCopy } from "react-icons/md";
 import { FaRegCircleCheck } from "react-icons/fa6";
 import { updateConnections } from "../store/userSlice";
 import { useIdBarContext } from "../contexts/IdBarContext";
-import { copyToClipboard } from "../../utils/funcs/funcs";
+import { copyToClipboard, getRandomEmoji } from "../../utils/funcs/funcs";
 
 const IdBar: React.FC = () => {
 
@@ -17,7 +17,7 @@ const IdBar: React.FC = () => {
     const { idBarOpen, setIdBarOpen } = useIdBarContext();
 
     const [idCopied, setIdCopied] = useState<boolean>(false);   // State to track whether the ID has been copied.
-    const [idToAdd, setIdToAdd] = useState<string>("");   // State to store the ID to add.
+    const [userEmailToAdd, setUserEmailToAdd] = useState<string>("");   // State to store the ID to add.
     const [isAdding, setIsAdding] = useState<boolean>(false);   // State to track whether the user is adding a new ID.
 
     useEffect(() => {
@@ -38,19 +38,13 @@ const IdBar: React.FC = () => {
         };
     }, [idCopied]);
 
-    // Function to copy the user's ID to the clipboard.
-    const copyIdToClipboard = () => {
-        copyToClipboard(user?._id as string);
-        setIdCopied(true);
-    }
-
-    const addId = async () => {
+    const addFriend = async () => {
         setIsAdding(true);
 
         const token = localStorage.getItem("token");
 
         try {
-            console.log("Adding ID:", idToAdd);
+            console.log("Adding ID:", userEmailToAdd);
             const response = await fetch("/api/auth/addConnection", {
                 method: "POST",
                 headers: {
@@ -58,7 +52,7 @@ const IdBar: React.FC = () => {
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
-                    idToAdd: idToAdd
+                    userEmailToAdd: userEmailToAdd
                 })
             });
 
@@ -68,7 +62,7 @@ const IdBar: React.FC = () => {
 
                 if (connections) {
                     dispatch(updateConnections(connections));
-                    setIdToAdd("");
+                    setUserEmailToAdd("");
                     setIsAdding(false);
                 }
             } else {
@@ -88,27 +82,20 @@ const IdBar: React.FC = () => {
                     <IoClose size={30} className="text-white" />
                 </button>
 
-                <div className="text-2xl text-center my-10 overflow-hidden">
-                    <p>Your ID:</p>
-                    <div className="w-[80%] max-w-[400px] lg:max-w-none mx-auto my-1 flex items-center justify-between">
-                        <p className="max-w-[85%] overflow-hidden overflow-ellipsis">{user?._id}</p>
-
-                        <button className="w-fit" onClick={copyIdToClipboard}>
-                            {idCopied ? <FaRegCircleCheck size={30} /> : <MdOutlineContentCopy size={30} className="lg:hover:opacity-80 duration-300" />}
-                        </button>
-                    </div>
+                <div className="text-2xl text-center mt-32 overflow-hidden">
+                    <p>Add new friend {getRandomEmoji()}</p>
                 </div>
 
-                <form className="my-16 flex flex-row items-center justify-center" onSubmit={(e) => {
+                <form className="my-4 flex flex-row items-center justify-center" onSubmit={(e) => {
                     e.preventDefault();
-                    addId();
+                    addFriend();
                 }}>
                     <input
-                        type="text"
-                        value={idToAdd}
-                        placeholder="Enter your friend's ID"
+                        type="email"
+                        value={userEmailToAdd}
+                        placeholder="Enter your friend's email"
                         className={`w-[70%] max-w-[350px] lg:max-w-none px-4 py-2 bg-gray-800 border-b-2 border-gray-800 focus:outline-none focus:border-blue-700 rounded-l-lg ${isAdding ? "opacity-50" : "opacity-100"}`}
-                        onChange={(e) => setIdToAdd(e.target.value)}
+                        onChange={(e) => setUserEmailToAdd(e.target.value)}
                         readOnly={isAdding}
                     />
 

@@ -31,20 +31,22 @@ export default async function addConnection(req: NextApiRequest, res: NextApiRes
         }
 
         // Get id from body.
-        const { idToAdd } = req.body;
+        const { userEmailToAdd } = req.body;
+        // const { idToAdd } = req.body;
 
         // Check if id is valid.
-        if (!idToAdd) {
-            return res.status(400).json({ message: "ID is required." });
+        if (!userEmailToAdd) {
+            return res.status(400).json({ message: "Email is required." });
         }
 
         // Get user to add.
-        const userToAdd = await User.findById(idToAdd);
-
+        const userToAdd = await User.findOne({ email: userEmailToAdd });
         // Check if user to add exists.
         if (!userToAdd) {
-            return res.status(404).json({ message: `User with id ${idToAdd} not found` });
+            return res.status(404).json({ message: `User with email ${userEmailToAdd} not found` });
         }
+
+        const idToAdd = (userToAdd._id as mongoose.Types.ObjectId).toString();
 
         // Check if user is already connected.
         const isAlreadyConnected = user.connections.some(connection => connection._id.toString() === idToAdd);
