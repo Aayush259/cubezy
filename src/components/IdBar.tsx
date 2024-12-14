@@ -1,7 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "../store/store";
+import { useDispatch } from "react-redux";
 import { IoClose } from "react-icons/io5";
 import { updateConnections } from "../store/userSlice";
 import { useIdBarContext } from "../contexts/IdBarContext";
@@ -9,32 +8,12 @@ import { getRandomEmoji } from "../../utils/funcs/funcs";
 
 const IdBar: React.FC = () => {
 
-    const { user } = useSelector((state: RootState) => state.user);
     const dispatch = useDispatch();
 
     const { idBarOpen, setIdBarOpen } = useIdBarContext();
 
-    const [idCopied, setIdCopied] = useState<boolean>(false);   // State to track whether the ID has been copied.
     const [userEmailToAdd, setUserEmailToAdd] = useState<string>("");   // State to store the ID to add.
     const [isAdding, setIsAdding] = useState<boolean>(false);   // State to track whether the user is adding a new ID.
-
-    useEffect(() => {
-        let intervalId: NodeJS.Timeout | undefined;
-
-        // If idCopied is true, then set it to false after 4 seconds.
-        if (idCopied) {
-            intervalId = setTimeout(() => {
-                setIdCopied(false);
-            }, 4000);
-        }
-
-        // Clean up the interval on component unmount.
-        return () => {
-            if (intervalId) {
-                clearTimeout(intervalId);
-            }
-        };
-    }, [idCopied]);
 
     useEffect(() => {
 

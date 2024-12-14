@@ -222,6 +222,7 @@ export default async function handler(_: NextApiRequest, res: ExtendedNextApiRes
                         receiver.connections.push({
                             chatId: chatId,
                             _id: sender._id as mongoose.Types.ObjectId,
+                            email: sender.email,
                             name: sender.name,
                             dp: sender.dp,
                         });

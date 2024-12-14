@@ -9,6 +9,7 @@ export interface IUserSlice {
         connections: {
             _id: string;
             name: string;
+            email: string;
             chatId: string;
             dp: string | null;
         }[];
@@ -37,6 +38,7 @@ export interface IProfileInfo {
     connections: {
         _id: string;
         name: string;
+        email: string;
         chatId: string;
         dp: string | null;
     }[];

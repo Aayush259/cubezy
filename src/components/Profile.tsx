@@ -1,11 +1,8 @@
 "use client";
 import Image from "next/image";
 import { useProfileContext } from "../contexts/ProfileContext";
-import { MdOutlineContentCopy } from "react-icons/md";
 import { IoClose, IoCameraSharp } from "react-icons/io5";
-import { useEffect, useState } from "react";
-import { FaRegCircleCheck } from "react-icons/fa6";
-import { copyToClipboard, formatDate2 } from "../../utils/funcs/funcs";
+import { formatDate2 } from "../../utils/funcs/funcs";
 import { useSelector } from "react-redux";
 import { RootState } from "../store/store";
 import { useChatContext } from "../contexts/ChatContext";
@@ -19,32 +16,6 @@ const Profile = () => {
 
     // User state from store.
     const { user } = useSelector((state: RootState) => state.user);
-
-    const [idCopied, setIdCopied] = useState<boolean>(false);   // State to track whether the ID has been copied.
-
-    useEffect(() => {
-        let intervalId: NodeJS.Timeout | undefined;
-
-        // If idCopied is true, then set it to false after 4 seconds.
-        if (idCopied) {
-            intervalId = setTimeout(() => {
-                setIdCopied(false);
-            }, 4000);
-        }
-
-        // Clean up the interval on component unmount.
-        return () => {
-            if (intervalId) {
-                clearTimeout(intervalId);
-            }
-        };
-    }, [idCopied]);
-
-    // Function to copy the user's ID to the clipboard.
-    const copyIdToClipboard = () => {
-        copyToClipboard(profileInfo?._id || "");
-        setIdCopied(true);
-    };
 
     return (
         <div className={`py-8 h-full w-full fixed lg:absolute top-0 left-0 duration-300 z-[100] overflow-hidden bg-[#0A0A0A] ${isProfileOpen ? "translate-x-0" : "translate-x-full"}`}>

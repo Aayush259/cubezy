@@ -6,7 +6,7 @@ interface IUser extends Document {
     email: string;
     password: string;
     dp: string | null;
-    connections: {chatId: string, _id: mongoose.Types.ObjectId; name: string, dp: string | null}[];
+    connections: {chatId: string; _id: mongoose.Types.ObjectId; name: string; email: string; dp: string | null}[];
     createdAt: Date;
     comparePassword(password: string): Promise<boolean>;
 };
