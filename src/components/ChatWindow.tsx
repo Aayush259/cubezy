@@ -9,7 +9,7 @@ import { GoClock } from "react-icons/go";
 import { MdContentCopy, MdDelete } from "react-icons/md";
 import { FaCheck } from "react-icons/fa6";
 import { useEffect, useRef, useState } from "react";
-import { compareDates, formatDate } from "../../utils/funcs/funcs";
+import { compareDates, copyToClipboard, formatDate } from "../../utils/funcs/funcs";
 import Image from "next/image";
 import { useProfileContext } from "../contexts/ProfileContext";
 import Loader from "./Loader";
@@ -83,6 +83,17 @@ const ChatWindow: React.FC = () => {
         }
     };
 
+    // Function to copy messages.
+    const copyMessages = () => {
+        if (selectedMessages.length === 0) return;
+
+        const messages = selectedMessages.map(selectedMessage => selectedMessage.message);
+        copyToClipboard(messages.join("\n"));
+
+        // Clear selected messages.
+        clearSelectedMessages();
+    };
+
     if (!receiverId) return (
         <div className="w-full h-full hidden lg:flex lg:flex-col items-center justify-center gap-6 relative z-20 text-xl font-[200]">
             <Image
@@ -116,11 +127,11 @@ const ChatWindow: React.FC = () => {
                                     <button onClick={deleteMessage}>
                                         <MdDelete size={22} />
                                     </button>
-                                    
-                                    <button>
+
+                                    <button onClick={copyMessages}>
                                         <MdContentCopy size={20} />
                                     </button>
-                                    
+
                                     <button>
                                         <IoMdShareAlt size={22} />
                                     </button>
