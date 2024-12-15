@@ -223,7 +223,7 @@ const ChatWindow: React.FC = () => {
                                                 onTouchEnd={() => handleLongPressMessageEnd()}
                                             >
                                                 {
-                                                    isMessageSelected && <div className="w-screen right-0 rounded-md h-full absolute bg-blue-700/20" />
+                                                    isMessageSelected && <div className="w-screen -right-4 lg:-right-32 rounded-md h-full absolute bg-blue-700/20" />
                                                 }
 
                                                 <div className={`flex items-end md:max-w-[350px] max-w-[90%] py-1 px-2 rounded-lg w-fit lg:text-xl relative ${chat.senderId === user?._id ? "ml-auto bg-blue-700" : "self-start bg-slate-800"}`}>
