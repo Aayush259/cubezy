@@ -18,9 +18,7 @@ const IdBar: React.FC = () => {
     useEffect(() => {
 
         const closeIdBar = () => {
-            if (idBarOpen) {
-                setIdBarOpen(false);
-            }
+            setIdBarOpen(false);
         };
 
         window.addEventListener("click", closeIdBar);

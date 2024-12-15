@@ -12,7 +12,7 @@ const Profile = () => {
 
     // Getting the state from the ProfileContext.
     const { isProfileOpen, setIsProfileOpen, isLoading, profileInfo } = useProfileContext();
-    const { addDp } = useChatContext();     // Function to add the DP to the chat.
+    const { addDp, onlineConnections, receiverId } = useChatContext();     // Function to add the DP to the chat.
 
     // User state from store.
     const { user } = useSelector((state: RootState) => state.user);
@@ -81,6 +81,15 @@ const Profile = () => {
                             <p className="text-2xl">
                                 <span className="font-semibold">{profileInfo.name}</span><span className="opacity-70">{user?._id === profileInfo._id && " (You)"}</span>
                             </p>
+
+                            {
+                                 user?._id !== profileInfo._id && receiverId && onlineConnections.includes(receiverId) && (
+                                    <span className="text-xs flex items-center gap-2 animate-heightActive">
+                                        <span className="h-2 w-2 bg-green-500 rounded-full block" />
+                                        {" Online"}
+                                    </span>
+                                )
+                            }
 
                             <p className="mb-4 lg:mb-0">{profileInfo.email}</p>
 
