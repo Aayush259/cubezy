@@ -3,20 +3,23 @@ import { useSelector } from "react-redux";
 import { useChatContext } from "../contexts/ChatContext";
 import { RootState } from "../store/store";
 import { IoSend } from "react-icons/io5";
-import { IoCheckmarkDone } from "react-icons/io5";
-import { IoMdCheckmark, IoIosArrowBack } from "react-icons/io";
+import { IoCheckmarkDone, IoClose } from "react-icons/io5";
+import { IoMdCheckmark, IoIosArrowBack, IoMdShareAlt } from "react-icons/io";
 import { GoClock } from "react-icons/go";
+import { MdContentCopy, MdDelete } from "react-icons/md";
+import { FaCheck } from "react-icons/fa6";
 import { useEffect, useRef, useState } from "react";
 import { compareDates, formatDate } from "../../utils/funcs/funcs";
 import Image from "next/image";
 import { useProfileContext } from "../contexts/ProfileContext";
 import Loader from "./Loader";
+import { IChatMessage } from "@/utils/interfaces/interfaces";
 
 const ChatWindow: React.FC = () => {
 
     const { user } = useSelector((state: RootState) => state.user);
 
-    const { receiverId, updateReceiverId, chats, loadingChats, sendMessage, onlineConnections } = useChatContext();
+    const { receiverId, updateReceiverId, chats, loadingChats, sendMessage, onlineConnections, selectedMessages, addSelectedMessage, removeSelectedMessage, clearSelectedMessages } = useChatContext();
     const { openProfile } = useProfileContext();
 
     const [message, setMessage] = useState<string>("");
@@ -24,6 +27,9 @@ const ChatWindow: React.FC = () => {
     const receiver = user?.connections.find((connection) => connection._id === receiverId);
 
     const chatScrollRef = useRef<HTMLDivElement | null>(null);
+
+    const [longPressTimeout, setLongPressTimeout] = useState<NodeJS.Timeout | null>(null);
+    const [longPressActive, setLongPressActive] = useState<boolean>(false);
 
     useEffect(() => {
         if (chatScrollRef.current) {
@@ -35,6 +41,36 @@ const ChatWindow: React.FC = () => {
         e.preventDefault();
         sendMessage(message);
         setMessage("");
+    };
+
+    const handleLongPressMessage = (message: IChatMessage) => {
+        if (selectedMessages.length > 0) return;
+
+        const longPressTimeout = setTimeout(() => {
+            addSelectedMessage(message);
+            setLongPressActive(true);
+        }, 500);
+
+        setLongPressTimeout(longPressTimeout);
+    };
+
+    const handleLongPressMessageEnd = () => {
+        if (longPressTimeout) {
+            clearTimeout(longPressTimeout);
+            setLongPressTimeout(null);
+        }
+        setTimeout(() => setLongPressActive(false), 100);
+    };
+
+    const handleMessageClick = (message: IChatMessage) => {
+        if (selectedMessages.length <= 0 || longPressActive) return;
+        const isMessageSelected = selectedMessages.filter(selectedMessage => selectedMessage._id === message._id).length > 0;
+
+        if (isMessageSelected) {
+            removeSelectedMessage(message._id);
+        } else {
+            addSelectedMessage(message);
+        }
     };
 
     if (!receiverId) return (
@@ -55,6 +91,34 @@ const ChatWindow: React.FC = () => {
         <div className={`w-screen h-screen lg:w-full z-20 fixed top-0 left-0 lg:relative bg-[#0A0A0A] lg:bg-none`}>
             <div className="h-[85%] w-full overflow-y-auto scroll-smooth flex flex-col" ref={chatScrollRef}>
                 <div className="sticky top-0 left-0 z-10 w-full lg:px-6 lg:py-4 flex items-center justify-between bg-[#0A0A0A] lg:hover:bg-gray-900 duration-300 border-b border-gray-800 text-xl">
+                    {
+                        selectedMessages.length > 0 && (
+                            <div className="w-full h-full flex items-center justify-between px-2 lg:px-6 gap-2 absolute top-0 left-0 bg-[#0A0A0A] z-10">
+                                <p className="flex items-center gap-2">
+                                    <button onClick={clearSelectedMessages}>
+                                        <IoClose size={30} />
+                                    </button>
+
+                                    {selectedMessages.length + " Selected"}
+                                </p>
+
+                                <div className="flex items-center gap-4 ml-auto justify-self-end">
+                                    <button>
+                                        <MdDelete size={22} />
+                                    </button>
+                                    
+                                    <button>
+                                        <MdContentCopy size={20} />
+                                    </button>
+                                    
+                                    <button>
+                                        <IoMdShareAlt size={22} />
+                                    </button>
+                                </div>
+                            </div>
+                        )
+                    }
+
                     <button
                         className="lg:hidden rounded-full outline-none mx-4"
                         onClick={() => updateReceiverId(null)}
@@ -102,43 +166,76 @@ const ChatWindow: React.FC = () => {
                     ) : (
                         <div className="flex-grow h-fit pt-2 px-4 lg:px-32 flex flex-col justify-end gap-1.5 w-full">
                             {
-                                chats?.map((chat, index) => (
-                                    <div key={chat._id} className="w-full">
-                                        {
-                                            compareDates(chats[index - 1]?.sentAt, chat.sentAt) && (
-                                                <div key={chat._id} className="gap-2 w-fit mx-auto text-sm my-1 px-4 py-1 rounded-full bg-slate-800">
-                                                    {compareDates(chats[index - 1]?.sentAt, chat.sentAt)}
-                                                </div>
-                                            )
-                                        }
-                                        <div className={`flex items-end md:max-w-[350px] max-w-[90%] py-1 px-2 rounded-lg w-fit lg:text-xl relative ${chat.senderId === user?._id ? "ml-auto bg-blue-700" : "self-start bg-slate-800"}`}>
-                                            {chat.message}
+                                chats?.map((chat, index) => {
 
-                                            <div className="flex items-center justify-end gap-1 text-sm text-white whitespace-nowrap pl-4">
-                                                <p className="text-[10px] leading-none">
+                                    const isMessageSelected = selectedMessages.filter(selectedMessage => selectedMessage._id === chat._id).length > 0;
+
+                                    const comparedDate = compareDates(chats[index - 1]?.sentAt, chat.sentAt);
+
+                                    return (
+                                        <div key={chat._id} className={`w-full relative duration-300 ${selectedMessages.length > 0 ? "pl-8" : "pl-0"}`}>
+                                            {
+                                                comparedDate && (
+                                                    <div key={chat._id} className="gap-2 w-fit mx-auto text-sm my-1 px-4 py-1 rounded-full bg-slate-800">
+                                                        {comparedDate}
+                                                    </div>
+                                                )
+                                            }
+
+                                            {
+                                                selectedMessages.length > 0 && <button
+                                                    className={`absolute flex items-center justify-center outline-none bottom-0 -translate-y-1/2 -left-3 h-5 w-5 rounded-full overflow-hidden border border-white ${isMessageSelected ? "bg-blue-700" : "bg-transparent"}`}
+                                                    onClick={() => handleMessageClick(chat)}
+                                                >
                                                     {
-                                                        formatDate(chat.sentAt)
+                                                        isMessageSelected && <FaCheck size={10} />
                                                     }
-                                                </p>
+                                                </button>
+                                            }
 
+                                            <div
+                                                className="w-full relative"
+                                                onClick={() => handleMessageClick(chat)}
+                                                onMouseDown={() => handleLongPressMessage(chat)}
+                                                onTouchStart={() => handleLongPressMessage(chat)}
+                                                onMouseUp={() => handleLongPressMessageEnd()}
+                                                onTouchEnd={() => handleLongPressMessageEnd()}
+                                            >
                                                 {
-                                                    chat.isRead && user?._id === chat.senderId && (
-                                                        <IoCheckmarkDone className="text-green-300" />
-                                                    )
+                                                    isMessageSelected && <div className="w-screen right-0 rounded-md h-full absolute bg-blue-700/20" />
                                                 }
 
-                                                {
-                                                    chat.status === "sending" ? (
-                                                        <GoClock className="text-white" />
-                                                    )
-                                                        : !chat.isRead && user?._id === chat.senderId && (
-                                                            <IoMdCheckmark className="text-white" />
-                                                        )
-                                                }
+                                                <div className={`flex items-end md:max-w-[350px] max-w-[90%] py-1 px-2 rounded-lg w-fit lg:text-xl relative ${chat.senderId === user?._id ? "ml-auto bg-blue-700" : "self-start bg-slate-800"}`}>
+
+                                                    {chat.message}
+
+                                                    <div className="flex items-center justify-end gap-1 text-sm text-white whitespace-nowrap pl-4">
+                                                        <p className="text-[10px] leading-none">
+                                                            {
+                                                                formatDate(chat.sentAt)
+                                                            }
+                                                        </p>
+
+                                                        {
+                                                            chat.isRead && user?._id === chat.senderId && (
+                                                                <IoCheckmarkDone className="text-green-300" />
+                                                            )
+                                                        }
+
+                                                        {
+                                                            chat.status === "sending" ? (
+                                                                <GoClock className="text-white" />
+                                                            )
+                                                                : !chat.isRead && user?._id === chat.senderId && (
+                                                                    <IoMdCheckmark className="text-white" />
+                                                                )
+                                                        }
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                ))
+                                    )
+                                })
                             }
                         </div>
                     )
