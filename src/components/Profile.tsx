@@ -83,7 +83,7 @@ const Profile = () => {
                             </p>
 
                             {
-                                 user?._id !== profileInfo._id && receiverId && onlineConnections.includes(receiverId) && (
+                                user?._id !== profileInfo._id && receiverId && onlineConnections.includes(receiverId) && (
                                     <span className="text-xs flex items-center gap-2 animate-heightActive">
                                         <span className="h-2 w-2 bg-green-500 rounded-full block" />
                                         {" Online"}
