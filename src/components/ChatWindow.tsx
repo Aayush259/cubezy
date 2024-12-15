@@ -19,7 +19,7 @@ const ChatWindow: React.FC = () => {
 
     const { user } = useSelector((state: RootState) => state.user);
 
-    const { receiverId, updateReceiverId, chats, loadingChats, sendMessage, onlineConnections, selectedMessages, addSelectedMessage, removeSelectedMessage, clearSelectedMessages } = useChatContext();
+    const { receiverId, updateReceiverId, chats, loadingChats, sendMessage, onlineConnections, selectedMessages, addSelectedMessage, removeSelectedMessage, clearSelectedMessages, deleteMessage } = useChatContext();
     const { openProfile } = useProfileContext();
 
     const [message, setMessage] = useState<string>("");
@@ -28,8 +28,8 @@ const ChatWindow: React.FC = () => {
 
     const chatScrollRef = useRef<HTMLDivElement | null>(null);
 
-    const [longPressTimeout, setLongPressTimeout] = useState<NodeJS.Timeout | null>(null);
-    const [longPressActive, setLongPressActive] = useState<boolean>(false);
+    const [longPressTimeout, setLongPressTimeout] = useState<NodeJS.Timeout | null>(null);      // Used to handle long press on messages.
+    const [longPressActive, setLongPressActive] = useState<boolean>(false);     // Used to handle long press on messages.
 
     useEffect(() => {
         if (chatScrollRef.current) {
@@ -37,15 +37,19 @@ const ChatWindow: React.FC = () => {
         }
     }, [chats]);
 
+    // Handle message submit.
     const handleMessageSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         sendMessage(message);
         setMessage("");
     };
 
+    // Handle long press on messages.
     const handleLongPressMessage = (message: IChatMessage) => {
+        // If any message is already selected, don't do anything.
         if (selectedMessages.length > 0) return;
 
+        // Add the message to selected messages and set long press active.
         const longPressTimeout = setTimeout(() => {
             addSelectedMessage(message);
             setLongPressActive(true);
@@ -54,18 +58,24 @@ const ChatWindow: React.FC = () => {
         setLongPressTimeout(longPressTimeout);
     };
 
+    // Handle long press on messages end.
     const handleLongPressMessageEnd = () => {
         if (longPressTimeout) {
+            // Clear the timeout and set long press active to false.
             clearTimeout(longPressTimeout);
             setLongPressTimeout(null);
         }
         setTimeout(() => setLongPressActive(false), 100);
     };
 
+    // Handle message click.
     const handleMessageClick = (message: IChatMessage) => {
-        if (selectedMessages.length <= 0 || longPressActive) return;
+        // If no messages are selected or long press is active, don't do anything.
+        if (selectedMessages.length === 0 || longPressActive) return;
+
         const isMessageSelected = selectedMessages.filter(selectedMessage => selectedMessage._id === message._id).length > 0;
 
+        // If message is already selected, remove it from selected messages, else add it to selected messages.
         if (isMessageSelected) {
             removeSelectedMessage(message._id);
         } else {
@@ -103,7 +113,7 @@ const ChatWindow: React.FC = () => {
                                 </p>
 
                                 <div className="flex items-center gap-4 ml-auto justify-self-end">
-                                    <button>
+                                    <button onClick={deleteMessage}>
                                         <MdDelete size={22} />
                                     </button>
                                     
@@ -184,7 +194,7 @@ const ChatWindow: React.FC = () => {
 
                                             {
                                                 selectedMessages.length > 0 && <button
-                                                    className={`absolute flex items-center justify-center outline-none bottom-0 -translate-y-1/2 -left-3 h-5 w-5 rounded-full overflow-hidden border border-white ${isMessageSelected ? "bg-blue-700" : "bg-transparent"}`}
+                                                    className={`absolute flex items-center justify-center outline-none bottom-0 -translate-y-1/4 lg:-translate-y-1/2 left-0 h-5 w-5 rounded-full overflow-hidden border border-white ${isMessageSelected ? "bg-blue-700" : "bg-transparent"}`}
                                                     onClick={() => handleMessageClick(chat)}
                                                 >
                                                     {

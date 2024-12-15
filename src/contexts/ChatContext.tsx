@@ -24,6 +24,7 @@ const ChatContext = createContext<{
     addSelectedMessage: (message: IChatMessage) => void;
     removeSelectedMessage: (messageId: string) => void;
     clearSelectedMessages: () => void;
+    deleteMessage: () => void;
 }>({
     receiverId: null,
     updateReceiverId: () => { },
@@ -37,6 +38,7 @@ const ChatContext = createContext<{
     addSelectedMessage: () => { },
     removeSelectedMessage: () => { },
     clearSelectedMessages: () => { },
+    deleteMessage: () => { },
 })
 
 const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
@@ -265,6 +267,29 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
         }
     };
 
+    // Function to delete a message.
+    const deleteMessage = async () => {
+        if (!socket || !chatId || selectedMessages.length === 0) return;
+
+        const messageIdsToDelete = selectedMessages.map(message => message._id);
+
+        // Emit the messageIds to the server to delete the messages.
+        socket.emit("deleteMessage", {
+            chatId,
+            messageIds: messageIdsToDelete,
+        }, (response: any) => {
+            if (!response.success) {
+                addToast("Failed to delete", false);
+                clearSelectedMessages();
+                return;
+            }
+
+            // Update the chats state to remove the deleted messages.
+            setChats(prevChats => prevChats.filter(chat => !messageIdsToDelete.includes(chat._id)));
+            clearSelectedMessages();
+        });
+    };
+
     // Function to add DP.
     const addDp = async (event: React.ChangeEvent<HTMLInputElement>) => {
         if (!socket || !user) return;
@@ -459,7 +484,7 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
     }, [chats]);
 
     return (
-        <ChatContext.Provider value={{ receiverId: receiverId, updateReceiverId, lastMessages, chats, loadingChats, sendMessage, addDp, onlineConnections, selectedMessages, addSelectedMessage, removeSelectedMessage, clearSelectedMessages }}>
+        <ChatContext.Provider value={{ receiverId: receiverId, updateReceiverId, lastMessages, chats, loadingChats, sendMessage, addDp, onlineConnections, selectedMessages, addSelectedMessage, removeSelectedMessage, clearSelectedMessages, deleteMessage }}>
             {
                 loadingLastMessages ? <Loader /> : error ? <p>Something went wrong</p> : children
             }
