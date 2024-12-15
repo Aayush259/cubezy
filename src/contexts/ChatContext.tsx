@@ -20,6 +20,10 @@ const ChatContext = createContext<{
     sendMessage: (message: string) => void;
     addDp: (event: React.ChangeEvent<HTMLInputElement>) => void;
     onlineConnections: string[];
+    selectedMessages: IChatMessage[];
+    addSelectedMessage: (message: IChatMessage) => void;
+    removeSelectedMessage: (messageId: string) => void;
+    clearSelectedMessages: () => void;
 }>({
     receiverId: null,
     updateReceiverId: () => { },
@@ -29,6 +33,10 @@ const ChatContext = createContext<{
     sendMessage: () => { },
     addDp: () => { },
     onlineConnections: [],
+    selectedMessages: [],
+    addSelectedMessage: () => { },
+    removeSelectedMessage: () => { },
+    clearSelectedMessages: () => { },
 })
 
 const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
@@ -40,7 +48,6 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
 
     const { addToast } = useToast();
 
-    // const [receiverId, setReceiverId] = useState<string | null>(null);      // Receiver ID.
     const [socket, setSocket] = useState<Socket | null>(null);      // Socket.
     const [loadingChats, setLoadingChats] = useState<boolean>(true);    // Loading chats state.
     const [chats, setChats] = useState<IChatMessage[]>([]);     // Chats state.
@@ -55,6 +62,24 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
 
     // Reference to the active connections.
     const activeConnections = useRef<string[]>([]);
+
+    // State to track selected messages.
+    const [selectedMessages, setSelectedMessages] = useState<IChatMessage[]>([]);
+
+    // Function to add append selected message.
+    const addSelectedMessage = (message: IChatMessage) => {
+        setSelectedMessages((prevSelectedMessages) => [...prevSelectedMessages, message]);
+    };
+
+    // Function to remove selected message.
+    const removeSelectedMessage = (messageId: string) => {
+        setSelectedMessages((prevSelectedMessages) => prevSelectedMessages.filter(message => message._id !== messageId));
+    };
+
+    // Function to clear selected messages.
+    const clearSelectedMessages = () => {
+        setSelectedMessages([]);
+    };
 
     // Function to update the active connections.
     const setActiveConnections = (connections: string[]) => {
@@ -434,7 +459,7 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
     }, [chats]);
 
     return (
-        <ChatContext.Provider value={{ receiverId: receiverId, updateReceiverId, lastMessages, chats, loadingChats, sendMessage, addDp, onlineConnections }}>
+        <ChatContext.Provider value={{ receiverId: receiverId, updateReceiverId, lastMessages, chats, loadingChats, sendMessage, addDp, onlineConnections, selectedMessages, addSelectedMessage, removeSelectedMessage, clearSelectedMessages }}>
             {
                 loadingLastMessages ? <Loader /> : error ? <p>Something went wrong</p> : children
             }
