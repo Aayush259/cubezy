@@ -2,6 +2,8 @@ import { NextApiRequest, NextApiResponse } from "next";
 import jwt from "jsonwebtoken";
 import connectMongoDb from "@/utils/lib/mongodb";
 import createMessageModel from "@/utils/models/Chat";
+import DeletedChats from "@/utils/models/DeletedChats";
+import mongoose from "mongoose";
 
 export default async function getMessages(req: NextApiRequest, res: NextApiResponse) {
     if (req.method !== "POST") {
@@ -37,7 +39,18 @@ export default async function getMessages(req: NextApiRequest, res: NextApiRespo
         const MessageModel = createMessageModel(chatId);
 
         // Fetch all messages from the collection.
-        const messages = await MessageModel.find().sort({ sentAt: 1 });     // Sorting by sentAt for chronological order.
+        let messages = await MessageModel.find().sort({ sentAt: 1 });     // Sorting by sentAt for chronological order.
+
+        // Check if the user has deleted any messages.
+        const userDeletedChats = await DeletedChats.findOne({ chatId, userId: decodedToken.id });
+
+        if (userDeletedChats) {
+            // Extract deleted message IDs from the user's deleted chats.
+            const deletedMessageIds = userDeletedChats.deletedMessages;
+
+            // Filter out messages that have been deleted by the user.
+            messages = messages.filter(message => !deletedMessageIds.includes((message._id as mongoose.Types.ObjectId).toString()));
+        }
 
         res.status(200).json({
             message: "Messages fetched successfully",

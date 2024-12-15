@@ -59,7 +59,7 @@ export default async function handler(_: NextApiRequest, res: ExtendedNextApiRes
             path: "/api/socket/connect",
         });
 
-        // Middleware for jet authentication.
+        // Middleware for jwt authentication.
         io.use(async (socket, next) => {
             const token = socket.handshake.auth.token;
             console.log(token)
@@ -120,6 +120,7 @@ export default async function handler(_: NextApiRequest, res: ExtendedNextApiRes
             // Send the active connections to the connected user.
             socket.emit("activeConnections", { activeUserIds: activeConnections });
 
+            // Set profile picture.
             socket.on("setProfilePicture", async ({ file }: { file: Buffer }, callback) => {
                 try {
                     // Validate the file.
@@ -197,6 +198,7 @@ export default async function handler(_: NextApiRequest, res: ExtendedNextApiRes
                 }
             });
 
+            // Handle incoming messages.
             socket.on("sendMessage", async ({ senderId, receiverId, message }: { senderId: string, receiverId: string, message: string }, callback) => {
                 try {
                     await connectMongoDb();
@@ -301,6 +303,7 @@ export default async function handler(_: NextApiRequest, res: ExtendedNextApiRes
                 }
             });
 
+            // Handling the "markAsRead" event.
             socket.on("markAsRead", async ({ chatId, messageIds }: { chatId: string, messageIds: string[] }) => {
 
                 if (!chatId || !messageIds || messageIds.length === 0) {
@@ -350,7 +353,8 @@ export default async function handler(_: NextApiRequest, res: ExtendedNextApiRes
                 }
             });
 
-            socket.on("deleteMessage", async ({ chatId, messageIds }: { chatId: string, messageIds: string[] }) => {
+            // Delete message.
+            socket.on("deleteMessage", async ({ chatId, messageIds }: { chatId: string, messageIds: string[] }, callback) => {
                 if (!chatId || !messageIds || messageIds.length === 0) {
                     console.log("Invalid chatId or messageIds");
                     return;
@@ -390,12 +394,12 @@ export default async function handler(_: NextApiRequest, res: ExtendedNextApiRes
                         });
 
                         console.log(`Deleted chats record created for user ${socket.data.user._id} in chat ${chatId}`);
-                    }
+                    };
 
-                    socket.emit("messageDeleted", { chatId, messageIds: validMessageIds, success: true });
+                    callback({ success: true });
                 } catch (error) {
                     console.error("Error handling deleteMessage socket event:", error);
-                    socket.emit("messageDeleted", { success: false });
+                    callback({ success: false, error: "Internal server error" });
                 }
             })
 
@@ -418,7 +422,7 @@ export default async function handler(_: NextApiRequest, res: ExtendedNextApiRes
         });
 
         res.socket.server.io = io;
-    }
+    };
 
     res.end();
-}
+};
