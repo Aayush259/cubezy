@@ -239,6 +239,25 @@ export default async function handler(_: NextApiRequest, res: ExtendedNextApiRes
                                 name: sender.name,
                                 dp: sender.dp,
                             });
+
+                            receiverSocket.data.user.connections.push({
+                                chatId: chatId,
+                                _id: sender._id,
+                                name: sender.name,
+                                dp: sender.dp,
+                            });
+
+                            socket.data.user.connections.push({
+                                chatId: chatId,
+                                _id: (receiver._id as mongoose.Types.ObjectId).toString(),
+                                name: receiver.name,
+                                dp: receiver.dp,
+                            });
+
+                            // Send the active connections to the connected user.
+                            (receiverSocket as CustomSocket).emit("addActiveConnection", { activeUserId: sender._id });
+
+                            socket.emit("addActiveConnection", { activeUserId: receiver._id });
                         }
                     }
 

@@ -351,12 +351,17 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
 
             // Listen for the "userInactive" event from the server.
             socket.on("userInactive", ({ userId }) => {
+                console.log(activeConnections.current);
                 setActiveConnections(activeConnections.current.filter((id) => id !== userId));
             });
 
             // Listen for the "activeConnections" event from the server.
             socket.on("activeConnections", ({ activeUserIds }) => {
                 setActiveConnections(activeUserIds);
+            });
+
+            socket.on("addActiveConnection", ({ activeUserId }) => {
+                setActiveConnections([...activeConnections.current, activeUserId]);
             });
 
             // Listen for the "connectionUpdated" event from the server.
