@@ -7,6 +7,7 @@ import ChatWindow from "@/src/components/ChatWindow";
 import Profile from "@/src/components/Profile";
 import { ProfileContextProvider } from "@/src/contexts/ProfileContext";
 import { Metadata } from "next";
+import ForwardMessageWindow from "@/src/components/ForwardMessageWindow";
 
 export const metadata: Metadata = {
   title: "Square",
@@ -33,7 +34,7 @@ export default function Home() {
             className="object-cover object-center absolute z-10 top-0 left-0 opacity-10 w-full h-full"
           /> */}
             <ChatWindow />
-
+            <ForwardMessageWindow />
             <Profile />
           </div>
         </ProfileContextProvider>
