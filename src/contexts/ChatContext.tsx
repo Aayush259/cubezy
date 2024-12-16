@@ -25,6 +25,9 @@ const ChatContext = createContext<{
     removeSelectedMessage: (messageId: string) => void;
     clearSelectedMessages: () => void;
     deleteMessage: () => void;
+    forwardMessageWindowVisible: boolean;
+    openForwardMessageWindow: () => void;
+    closeForwardMessageWindow: () => void;
 }>({
     receiverId: null,
     updateReceiverId: () => { },
@@ -39,6 +42,9 @@ const ChatContext = createContext<{
     removeSelectedMessage: () => { },
     clearSelectedMessages: () => { },
     deleteMessage: () => { },
+    forwardMessageWindowVisible: false,
+    openForwardMessageWindow: () => { },
+    closeForwardMessageWindow: () => { },
 })
 
 const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
@@ -67,6 +73,19 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
 
     // State to track selected messages.
     const [selectedMessages, setSelectedMessages] = useState<IChatMessage[]>([]);
+
+    // State to track forward message window visibility.
+    const [forwardMessageWindowVisible, setForwardMessageWindowVisible] = useState<boolean>(false);
+
+    // Function to close the forward message window.
+    const closeForwardMessageWindow = () => {
+        setForwardMessageWindowVisible(false);
+    };
+
+    // Function to open the forward message window.
+    const openForwardMessageWindow = () => {
+        setForwardMessageWindowVisible(true);
+    };
 
     // Function to add append selected message.
     const addSelectedMessage = (message: IChatMessage) => {
@@ -286,6 +305,8 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
 
             // Update the chats state to remove the deleted messages.
             setChats(prevChats => prevChats.filter(chat => !messageIdsToDelete.includes(chat._id)));
+            // Update the last messages state to remove the deleted messages.
+            setLastMessages(prevLastMessages => prevLastMessages.filter(prevLastMessage => !messageIdsToDelete.includes(prevLastMessage.lastMessage._id)));
             clearSelectedMessages();
         });
     };
@@ -484,7 +505,7 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
     }, [chats]);
 
     return (
-        <ChatContext.Provider value={{ receiverId: receiverId, updateReceiverId, lastMessages, chats, loadingChats, sendMessage, addDp, onlineConnections, selectedMessages, addSelectedMessage, removeSelectedMessage, clearSelectedMessages, deleteMessage }}>
+        <ChatContext.Provider value={{ receiverId: receiverId, updateReceiverId, lastMessages, chats, loadingChats, sendMessage, addDp, onlineConnections, selectedMessages, addSelectedMessage, removeSelectedMessage, clearSelectedMessages, deleteMessage, forwardMessageWindowVisible, openForwardMessageWindow, closeForwardMessageWindow }}>
             {
                 loadingLastMessages ? <Loader /> : error ? <p>Something went wrong</p> : children
             }
