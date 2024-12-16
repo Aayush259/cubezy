@@ -9,6 +9,7 @@ import { useChatContext } from "../contexts/ChatContext";
 import { formatDate, getRandomEmoji } from "../../utils/funcs/funcs";
 import { useProfileContext } from "../contexts/ProfileContext";
 import Image from "next/image";
+import DP from "../reusables/DP";
 
 export default function Sidebar() {
 
@@ -103,24 +104,7 @@ export default function Sidebar() {
                                 }}
                             >
                                 <span className="flex items-center gap-4 flex-grow pr-7">
-                                    {
-                                        connection.dp ? (
-                                            <span className="w-[40px] h-[40px] lg:w-[50px] lg:h-[50px] rounded-full overflow-hidden">
-                                                <Image
-                                                    src={connection.dp}
-                                                    alt={connection.name}
-                                                    width={50}
-                                                    height={50}
-                                                    className="rounded-full w-full h-full object-cover object-top"
-                                                />
-                                            </span>
-                                        ) : (
-                                            <span className="flex items-center justify-center h-[50px] w-[50px] bg-blue-700 text-white text-xl lg:text-2xl rounded-full overflow-hidden">
-                                                {connection.name[0]}
-                                            </span>
-                                        )
-                                    }
-
+                                    <DP  dp={connection.dp} name={connection.name} />
 
                                     <span className="flex flex-col flex-grow justify-between items-start gap-[1px] lg:gap-[3px]">
                                         <span className="block">{connection.name}</span>
