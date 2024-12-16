@@ -164,7 +164,7 @@ const ChatWindow: React.FC = () => {
                             </span>
                         )}
 
-                        <span className="flex flex-col gap-1">
+                        <span className="flex flex-col lg:gap-1">
                             <span>
                                 {receiver?.name}
                             </span>
