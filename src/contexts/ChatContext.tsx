@@ -28,6 +28,10 @@ const ChatContext = createContext<{
     forwardMessageWindowVisible: boolean;
     openForwardMessageWindow: () => void;
     closeForwardMessageWindow: () => void;
+    forwardToReceiverIds: string[];
+    addForwardToReceiverId: (id: string) => void;
+    removeForwardToReceiverId: (id: string) => void;
+    forwardMessages: () => void;
 }>({
     receiverId: null,
     updateReceiverId: () => { },
@@ -45,6 +49,10 @@ const ChatContext = createContext<{
     forwardMessageWindowVisible: false,
     openForwardMessageWindow: () => { },
     closeForwardMessageWindow: () => { },
+    forwardToReceiverIds: [],
+    addForwardToReceiverId: () => { },
+    removeForwardToReceiverId: () => { },
+    forwardMessages: () => { },
 })
 
 const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
@@ -74,8 +82,26 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
     // State to track selected messages.
     const [selectedMessages, setSelectedMessages] = useState<IChatMessage[]>([]);
 
+    // State to track receiver's id for forwarding messages.
+    const [forwardToReceiverIds, setForwardToReceiverIds] = useState<string[]>([]);
+
     // State to track forward message window visibility.
     const [forwardMessageWindowVisible, setForwardMessageWindowVisible] = useState<boolean>(false);
+
+    // Function to add receiver's id to the list of forwardToReceiverIds.
+    const addForwardToReceiverId = (receiverId: string) => {
+        setForwardToReceiverIds((prevIds) => [...prevIds, receiverId]);
+    };
+
+    // Function to remove receiver's id from the list of forwardToReceiverIds.
+    const removeForwardToReceiverId = (receiverId: string) => {
+        setForwardToReceiverIds((prevIds) => prevIds.filter((id) => id !== receiverId));
+    };
+
+    // Function to clear the list of forwardToReceiverIds.
+    const clearForwardToReceiverIds = () => {
+        setForwardToReceiverIds([]);
+    };
 
     // Function to close the forward message window.
     const closeForwardMessageWindow = () => {
@@ -244,6 +270,111 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
             console.error("Socket or chatId is not available.");
             addToast("Something went wrong", false);
         }
+    };
+
+    // Function to forward messages.
+    const forwardMessages = () => {
+        closeForwardMessageWindow();
+
+        if (!user?._id) {
+            addToast("Something went wrong", false);
+            return;
+        }
+
+        if (!socket) {
+            addToast("Something went wrong", false);
+            return;
+        }
+
+        // Check if there are selected messages and receivers
+        if (selectedMessages.length === 0 || forwardToReceiverIds.length === 0) {
+            addToast("No messages or receivers selected", false);
+            return;
+        }
+
+        forwardToReceiverIds.forEach(forwardToReceiverId => {
+            // Generate a real chatId temporarily for now.
+            const tempChatId = user?._id < forwardToReceiverId ? `${user?._id}_${forwardToReceiverId}` : `${forwardToReceiverId}_${user?._id}`;
+
+            selectedMessages.forEach(message => {
+                // Create a temporary message ID for the forwarded message
+                const tempId = uuidv4();
+
+                // Create a temporary message object
+                const forwardedMessage: IChatMessage = {
+                    _id: tempId,
+                    senderId: user?._id as string,
+                    message: message.message, // Copy the message content
+                    sentAt: new Date(),
+                    isRead: false,
+                    status: "sending",
+                };
+
+                const isOpenedReceiverSameAsForwardReceiver = forwardToReceiverId === receiverIdRef.current;
+
+                if (isOpenedReceiverSameAsForwardReceiver) {
+                    // Add the forwarded message to the chats state
+                    setChats(prevChats => prevChats ? [...prevChats, forwardedMessage] : [forwardedMessage]);
+                };
+
+                // Emit the message to the server.
+                socket.emit("sendMessage", {
+                    senderId: user?._id,
+                    receiverId: forwardToReceiverId,
+                    message: message.message,
+                }, (response: any) => {
+                    if (!response.success) {
+                        addToast(`Failed to forward message to ${receiverId}`, false);
+
+                        if (isOpenedReceiverSameAsForwardReceiver) {
+                            // Remove the temporary message on failure.
+                            setChats(prevChats => prevChats?.filter(chat => chat._id !== tempId) || null);
+                        }
+                        return;
+                    }
+
+                    if (isOpenedReceiverSameAsForwardReceiver) {
+                        // Update the temporary message to mark it as sent
+                        setChats(prevChats => {
+                            const updatedChats = prevChats?.map(chat => chat._id === tempId ? { ...chat, _id: response._id, sentAt: response.sentAt, status: "sent" } as IChatMessage : chat) || null;
+
+                            return updatedChats;
+                        });
+                    }
+
+                    // Update the lastMessages state for the forwarded message.
+                    setLastMessages(prevMessages => {
+                        const existingIndex = prevMessages.findIndex(msg => msg.chatId === tempChatId);
+
+                        const newLastMessage: ILastMessage = {
+                            chatId: tempChatId,
+                            lastMessage: {
+                                _id: response._id,
+                                senderId: user?._id as string,
+                                message: message.message,
+                                sentAt: response.sentAt,
+                                isRead: false,
+                            },
+                        };
+
+                        if (existingIndex !== -1) {
+                            // Update the existing entry
+                            return prevMessages.map((msg, idx) =>
+                                idx === existingIndex ? newLastMessage : msg
+                            );
+                        } else {
+                            // Add a new entry if it doesn't exist
+                            return [...prevMessages, newLastMessage];
+                        }
+                    });
+                });
+            });
+        });
+
+        // Clear selected messages and receivers after forwarding.
+        clearSelectedMessages();
+        clearForwardToReceiverIds();
+        console.log("Messages forwarded successfully");
     };
 
     // Function to mark a message as read.
@@ -505,7 +636,7 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
     }, [chats]);
 
     return (
-        <ChatContext.Provider value={{ receiverId: receiverId, updateReceiverId, lastMessages, chats, loadingChats, sendMessage, addDp, onlineConnections, selectedMessages, addSelectedMessage, removeSelectedMessage, clearSelectedMessages, deleteMessage, forwardMessageWindowVisible, openForwardMessageWindow, closeForwardMessageWindow }}>
+        <ChatContext.Provider value={{ receiverId: receiverId, updateReceiverId, lastMessages, chats, loadingChats, sendMessage, addDp, onlineConnections, selectedMessages, addSelectedMessage, removeSelectedMessage, clearSelectedMessages, deleteMessage, forwardMessageWindowVisible, openForwardMessageWindow, closeForwardMessageWindow, forwardToReceiverIds, addForwardToReceiverId, removeForwardToReceiverId, forwardMessages }}>
             {
                 loadingLastMessages ? <Loader /> : error ? <p>Something went wrong</p> : children
             }
