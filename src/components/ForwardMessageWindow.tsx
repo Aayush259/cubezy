@@ -8,7 +8,7 @@ import DP from "../reusables/DP";
 export default function ForwardMessageWindow() {
 
     const { user } = useSelector((state: RootState) => state.user);
-    const { forwardMessageWindowVisible, closeForwardMessageWindow } = useChatContext();
+    const { forwardMessageWindowVisible, closeForwardMessageWindow, forwardToReceiverIds, addForwardToReceiverId, removeForwardToReceiverId, forwardMessages } = useChatContext();
 
     if (!forwardMessageWindowVisible) return null;
 
@@ -32,20 +32,33 @@ export default function ForwardMessageWindow() {
                                     type="checkbox"
                                     id={connection._id}
                                     className="appearance-none w-5 h-5 border-2 border-gray-800 rounded-md bg-transparent checked:bg-blue-700 checked:border-blue-700 focus:outline-none before:block before:w-full before:h-full before:rounded-md checked:before:bg-[url('/icons/check.svg')] before:bg-no-repeat before:bg-center before:bg-contain"
+                                    checked={forwardToReceiverIds.includes(connection._id)}
+                                    onChange={() => {
+                                        if (forwardToReceiverIds.includes(connection._id)) {
+                                            removeForwardToReceiverId(connection._id);
+                                        } else {
+                                            addForwardToReceiverId(connection._id);
+                                        }
+                                    }}
                                 />
                             </label>
                         ))
                     }
                 </div>
 
-                <div className="h-[15%] px-2 py-4 md:px-6 md:py-6 flex items-center justify-between text-xl bg-slate-900">
-                    <p>Send</p>
+                <div className={`${forwardToReceiverIds.length === 0 ? "h-[0%] opacity-0" : "h-[15%] opacity-100"} duration-200 overflow-hidden px-2 md:px-6 flex items-center justify-between text-xl bg-slate-900`}>
+                    {
+                        forwardToReceiverIds.length !== 0 && (<>
+                            <p>Send</p>
 
-                    <button
-                        className={`p-2 w-fit bg-blue-700 rounded-full block duration-300 lg:hover:opacity-70`}
-                    >
-                        <IoSend size={24} />
-                    </button>
+                            <button
+                                className={`p-2 w-fit bg-blue-700 rounded-full block duration-300 lg:hover:opacity-70`}
+                                onClick={forwardMessages}
+                            >
+                                <IoSend size={24} />
+                            </button>
+                        </>)
+                    }
                 </div>
             </div>
         </div>
