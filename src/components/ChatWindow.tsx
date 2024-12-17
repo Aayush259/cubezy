@@ -19,7 +19,7 @@ const ChatWindow: React.FC = () => {
 
     const { user } = useSelector((state: RootState) => state.user);
 
-    const { receiverId, updateReceiverId, chats, loadingChats, sendMessage, onlineConnections, selectedMessages, addSelectedMessage, removeSelectedMessage, clearSelectedMessages, deleteMessage } = useChatContext();
+    const { receiverId, updateReceiverId, chats, loadingChats, sendMessage, onlineConnections, selectedMessages, addSelectedMessage, removeSelectedMessage, clearSelectedMessages, deleteMessage, openForwardMessageWindow } = useChatContext();
     const { openProfile } = useProfileContext();
 
     const [message, setMessage] = useState<string>("");
@@ -132,7 +132,7 @@ const ChatWindow: React.FC = () => {
                                         <MdContentCopy size={20} />
                                     </button>
 
-                                    <button>
+                                    <button onClick={openForwardMessageWindow}>
                                         <IoMdShareAlt size={22} />
                                     </button>
                                 </div>
