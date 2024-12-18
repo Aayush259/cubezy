@@ -104,7 +104,7 @@ export default function Sidebar() {
                                 }}
                             >
                                 <span className="flex items-center gap-4 flex-grow pr-7">
-                                    <DP  dp={connection.dp} name={connection.name} />
+                                    <DP dp={connection.dp} name={connection.name} />
 
                                     <span className="flex flex-col flex-grow justify-between items-start gap-[1px] lg:gap-[3px]">
                                         <span className="block">{connection.name}</span>
@@ -137,7 +137,13 @@ export default function Sidebar() {
                 {
                     user?.connections.length === 0 && (
                         <div className="text-center text-xl w-full h-full flex items-center justify-center text-white/70">
-                            <button onClick={() => setIdBarOpen(true)} className="lg:hover:text-white duration-300">
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setIdBarOpen(true)
+                                }}
+                                className="lg:hover:text-white duration-300"
+                            >
                                 {"Add your first friend " + getRandomEmoji()}
                             </button>
                         </div>
