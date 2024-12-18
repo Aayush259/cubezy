@@ -8,12 +8,14 @@ import { IoMdCheckmark, IoIosArrowBack, IoMdShareAlt } from "react-icons/io";
 import { GoClock } from "react-icons/go";
 import { MdContentCopy, MdDelete } from "react-icons/md";
 import { FaCheck } from "react-icons/fa6";
+import { BsEmojiSmileUpsideDown } from "react-icons/bs";
 import { useEffect, useRef, useState } from "react";
 import { compareDates, copyToClipboard, formatDate } from "../../utils/funcs/funcs";
 import Image from "next/image";
 import { useProfileContext } from "../contexts/ProfileContext";
 import Loader from "./Loader";
 import { IChatMessage } from "@/utils/interfaces/interfaces";
+import { emojis } from "@/utils/data";
 
 const ChatWindow: React.FC = () => {
 
@@ -23,9 +25,11 @@ const ChatWindow: React.FC = () => {
     const { openProfile } = useProfileContext();
 
     const [message, setMessage] = useState<string>("");
+    const [showEmojis, setShowEmojis] = useState<boolean>(false);
 
     const receiver = user?.connections.find((connection) => connection._id === receiverId);
 
+    const messageInputRef = useRef<HTMLInputElement | null>(null);
     const chatScrollRef = useRef<HTMLDivElement | null>(null);
 
     const [longPressTimeout, setLongPressTimeout] = useState<NodeJS.Timeout | null>(null);      // Used to handle long press on messages.
@@ -42,6 +46,7 @@ const ChatWindow: React.FC = () => {
         e.preventDefault();
         sendMessage(message);
         setMessage("");
+        setShowEmojis(false);
     };
 
     // Handle long press on messages.
@@ -80,6 +85,16 @@ const ChatWindow: React.FC = () => {
             removeSelectedMessage(message._id);
         } else {
             addSelectedMessage(message);
+        }
+    };
+
+    // Handle emoji click.
+    const handleEmojiClick = (emoji: string) => {
+        setMessage((prev) => prev + emoji);
+
+        // Regain focus on the input field
+        if (messageInputRef.current) {
+            messageInputRef.current.focus();
         }
     };
 
@@ -265,14 +280,36 @@ const ChatWindow: React.FC = () => {
 
             {
                 !loadingChats && (
-                    <form className="w-full h-[15%] flex items-start pt-2 justify-center gap-3" onSubmit={handleMessageSubmit}>
-                        <input
-                            type="text"
-                            value={message}
-                            placeholder="Message"
-                            className={`w-[80%] lg:w-[70%] px-4 py-2 bg-gray-800 focus:outline-none rounded-full`}
-                            onChange={(e) => setMessage(e.target.value)}
-                        />
+                    <form className="w-full h-[15%] flex items-start pt-2 justify-center gap-3 relative overflow-visible" onSubmit={handleMessageSubmit} onClick={(e) => e.stopPropagation()}>
+
+                        <div className={`${showEmojis ? "h-[250px] p-2.5 border opacity-100" : "h-[0px] border-0 p-0 opacity-0"} absolute bottom-[98%] left-2 w-[80%] lg:w-[40%] overflow-y-auto overflow-x-hidden rounded-xl bg-gray-800 border-gray-700 text-xl flex items-center justify-start gap-2 flex-wrap duration-500`}>
+                            {
+                                emojis.map((emoji, index) => (
+                                    <button type="button" key={index} className="outline-none rounded-full hover:opacity-70 duration-200" onClick={() => handleEmojiClick(emoji)}>
+                                        {emoji}
+                                    </button>
+                                ))
+                            }
+                        </div>
+                        <label htmlFor="message" className="w-[80%] lg:w-[70%] px-2 py-2 bg-gray-800 focus:outline-none rounded-full flex items-center gap-2">
+                            <button type="button" className="outline-none rounded-full text-neutral-300" onClick={() => {
+                                setShowEmojis(prev => !prev)
+                            }}>
+                                <BsEmojiSmileUpsideDown size={24} className="rotate-180" />
+                            </button>
+
+                            <input
+                                type="text"
+                                value={message}
+                                id="message"
+                                autoComplete="off"
+                                autoFocus
+                                ref={messageInputRef}
+                                placeholder="Message"
+                                className={`bg-transparent flex-grow focus:outline-none`}
+                                onChange={(e) => setMessage(e.target.value)}
+                            />
+                        </label>
 
                         <button
                             type="submit"
