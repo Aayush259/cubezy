@@ -1,27 +1,58 @@
 "use client";
-import { IoClose, IoSend } from "react-icons/io5";
+import { IoSend } from "react-icons/io5";
+import { IoIosArrowRoundBack, IoIosSearch } from "react-icons/io";
 import { useChatContext } from "../contexts/ChatContext";
 import { useSelector } from "react-redux";
 import { RootState } from "../store/store";
 import DP from "../reusables/DP";
+import { useMemo, useState } from "react";
 
 export default function ForwardMessageWindow() {
 
     const { user } = useSelector((state: RootState) => state.user);
     const { forwardMessageWindowVisible, closeForwardMessageWindow, forwardToReceiverIds, addForwardToReceiverId, removeForwardToReceiverId, forwardMessages } = useChatContext();
 
+    const [searchQuery, setSearchQuery] = useState<string>("");
+
+    const filteredConnections = useMemo(() => {
+        if (searchQuery === "") {
+            return user?.connections;
+        }
+
+        return user?.connections?.filter(connection => connection.name.toLowerCase().includes(searchQuery.toLowerCase()));
+    }, [searchQuery, user?.connections]);
+
     if (!forwardMessageWindowVisible) return null;
 
     return (
         <div className="fixed w-screen min-h-screen top-0 left-0 z-[999] flex items-center justify-center bg-black/50">
-            <button className="absolute top-4 right-4 lg:hover:opacity-80 duration-300" onClick={closeForwardMessageWindow}>
-                <IoClose size={30} className="text-white" />
-            </button>
 
-            <div className="max-w-[90vw] h-[600px] w-[600px] max-h-[95vh] bg-black border border-gray-800 rounded-xl mx-auto overflow-hidden">
+            <div className="h-screen w-screen md:max-w-[90vw] md:h-[600px] md:w-[500px] md:max-h-[95vh] bg-black border border-gray-800 rounded-xl mx-auto overflow-hidden">
                 <div className="w-full h-[85%] flex flex-col overflow-y-auto">
+                    <div className="px-2 py-3 md:px-6 md:py-4 border-b border-gray-800 flex items-center gap-4">
+                        <button className="sticky top-0 left-0 lg:hover:opacity-80 duration-300" onClick={closeForwardMessageWindow}>
+                            <IoIosArrowRoundBack size={30} className="text-white" />
+                        </button>
+
+                        <label htmlFor="search" className="flex px-4 py-1 items-center border bg-gray-800 border-gray-800 rounded-full w-full">
+                            <input
+                                type="text"
+                                id="search"
+                                className="bg-transparent w-full outline-none" placeholder="Search..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                            />
+
+                            <IoIosSearch size={20} />
+                        </label>
+                    </div>
+
                     {
-                        user?.connections.map(connection => (
+                        (!filteredConnections || filteredConnections.length === 0) ? (
+                            <div className="w-full py-8 text-center text-neutral-500">
+                                No results found
+                            </div>
+                        ) : filteredConnections.map(connection => (
                             <label key={connection._id} htmlFor={connection._id} className="flex items-center justify-between gap-4 cursor-pointer border-b border-gray-800 px-2 py-4 md:px-6 md:py-6">
                                 <div className="flex items-center gap-4">
                                     <DP dp={connection.dp} name={connection.name} />
