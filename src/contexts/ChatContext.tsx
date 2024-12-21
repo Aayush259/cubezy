@@ -12,6 +12,7 @@ import { useToast } from "./ToastContext";
 const SOCKET_PATH = "/api/socket/connect";
 
 const ChatContext = createContext<{
+    socket: Socket | null;
     receiverId: string | null;
     updateReceiverId: (id: string | null) => void;
     chats: IChatMessage[];
@@ -19,6 +20,7 @@ const ChatContext = createContext<{
     loadingChats: boolean;
     sendMessage: (message: string) => void;
     addDp: (event: React.ChangeEvent<HTMLInputElement>) => void;
+    updateBio: (bio: string) => void;
     onlineConnections: string[];
     selectedMessages: IChatMessage[];
     addSelectedMessage: (message: IChatMessage) => void;
@@ -33,6 +35,7 @@ const ChatContext = createContext<{
     removeForwardToReceiverId: (id: string) => void;
     forwardMessages: () => void;
 }>({
+    socket: null,
     receiverId: null,
     updateReceiverId: () => { },
     lastMessages: [],
@@ -40,6 +43,7 @@ const ChatContext = createContext<{
     loadingChats: false,
     sendMessage: () => { },
     addDp: () => { },
+    updateBio: () => { },
     onlineConnections: [],
     selectedMessages: [],
     addSelectedMessage: () => { },
@@ -478,6 +482,19 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
         })
     };
 
+    // Function to update bio.
+    const updateBio = async (bio: string) => {
+        if (!socket || !user) return;
+        socket.emit("setBio", { bio }, (response: any) => {
+            if (response.success) {
+                dispatch(updateUser({ ...user, bio: response.bio }));
+            } else {
+                console.log("Error updating bio", response);
+                addToast("Something went wrong", false);
+            }
+        })
+    };
+
     useEffect(() => {
         if (chatId) {
             setChats([]);
@@ -636,7 +653,7 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
     }, [chats]);
 
     return (
-        <ChatContext.Provider value={{ receiverId: receiverId, updateReceiverId, lastMessages, chats, loadingChats, sendMessage, addDp, onlineConnections, selectedMessages, addSelectedMessage, removeSelectedMessage, clearSelectedMessages, deleteMessage, forwardMessageWindowVisible, openForwardMessageWindow, closeForwardMessageWindow, forwardToReceiverIds, addForwardToReceiverId, removeForwardToReceiverId, forwardMessages }}>
+        <ChatContext.Provider value={{ socket, receiverId: receiverId, updateReceiverId, lastMessages, chats, loadingChats, sendMessage, addDp, updateBio, onlineConnections, selectedMessages, addSelectedMessage, removeSelectedMessage, clearSelectedMessages, deleteMessage, forwardMessageWindowVisible, openForwardMessageWindow, closeForwardMessageWindow, forwardToReceiverIds, addForwardToReceiverId, removeForwardToReceiverId, forwardMessages }}>
             {
                 loadingLastMessages ? <Loader /> : error ? <p>Something went wrong</p> : children
             }
