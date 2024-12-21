@@ -5,6 +5,7 @@ export interface IUserSlice {
         _id: string;
         name: string;
         email: string;
+        bio: string;
         dp: string | null;
         connections: {
             _id: string;
@@ -34,6 +35,7 @@ export interface IProfileInfo {
     _id: string;
     name: string;
     email: string;
+    bio: string;
     dp: string | null;
     connections: {
         _id: string;
