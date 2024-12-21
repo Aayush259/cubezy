@@ -39,6 +39,7 @@ const Profile = () => {
 
     // Function to handle the bio submit.
     const handleBioSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
         updateBio(profileBio);
         setEditBio(false);
     };
