@@ -28,6 +28,7 @@ export default async function getUser(req: NextApiRequest, res: NextApiResponse)
             _id: user._id,
             email: user.email,
             name: user.name,
+            bio: user.bio,
             dp: user.dp,
             connections: user.connections,
         } });
