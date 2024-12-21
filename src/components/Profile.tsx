@@ -15,7 +15,19 @@ const Profile = () => {
 
     // Getting the state from the ProfileContext.
     const { isProfileOpen, setIsProfileOpen, isLoading, profileInfo } = useProfileContext();
-    const { addDp, updateBio, onlineConnections, receiverId } = useChatContext();     // Function to add the DP to the chat.
+    const { addDp, updateBio, onlineConnections, receiverId, updateReceiverId } = useChatContext();     // Function to add the DP to the chat.
+
+    // Reset the receiverId when the profile is opened.
+    useEffect(() => {
+        let timer: NodeJS.Timeout;
+        if (isProfileOpen) {
+            timer = setTimeout(() => {
+                updateReceiverId(null);
+            }, 500);
+        }
+
+        return () => clearTimeout(timer);
+    }, [isProfileOpen]);
 
     // User state from store.
     const { user } = useSelector((state: RootState) => state.user);
