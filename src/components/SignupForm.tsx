@@ -1,12 +1,15 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../store/store";
 import Loader from "./Loader";
 import { useToast } from "../contexts/ToastContext";
+import { login } from "../store/userSlice";
 
 export default function SignupForm() {
+
+    const dispatch = useDispatch();
 
     const { addToast } = useToast();
     const { isLoggedIn, user } = useSelector((state: RootState) => state.user);
@@ -45,7 +48,21 @@ export default function SignupForm() {
             });
 
             if (response.ok) {
-                router.push("/login");
+                const res = await fetch("/api/auth/login", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(formData),
+                });
+
+                if (res.ok) {
+                    const { token, user } = await res.json();
+                    localStorage.setItem("token", token);
+                    dispatch(login(user));
+                } else {
+                    router.push("/login");
+                }
             } else {
                 console.log("Signup failed");
                 addToast("Something went wrong", false);
