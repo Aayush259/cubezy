@@ -52,7 +52,6 @@ const AuthProvider: React.FC<{
                 setIsAuthenticated(false);
             }
         } catch (error) {
-            console.log(error);
             dispatch(logout());
             localStorage.removeItem("token");
             router.push("/login");

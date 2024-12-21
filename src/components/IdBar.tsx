@@ -34,7 +34,6 @@ const IdBar: React.FC = () => {
         const token = localStorage.getItem("token");
 
         try {
-            console.log("Adding ID:", userEmailToAdd);
             const response = await fetch("/api/auth/addConnection", {
                 method: "POST",
                 headers: {

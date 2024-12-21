@@ -74,8 +74,6 @@ const ProfileContextProvider = ({ children }: { children: React.ReactNode }) => 
         if (socket) {
             // Listen for the "bioUpdated" event from the server.
             socket.on("bioUpdated", ({ userId, bio }) => {
-                console.log(profileInfoRef.current)
-                console.log(userId, profileInfoRef.current?._id, bio);
                 if (userId === profileInfoRef.current?._id) {
                     setProfileInfo((prev) => {
                         if (prev) {
@@ -112,7 +110,6 @@ const ProfileContextProvider = ({ children }: { children: React.ReactNode }) => 
 
     // Function to open the profile.
     const openProfile = (id: string) => {
-        console.log(id);
         setProfileId(id);
         setIsProfileOpen(true);
     };

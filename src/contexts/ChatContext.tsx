@@ -169,7 +169,6 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
 
         // Check if token exists.
         if (!token) {
-            console.log("No token found");
             addToast("Something went wrong", false);
             return
         };
@@ -192,7 +191,6 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
             const data = await response.json();
             setChats(data.chats);
         } catch (error) {
-            console.log(error);
             addToast("Something went wrong", false);
         } finally {
             setLoadingChats(false);
@@ -378,7 +376,6 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
         // Clear selected messages and receivers after forwarding.
         clearSelectedMessages();
         clearForwardToReceiverIds();
-        console.log("Messages forwarded successfully");
     };
 
     // Function to mark a message as read.
@@ -461,11 +458,8 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
         const dp = input.files[0];
 
         // Check if the file is an image.
-        if (dp && dp.type.startsWith('image/')) {
-            console.log('File accepted:', dp);
-        } else {
+        if (!(dp && dp.type.startsWith('image/'))) {
             addToast("Invalid Image", false);
-            console.log("Invalid file type");
         };
 
         // Convert the file to a buffer.
@@ -476,7 +470,6 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
             if (response.success) {
                 dispatch(updateUser({ ...user, dp: response.dp }));
             } else {
-                console.log("Error updating dp", response);
                 addToast("Something went wrong", false);
             }
         })
@@ -489,7 +482,6 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
             if (response.success) {
                 dispatch(updateUser({ ...user, bio: response.bio }));
             } else {
-                console.log("Error updating bio", response);
                 addToast("Something went wrong", false);
             }
         })
@@ -512,7 +504,6 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
         const token = localStorage.getItem("token");
 
         if (!token) {
-            console.log("No token found");
             addToast("Something went wrong", false);
             return;
         }
@@ -528,10 +519,8 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
             });
 
             const data = await response.json();
-            console.log("Fetched last messages:", data.lastMessages);
             setLastMessages(data.lastMessages);
         } catch (error) {
-            console.log(error);
             setError("Error fetching last messages");
             addToast("Something went wrong", false);
         } finally {
@@ -570,7 +559,6 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
 
             // Listen for the "userInactive" event from the server.
             socket.on("userInactive", ({ userId }) => {
-                console.log(activeConnections.current);
                 setActiveConnections(activeConnections.current.filter((id) => id !== userId));
             });
 
@@ -595,8 +583,6 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
             socket.on("receiveMessage", (messageDetails) => {
                 const senderId = messageDetails.senderId;
                 if (senderId === receiverIdRef.current) {
-                    console.log("Received message:", messageDetails);
-                    console.log(receiverIdRef.current);
                     setChats(prevChats => prevChats ? [...prevChats, messageDetails] : [messageDetails]);
                 } else {
                     addToast(`New message from ${user?.connections.find(connection => connection._id === senderId)?.name.split(" ")[0]}`, true);
@@ -629,7 +615,6 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
 
             // Listen for the "messageRead" event from the server.
             socket.on("messageRead", ({ chatId, messageIds }) => {
-                console.log(chatId);
                 setChats(prevChats => prevChats?.map(chat => messageIds?.includes(chat._id) ? { ...chat, isRead: true, status: "sent" } : chat) || null);
             });
 

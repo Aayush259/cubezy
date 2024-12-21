@@ -51,11 +51,9 @@ export default function LoginForm() {
                 dispatch(login(user));
             } else {
                 addToast("Something went wrong", false);
-                console.log("Login failed");
             }
         } catch (error) {
             addToast("Incorrect email or password!", false);
-            console.log(error);
         } finally {
             setIsSubmitting(false);
         }

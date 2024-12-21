@@ -53,7 +53,6 @@ interface ExtendedNextApiResponse extends NetSocket {
 export default async function handler(_: NextApiRequest, res: ExtendedNextApiResponse) {
 
     if (!res.socket.server.io) {
-        console.log("Initializing Socket.io");
 
         // Creating new Socket.IO server.
         io = new IOServer(res.socket.server, {
@@ -63,7 +62,6 @@ export default async function handler(_: NextApiRequest, res: ExtendedNextApiRes
         // Middleware for jwt authentication.
         io.use(async (socket, next) => {
             const token = socket.handshake.auth.token;
-            console.log(token)
 
             if (!token) {
                 return next(new Error("Unauthorized"));
@@ -75,7 +73,6 @@ export default async function handler(_: NextApiRequest, res: ExtendedNextApiRes
                 const user = await User.findById(decodedToken.id);
 
                 if (!user) {
-                    console.log("User not found");
                     return next(new Error("User not found"));
                 }
 
@@ -90,15 +87,12 @@ export default async function handler(_: NextApiRequest, res: ExtendedNextApiRes
 
                 next();
             } catch (error) {
-                console.log("JWT authentication error", error);
                 return next(new Error("JWT authentication error"));
             }
         });
 
 
         io.on("connection", (socket: CustomSocket) => {
-            console.log(socket.data);
-            console.log("User connected:", socket.data.user.name);
 
             // Notify the connected user's connections  that they are active.
             socket.data.user.connections.forEach(async (connection) => {
@@ -255,7 +249,6 @@ export default async function handler(_: NextApiRequest, res: ExtendedNextApiRes
 
                     // Checking if sender and receiver exist.
                     if (!sender || !receiver) {
-                        console.log("Sender or receiver not found");
                         return socket.emit("error", { message: "Sender or receiver not found" });
                     }
 
@@ -353,7 +346,6 @@ export default async function handler(_: NextApiRequest, res: ExtendedNextApiRes
             socket.on("markAsRead", async ({ chatId, messageIds }: { chatId: string, messageIds: string[] }) => {
 
                 if (!chatId || !messageIds || messageIds.length === 0) {
-                    console.log("Invalid chatId or messageIds");
                     return;
                 }
 
@@ -363,7 +355,6 @@ export default async function handler(_: NextApiRequest, res: ExtendedNextApiRes
                     const validMessageIds = messageIds.filter((id) => mongoose.Types.ObjectId.isValid(id));
 
                     if (validMessageIds.length === 0) {
-                        console.log("No valid message IDs provided");
                         return;
                     }
 
@@ -402,7 +393,6 @@ export default async function handler(_: NextApiRequest, res: ExtendedNextApiRes
             // Delete message.
             socket.on("deleteMessage", async ({ chatId, messageIds }: { chatId: string, messageIds: string[] }, callback) => {
                 if (!chatId || !messageIds || messageIds.length === 0) {
-                    console.log("Invalid chatId or messageIds");
                     return;
                 };
 
@@ -412,7 +402,6 @@ export default async function handler(_: NextApiRequest, res: ExtendedNextApiRes
                     const validMessageIds = messageIds.filter((id) => mongoose.Types.ObjectId.isValid(id));
 
                     if (validMessageIds.length === 0) {
-                        console.log("No valid message IDs provided");
                         return;
                     }
 
@@ -426,10 +415,6 @@ export default async function handler(_: NextApiRequest, res: ExtendedNextApiRes
                         if (newDeletedMessages.length > 0) {
                             userDeletedChat.deletedMessages.push(...newDeletedMessages);
                             await userDeletedChat.save();
-
-                            console.log(`Messages added to deleted list for user ${socket.data.user._id} in chat ${chatId}`);
-                        } else {
-                            console.log("No new messages to add to the deleted list");
                         }
                     } else {
                         // Create a new record for this user and chat
@@ -438,8 +423,6 @@ export default async function handler(_: NextApiRequest, res: ExtendedNextApiRes
                             userId: socket.data.user._id,
                             deletedMessages: validMessageIds,
                         });
-
-                        console.log(`Deleted chats record created for user ${socket.data.user._id} in chat ${chatId}`);
                     };
 
                     callback({ success: true });
@@ -450,7 +433,6 @@ export default async function handler(_: NextApiRequest, res: ExtendedNextApiRes
             })
 
             socket.on("disconnect", () => {
-                console.log("User disconnected:", socket.id);
 
                 // Notify connections that the user is inactive.
                 socket.data.user.connections.forEach(async (connection) => {

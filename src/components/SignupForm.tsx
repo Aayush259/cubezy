@@ -64,11 +64,9 @@ export default function SignupForm() {
                     router.push("/login");
                 }
             } else {
-                console.log("Signup failed");
                 addToast("Something went wrong", false);
             }
         } catch (error) {
-            console.log(error);
             addToast("Something went wrong", false);
         } finally {
             setIsSubmitting(false);
