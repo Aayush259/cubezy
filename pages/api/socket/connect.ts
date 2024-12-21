@@ -28,6 +28,7 @@ interface CustomSocket extends Socket {
             _id: string;
             email: string;
             name: string;
+            bio: string;
             dp: string | null;
             connections: {
                 chatId: string;
@@ -120,7 +121,7 @@ export default async function handler(_: NextApiRequest, res: ExtendedNextApiRes
             // Send the active connections to the connected user.
             socket.emit("activeConnections", { activeUserIds: activeConnections });
 
-            // Set profile picture.
+            // Update user's profile picture.
             socket.on("setProfilePicture", async ({ file }: { file: Buffer }, callback) => {
                 try {
                     // Validate the file.
@@ -194,6 +195,51 @@ export default async function handler(_: NextApiRequest, res: ExtendedNextApiRes
                     stream.pipe(uploadStream);
                 } catch (error) {
                     console.log("Error setting profile picture:", error);
+                    callback({ success: false, message: "Internal server error" });
+                }
+            });
+
+            // Update user's bio.
+            socket.on("setBio", async ({ bio }: { bio: string }, callback) => {
+                if (!bio) {
+                    return callback({ success: false, message: "No bio provided" });
+                }
+                try {
+                    await connectMongoDb();
+                    const user = await User.findById(socket.data.user._id);
+                    if (!user) {
+                        return callback({ success: false, message: "User not found" });
+                    }
+
+                    user.bio = bio;
+                    await user.save();
+
+                    socket.data.user.bio = user.bio;
+
+                    callback({ success: true, message: "Bio updated successfully", bio: user.bio });
+
+                    // Notify the user's connections.
+                    for (const connection of user.connections) {
+                        // Get the receiver.
+                        const receiver = await User.findById(connection._id);
+
+                        if (receiver) {
+                            // Notify the receiver in real time.
+                            const receiverSocket = Array.from(io.sockets.sockets.values()).find(
+                                (s) => (s as CustomSocket).data?.user._id.toString() === (receiver._id as string).toString()
+                            );
+
+                            if (receiverSocket) {
+                                (receiverSocket as CustomSocket).emit("bioUpdated", {
+                                    userId: user._id,
+                                    bio: user.bio
+                                });
+                            }
+                        }
+                    }
+
+                } catch (error) {
+                    console.log("Error setting bio:", error);
                     callback({ success: false, message: "Internal server error" });
                 }
             });
