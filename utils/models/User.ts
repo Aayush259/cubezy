@@ -5,18 +5,20 @@ interface IUser extends Document {
     name: string;
     email: string;
     password: string;
+    bio: string;
     dp: string | null;
-    connections: {chatId: string; _id: mongoose.Types.ObjectId; name: string; email: string; dp: string | null}[];
+    connections: { chatId: string; _id: mongoose.Types.ObjectId; name: string; email: string; dp: string | null }[];
     createdAt: Date;
     comparePassword(password: string): Promise<boolean>;
 };
 
 const userSchema = new Schema<IUser>({
     name: { type: String, required: true },
-    email: {type: String, required: true, unique: true},
-    password: {type: String, required: true},
-    dp: {type: String, default: null},
-    createdAt: {type: Date, default: Date.now},
+    email: { type: String, required: true, unique: true },
+    password: { type: String, required: true },
+    bio: { type: String, default: "I'm cool." },
+    dp: { type: String, default: null },
+    createdAt: { type: Date, default: Date.now },
     connections: [
         {
             chatId: String,
@@ -28,14 +30,14 @@ const userSchema = new Schema<IUser>({
 });
 
 // Hash password before saving.
-userSchema.pre<IUser>("save", async function(next) {
+userSchema.pre<IUser>("save", async function (next) {
     if (!this.isModified("password")) return next();
     this.password = await bcrypt.hash(this.password, 10);
     next();
 });
 
 // Compare hashed password.
-userSchema.methods.comparePassword = async function(password: string) {
+userSchema.methods.comparePassword = async function (password: string) {
     return await bcrypt.compare(password, this.password);
 };
 
