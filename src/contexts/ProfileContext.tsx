@@ -1,9 +1,10 @@
 "use client";
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { IProfileInfo } from "../../utils/interfaces/interfaces";
 import { useSelector } from "react-redux";
 import { RootState } from "../store/store";
 import { useToast } from "./ToastContext";
+import { useChatContext } from "./ChatContext";
 
 const ProfileContext = createContext<{
     isProfileOpen: boolean;
@@ -32,10 +33,15 @@ const ProfileContextProvider = ({ children }: { children: React.ReactNode }) => 
 
     const { addToast } = useToast();
 
+    const { socket } = useChatContext();
+
     const [isProfileOpen, setIsProfileOpen] = useState<boolean>(false);     // Whether the profile is open or not.
     const [profileId, setProfileId] = useState<string | null>(null);    // The id of the profile to be opened.
     const [isLoading, setIsLoading] = useState<boolean>(true);      // Whether the profile is loading or not.
     const [profileInfo, setProfileInfo] = useState<IProfileInfo | null>(null);     // The profile info to be displayed.
+
+    // Ref to store the profile info (to use in useEffect with socket).
+    const profileInfoRef = useRef<IProfileInfo | null>(null);
 
     // Function to fetch the profile info.
     const fetchProfileInfo = async (id: string) => {
@@ -60,8 +66,30 @@ const ProfileContextProvider = ({ children }: { children: React.ReactNode }) => 
             return;
         }
         setProfileInfo(data);
+        profileInfoRef.current = data;
         setIsLoading(false);
     };
+
+    useEffect(() => {
+        if (socket) {
+            // Listen for the "bioUpdated" event from the server.
+            socket.on("bioUpdated", ({ userId, bio }) => {
+                console.log(profileInfoRef.current)
+                console.log(userId, profileInfoRef.current?._id, bio);
+                if (userId === profileInfoRef.current?._id) {
+                    setProfileInfo((prev) => {
+                        if (prev) {
+                            return {
+                                ...prev,
+                                bio: bio,
+                            };
+                        }
+                        return prev;
+                    });
+                }
+            });
+        }
+    }, [socket]);
 
     useEffect(() => {
         fetchProfileInfo(profileId as string);
@@ -72,7 +100,13 @@ const ProfileContextProvider = ({ children }: { children: React.ReactNode }) => 
             setProfileInfo({
                 ...profileInfo,
                 dp: user.dp,
+                bio: user.bio,
             });
+            profileInfoRef.current = {
+                ...profileInfo,
+                dp: user.dp,
+                bio: user.bio,
+            };
         }
     }, [user]);
 

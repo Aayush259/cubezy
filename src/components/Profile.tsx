@@ -2,20 +2,52 @@
 import Image from "next/image";
 import { useProfileContext } from "../contexts/ProfileContext";
 import { IoClose, IoCameraSharp } from "react-icons/io5";
+import { RiPencilFill } from "react-icons/ri";
+import { FaArrowRightLong } from "react-icons/fa6";
 import { formatDate2 } from "../../utils/funcs/funcs";
 import { useSelector } from "react-redux";
 import { RootState } from "../store/store";
 import { useChatContext } from "../contexts/ChatContext";
 import Loader from "./Loader";
+import { useEffect, useRef, useState } from "react";
 
 const Profile = () => {
 
     // Getting the state from the ProfileContext.
     const { isProfileOpen, setIsProfileOpen, isLoading, profileInfo } = useProfileContext();
-    const { addDp, onlineConnections, receiverId } = useChatContext();     // Function to add the DP to the chat.
+    const { addDp, updateBio, onlineConnections, receiverId } = useChatContext();     // Function to add the DP to the chat.
 
     // User state from store.
     const { user } = useSelector((state: RootState) => state.user);
+
+    // Local state to handle profileBio.
+    const [profileBio, setProfileBio] = useState<string>("");
+
+    // State to handle editBio.
+    const [editBio, setEditBio] = useState<boolean>(false);
+
+    // Ref to focus the input when editBio is true.
+    const editBioInputRef = useRef<HTMLInputElement>(null);
+
+    // Function to show the editBio input.
+    const showEditBioInput = () => {
+        setEditBio(true);
+        setTimeout(() => {
+            editBioInputRef.current?.focus();
+        }, 100);
+    };
+
+    // Function to handle the bio submit.
+    const handleBioSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+        updateBio(profileBio);
+        setEditBio(false);
+    };
+
+    // Effect to set the profileBio state.
+    useEffect(() => {
+        setProfileBio(profileInfo?.bio || "");
+        setEditBio(false);
+    }, [profileInfo]);
 
     return (
         <div className={`py-8 h-full w-full fixed lg:absolute top-0 left-0 duration-300 z-[100] overflow-hidden bg-[#0A0A0A] ${isProfileOpen ? "translate-x-0" : "translate-x-full"}`}>
@@ -78,20 +110,56 @@ const Profile = () => {
                                 )
                             }
 
-                            <p className="text-2xl">
+                            <p className="text-2xl flex flex-row-reverse items-center justify-center gap-1">
                                 <span className="font-semibold">{profileInfo.name}</span><span className="opacity-70">{user?._id === profileInfo._id && " (You)"}</span>
+                                {
+                                    user?._id !== profileInfo._id && receiverId && onlineConnections.includes(receiverId) && (
+                                        <span className="h-2 w-2 bg-green-500 rounded-full block" />
+                                    )
+                                }
                             </p>
 
                             {
-                                user?._id !== profileInfo._id && receiverId && onlineConnections.includes(receiverId) && (
-                                    <span className="text-xs flex items-center gap-2 animate-heightActive">
-                                        <span className="h-2 w-2 bg-green-500 rounded-full block" />
-                                        {" Online"}
-                                    </span>
+                                !editBio && (
+                                    <div className="flex items-center justify-center gap-2">
+                                        <p className="mb-4 lg:mb-0">{profileInfo.bio}</p>
+
+                                        {
+                                            profileInfo._id === user?._id && (
+                                                <button
+                                                    type="button"
+                                                    className="rounded-full outline-none"
+                                                    onClick={showEditBioInput}
+                                                >
+                                                    <RiPencilFill size={18} className="opacity-70" />
+                                                </button>
+                                            )
+                                        }
+                                    </div>
                                 )
                             }
 
-                            <p className="mb-4 lg:mb-0">{profileInfo.email}</p>
+                            {
+                                profileInfo._id === user?._id && (
+                                    <form className={`flex items-center justify-center ${!editBio && "hidden"}`} onSubmit={handleBioSubmit}>
+                                        <input
+                                            type="text"
+                                            ref={editBioInputRef}
+                                            disabled={profileInfo._id !== user?._id}
+                                            readOnly={profileInfo._id !== user?._id}
+                                            autoFocus
+                                            name="bio"
+                                            id="bio"
+                                            className="bg-gray-800 rounded-l-full outline-none w-[200px] text-center px-2 border-y border-transparent"
+                                            value={profileBio} onChange={(e) => setProfileBio(e.target.value)}
+                                        />
+
+                                        <button type="submit" className="px-3 py-1 rounded-r-full bg-blue-700">
+                                            <FaArrowRightLong size={18} />
+                                        </button>
+                                    </form>
+                                )
+                            }
 
                             {
                                 profileInfo._id === user?._id && profileInfo.connections.length > 0 && <div className="w-full px-4 md:px-8 py-4 border-t border-b border-t-gray-800 border-b-gray-800 mt-3">
@@ -127,6 +195,10 @@ const Profile = () => {
                             }
 
                             <div className={`w-full px-4 md:px-8 pt-1 pb-3 border-b border-t-gray-800 border-b-gray-800 ${profileInfo._id !== user?._id && "border-t !pt-3 mt-3"}`}>
+                                <p className="mb-4 lg:mb-0">{profileInfo.email}</p>
+                            </div>
+
+                            <div className={`w-full px-4 md:px-8 pt-1 pb-3 border-b border-t-gray-800 border-b-gray-800`}>
                                 <p>Joined on: {formatDate2(profileInfo.createdAt)}</p>
                             </div>
                         </div>
