@@ -66,7 +66,7 @@ export default function SignupForm() {
             } else {
                 addToast("Something went wrong", false);
             }
-        } catch (error) {
+        } catch {
             addToast("Something went wrong", false);
         } finally {
             setIsSubmitting(false);

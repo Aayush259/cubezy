@@ -190,7 +190,7 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
 
             const data = await response.json();
             setChats(data.chats);
-        } catch (error) {
+        } catch {
             addToast("Something went wrong", false);
         } finally {
             setLoadingChats(false);
@@ -520,7 +520,7 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
 
             const data = await response.json();
             setLastMessages(data.lastMessages);
-        } catch (error) {
+        } catch {
             setError("Error fetching last messages");
             addToast("Something went wrong", false);
         } finally {
@@ -614,7 +614,7 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
             });
 
             // Listen for the "messageRead" event from the server.
-            socket.on("messageRead", ({ chatId, messageIds }) => {
+            socket.on("messageRead", ({ messageIds }) => {
                 setChats(prevChats => prevChats?.map(chat => messageIds?.includes(chat._id) ? { ...chat, isRead: true, status: "sent" } : chat) || null);
             });
 

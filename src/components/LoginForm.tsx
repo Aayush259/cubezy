@@ -52,7 +52,7 @@ export default function LoginForm() {
             } else {
                 addToast("Something went wrong", false);
             }
-        } catch (error) {
+        } catch {
             addToast("Incorrect email or password!", false);
         } finally {
             setIsSubmitting(false);

@@ -87,7 +87,7 @@ export default async function handler(_: NextApiRequest, res: ExtendedNextApiRes
 
                 next();
             } catch (error) {
-                return next(new Error("JWT authentication error"));
+                return next(new Error("JWT authentication error", { cause: error }));
             }
         });
 
