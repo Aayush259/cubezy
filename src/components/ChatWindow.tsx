@@ -220,7 +220,7 @@ const ChatWindow: React.FC = () => {
 
                                             {
                                                 selectedMessages.length > 0 && <button
-                                                    className={`absolute flex items-center justify-center outline-none bottom-0 -translate-y-1/4 lg:-translate-y-1/2 left-0 h-5 w-5 rounded-full overflow-hidden border border-white ${isMessageSelected ? "bg-blue-700" : "bg-transparent"}`}
+                                                    className={`absolute flex items-center justify-center outline-none bottom-0 -translate-y-1/4 lg:-translate-y-1/2 left-0 h-5 w-5 rounded-md overflow-hidden border border-white ${isMessageSelected ? "bg-blue-700" : "bg-transparent"}`}
                                                     onClick={() => handleMessageClick(chat)}
                                                 >
                                                     {

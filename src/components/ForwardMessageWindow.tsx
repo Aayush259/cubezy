@@ -1,11 +1,12 @@
 "use client";
 import { IoSend } from "react-icons/io5";
-import { IoIosArrowRoundBack, IoIosSearch } from "react-icons/io";
+import { IoIosArrowRoundBack } from "react-icons/io";
 import { useChatContext } from "../contexts/ChatContext";
 import { useSelector } from "react-redux";
 import { RootState } from "../store/store";
 import DP from "../reusables/DP";
 import { useMemo, useState } from "react";
+import Search from "../reusables/Search";
 
 export default function ForwardMessageWindow() {
 
@@ -34,17 +35,13 @@ export default function ForwardMessageWindow() {
                             <IoIosArrowRoundBack size={30} className="text-white" />
                         </button>
 
-                        <label htmlFor="search" className="flex px-4 py-1 items-center border bg-gray-800 border-gray-800 rounded-full w-full">
-                            <input
-                                type="text"
-                                id="search"
-                                className="bg-transparent w-full outline-none" placeholder="Search..."
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                            />
-
-                            <IoIosSearch size={20} />
-                        </label>
+                        <Search
+                            id="search"
+                            type="text"
+                            placeholder="Search..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                        />
                     </div>
 
                     {

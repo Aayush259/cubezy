@@ -10,6 +10,7 @@ import { formatDate, getRandomEmoji } from "../../utils/funcs/funcs";
 import { useProfileContext } from "../contexts/ProfileContext";
 import Image from "next/image";
 import DP from "../reusables/DP";
+import Search from "../reusables/Search";
 
 export default function Sidebar() {
 
@@ -20,6 +21,8 @@ export default function Sidebar() {
     const { openProfile, closeProfile } = useProfileContext();
 
     const [greeting, setGreeting] = useState<string>("");   // Greeting message based on the current time.
+
+    const [searchQuery, setSearchQuery] = useState<string>("");
 
     const randomEmoji = useMemo(() => getRandomEmoji(), []);
 
@@ -49,7 +52,13 @@ export default function Sidebar() {
     const sortedConnections = useMemo(() => {
         if (!user || !lastMessages.length) return user?.connections || [];
 
-        return [...user.connections].sort((a, b) => {
+        let filteredConnections = [...user.connections];
+
+        if (searchQuery !== "") {
+            filteredConnections = filteredConnections.filter(connection => connection.name.toLowerCase().includes(searchQuery.toLowerCase()));
+        };
+
+        return [...filteredConnections].sort((a, b) => {
             const lastMessageA = lastMessages.find(m => m.chatId === a.chatId)?.lastMessage;
             const lastMessageB = lastMessages.find(m => m.chatId === b.chatId)?.lastMessage;
 
@@ -59,12 +68,12 @@ export default function Sidebar() {
             // Sort in descending order (newest first) by date.
             return dateB - dateA;
         });
-    }, [user, lastMessages]);
+    }, [user, lastMessages, user?.connections, searchQuery]);
 
     return (
         <div className="pb-4 h-full w-screen lg:max-w-[450px] border-r-2 border-gray-800 relative">
 
-            <div className="h-24 text-xl lg:text-2xl flex items-center justify-between border-b-2 border-gray-800 px-2 lg:px-4">
+            <div className="h-24 text-xl lg:text-2xl flex items-center justify-between px-2 lg:px-4">
                 <p className="font-semibold">
                     {greeting}{", "}{user?.name.split(" ")[0]}{" "}{randomEmoji}
                 </p>
@@ -90,6 +99,15 @@ export default function Sidebar() {
             </div>
 
             <div className="h-full pb-48 overflow-y-auto">
+                <Search
+                    id="searchConnections"
+                    labelClassName="mb-3 max-w-[90%] mx-auto !border-none !py-2"
+                    inputClassName="!text-sm"
+                    placeholder="Search"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                />
+
                 {
                     sortedConnections.map(connection => {
                         const lastMessage = lastMessages.find(message => message.chatId === connection.chatId)?.lastMessage;
@@ -97,7 +115,7 @@ export default function Sidebar() {
                         return (
                             <button
                                 key={connection._id}
-                                className={`w-full px-6 py-4 flex items-center justify-between lg:hover:bg-gray-900 duration-300 border-b border-gray-800 text-lg lg:text-xl ${connection._id === receiverId ? "bg-slate-900" : "bg-transparent"}`}
+                                className={`w-full px-6 py-4 flex items-center justify-between lg:hover:bg-gray-900 duration-300 text-lg lg:text-xl ${connection._id === receiverId ? "bg-slate-900" : "bg-transparent"}`}
                                 onClick={() => {
                                     updateReceiverId(connection._id);
                                     closeProfile();
@@ -132,7 +150,16 @@ export default function Sidebar() {
                                 </span>
                             </button>
                         )
-                    })}
+                    })
+                }
+
+                {
+                    sortedConnections.length === 0 && (
+                        <div className="w-full py-8 text-center text-neutral-500">
+                            No results found
+                        </div>
+                    )
+                }
 
                 {
                     user?.connections.length === 0 && (
