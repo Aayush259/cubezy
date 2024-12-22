@@ -15,19 +15,7 @@ const Profile = () => {
 
     // Getting the state from the ProfileContext.
     const { isProfileOpen, setIsProfileOpen, isLoading, profileInfo } = useProfileContext();
-    const { addDp, updateBio, onlineConnections, receiverId, updateReceiverId } = useChatContext();     // Function to add the DP to the chat.
-
-    // Reset the receiverId when the profile is opened.
-    useEffect(() => {
-        let timer: NodeJS.Timeout;
-        if (isProfileOpen) {
-            timer = setTimeout(() => {
-                updateReceiverId(null);
-            }, 500);
-        }
-
-        return () => clearTimeout(timer);
-    }, [isProfileOpen]);
+    const { addDp, updateBio, onlineConnections, receiverId } = useChatContext();     // Function to add the DP to the chat.
 
     // User state from store.
     const { user } = useSelector((state: RootState) => state.user);
@@ -63,7 +51,7 @@ const Profile = () => {
     }, [profileInfo]);
 
     return (
-        <div className={`py-8 h-full w-full fixed lg:absolute top-0 left-0 duration-300 z-[100] overflow-hidden bg-[#0A0A0A] ${isProfileOpen ? "translate-x-0" : "translate-x-full"}`}>
+        <div className={`py-8 h-full w-full fixed lg:absolute top-0 left-0 duration-300 z-[100] overflow-hidden bg-[#0A0A0A] ${isProfileOpen ? "translate-x-0" : "translate-x-full"}`} onClick={() => setEditBio(false)}>
             <button className="absolute top-4 right-4 lg:hover:opacity-80 duration-300" onClick={() => setIsProfileOpen(false)}>
                 <IoClose size={30} className="text-white" />
             </button>
@@ -124,7 +112,7 @@ const Profile = () => {
                             }
 
                             <p className="text-2xl flex flex-row-reverse items-center justify-center gap-1">
-                                <span className="font-semibold">{profileInfo.name}</span><span className="opacity-70">{user?._id === profileInfo._id && " (You)"}</span>
+                                <span className="font-semibold">{profileInfo.name}<span className="opacity-70">{user?._id === profileInfo._id && " (You)"}</span></span>
                                 {
                                     user?._id !== profileInfo._id && receiverId && onlineConnections.includes(receiverId) && (
                                         <span className="h-2 w-2 bg-green-500 rounded-full block" />
@@ -142,7 +130,10 @@ const Profile = () => {
                                                 <button
                                                     type="button"
                                                     className="rounded-full outline-none"
-                                                    onClick={showEditBioInput}
+                                                    onClick={(e) => {
+                                                        e.stopPropagation()
+                                                        showEditBioInput()
+                                                    }}
                                                 >
                                                     <RiPencilFill size={18} className="opacity-70" />
                                                 </button>
@@ -154,7 +145,7 @@ const Profile = () => {
 
                             {
                                 profileInfo._id === user?._id && (
-                                    <form className={`flex items-center justify-center ${!editBio && "hidden"}`} onSubmit={handleBioSubmit}>
+                                    <form className={`flex items-center justify-center ${!editBio && "hidden"}`} onSubmit={handleBioSubmit} onClick={(e) => e.stopPropagation()}>
                                         <input
                                             type="text"
                                             ref={editBioInputRef}
