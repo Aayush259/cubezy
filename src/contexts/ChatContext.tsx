@@ -460,6 +460,13 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
         // Check if the file is an image.
         if (!(dp && dp.type.startsWith('image/'))) {
             addToast("Invalid Image", false);
+            return;
+        };
+
+        // Check if the file size is too large.
+        if (dp.size > 1024 * 1024 * 1) {
+            addToast("File size too large", false);
+            return;
         };
 
         // Convert the file to a buffer.
