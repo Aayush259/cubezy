@@ -154,7 +154,7 @@ export default function Sidebar() {
                 }
 
                 {
-                    sortedConnections.length === 0 && (
+                    user?.connections.length !== 0 && sortedConnections.length === 0 && (
                         <div className="w-full py-8 text-center text-neutral-500">
                             No results found
                         </div>
