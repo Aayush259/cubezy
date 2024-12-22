@@ -123,7 +123,7 @@ const Profile = () => {
                             {
                                 !editBio && (
                                     <div className="flex items-center justify-center gap-2">
-                                        <p className="mb-4 lg:mb-0">{profileInfo.bio}</p>
+                                        <p>{profileInfo.bio}</p>
 
                                         {
                                             profileInfo._id === user?._id && (
