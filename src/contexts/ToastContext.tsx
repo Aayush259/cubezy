@@ -23,7 +23,7 @@ export const ToastProvider = ({ children }: { children: React.ReactNode }) => {
 
     return (
         <ToastContext.Provider value={{ addToast }}>
-            <div className="w-screen fixed top-5 left-0 z-50 flex flex-col duration-500 h-fit items-center">
+            <div className="w-screen fixed top-5 left-0 z-[999] flex flex-col duration-500 h-fit items-center">
                 {toasts.map((toast) => (
                     <Toast key={toast.id} message={toast.message} success={toast.success} onClose={() => removeToast(toast.id)} />
                 ))}

@@ -1,19 +1,21 @@
 "use client";
 import { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { IoClose } from "react-icons/io5";
 import { updateConnections } from "../store/userSlice";
 import { useIdBarContext } from "../contexts/IdBarContext";
 import { getRandomEmoji } from "../../utils/funcs/funcs";
+import { RootState } from "../store/store";
 
 const IdBar: React.FC = () => {
 
+    const { user } = useSelector((state: RootState) => state.user);
     const dispatch = useDispatch();
 
     const { idBarOpen, setIdBarOpen } = useIdBarContext();
 
-    const [userEmailToAdd, setUserEmailToAdd] = useState<string>("");   // State to store the ID to add.
-    const [isAdding, setIsAdding] = useState<boolean>(false);   // State to track whether the user is adding a new ID.
+    const [userEmailToAdd, setUserEmailToAdd] = useState<string>("");   // State to store the email to add.
+    const [isAdding, setIsAdding] = useState<boolean>(false);   // State to track whether the user is adding a new email.
 
     useEffect(() => {
 
@@ -30,6 +32,15 @@ const IdBar: React.FC = () => {
 
     const addFriend = async () => {
         setIsAdding(true);
+
+        const isUserAlreadyAdded = user?.connections.some(connection => connection.email === userEmailToAdd);
+        const isUsersEmail = user?.email === userEmailToAdd;
+
+        if (isUserAlreadyAdded || isUsersEmail) {
+            setIsAdding(false);
+            setUserEmailToAdd("");
+            return;
+        }
 
         const token = localStorage.getItem("token");
 

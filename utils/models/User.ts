@@ -24,6 +24,7 @@ const userSchema = new Schema<IUser>({
             chatId: String,
             _id: { type: mongoose.Types.ObjectId, ref: "User" },    // Receiver's Chat ID.
             name: { type: String, required: true },
+            email: { type: String, required: true },
             dp: { type: String, default: null },
         },
     ],
