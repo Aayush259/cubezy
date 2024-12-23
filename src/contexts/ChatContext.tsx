@@ -592,7 +592,7 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
                 if (senderId === receiverIdRef.current) {
                     setChats(prevChats => prevChats ? [...prevChats, messageDetails] : [messageDetails]);
                 } else {
-                    addToast(`New message from ${user?.connections.find(connection => connection._id === senderId)?.name.split(" ")[0]}`, true);
+                    addToast(`New message ${"from " + user?.connections.find(connection => connection._id === senderId)?.name.split(" ")[0] || ""}`, true);
                 }
 
                 const nChatId = user?._id as string < messageDetails.senderId ? `${user?._id}_${messageDetails.senderId}` : `${messageDetails.senderId}_${user?._id}`;
