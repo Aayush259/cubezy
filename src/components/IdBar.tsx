@@ -65,7 +65,7 @@ const IdBar: React.FC = () => {
     return (
         <div className="w-fit h-fit" onClick={(e) => e.stopPropagation()}>
 
-            <div className={`fixed right-0 top-0 z-50 w-screen h-screen lg:max-w-[450px] border-l-2 border-gray-800 bg-black ${idBarOpen ? "translate-x-0" : "translate-x-full"} duration-300`}>
+            <div className={`fixed right-0 top-0 z-[999] w-screen h-screen lg:max-w-[450px] border-l-2 border-gray-800 bg-black ${idBarOpen ? "translate-x-0" : "translate-x-full"} duration-300`}>
 
                 <button className="absolute top-4 right-4 lg:hover:opacity-80 duration-300" onClick={() => setIdBarOpen(false)}>
                     <IoClose size={30} className="text-white" />
