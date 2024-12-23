@@ -99,14 +99,16 @@ export default function Sidebar() {
             </div>
 
             <div className="h-full pb-48 overflow-y-auto">
-                <Search
-                    id="searchConnections"
-                    labelClassName="mb-3 max-w-[90%] mx-auto !border-none !py-2"
-                    inputClassName="!text-sm"
-                    placeholder="Search"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                />
+                {
+                    user && user?.connections.length > 0 && <Search
+                        id="searchConnections"
+                        labelClassName="mb-3 max-w-[90%] mx-auto !border-none !py-2"
+                        inputClassName="!text-sm"
+                        placeholder="Search"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                }
 
                 {
                     sortedConnections.map(connection => {
