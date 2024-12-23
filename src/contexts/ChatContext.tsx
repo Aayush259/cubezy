@@ -3,7 +3,7 @@ import { createContext, useContext, useEffect, useMemo, useRef, useState } from 
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../store/store";
 import { io, Socket } from "socket.io-client";
-import { updateConnections, updateUser } from "../store/userSlice";
+import { addDpInStore, updateConnections, updateUser } from "../store/userSlice";
 import { v4 as uuidv4 } from "uuid";
 import { IChatMessage, ILastMessage } from "../../utils/interfaces/interfaces";
 import Loader from "../components/Loader";
@@ -628,9 +628,7 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
 
             // Listen for the "profilePictureUpdated" event from the server.
             socket.on("profilePictureUpdated", ({ userId, dp }) => {
-                const updatedConnections = user?.connections?.map(connection => (connection._id === userId ? { ...connection, dp } : connection));
-
-                dispatch(updateUser({ ...user, connections: updatedConnections }));
+                dispatch(addDpInStore({ userId, dp }));
             });
         }
     }, [socket]);

@@ -26,9 +26,15 @@ const userSlice = createSlice({
         updateUser: (state, action) => {
             const updatedUser = action.payload;
             state.user = updatedUser;
+        },
+        addDpInStore: (state, action) => {
+            const { userId, dp } = action.payload;
+            const updatedConnections = state.user?.connections?.map(connection => (connection._id === userId ? { ...connection, dp } : connection));
+            const updatedUser = { ...state.user, connections: updatedConnections } as IUserSlice["user"];
+            state.user = updatedUser;
         }
     }
 });
 
-export const { login, logout, updateConnections, updateUser } = userSlice.actions;
+export const { login, logout, updateConnections, updateUser, addDpInStore } = userSlice.actions;
 export default userSlice.reducer;
