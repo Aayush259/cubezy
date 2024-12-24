@@ -124,7 +124,7 @@ export default function Sidebar() {
                                 }}
                             >
                                 <span className="flex items-center gap-4 flex-grow pr-7">
-                                    <DP dp={connection.dp} name={connection.name} />
+                                    <DP dp={connection.dp} name={connection.name.split(" ")[0]} />
 
                                     <span className="flex flex-col flex-grow justify-between items-start gap-[1px] lg:gap-[3px]">
                                         <span className="block">{connection.name}</span>
