@@ -127,7 +127,7 @@ export default function Sidebar() {
                                     <DP dp={connection.dp} name={connection.name.split(" ")[0]} />
 
                                     <span className="flex flex-col flex-grow justify-between items-start gap-[1px] lg:gap-[3px]">
-                                        <span className="block">{connection.name}</span>
+                                        <span className="block">{connection.name.split(" ")[0]}</span>
                                         <span className={`text-sm flex items-center justify-between w-full whitespace-nowrap ${lastMessage && !lastMessage.isRead && lastMessage.senderId !== user?._id ? "font-bold" : "opacity-70"}`}>
                                             <span className="block max-w-[200px] overflow-ellipsis overflow-hidden">
                                                 {lastMessage?.message}
