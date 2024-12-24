@@ -179,7 +179,7 @@ const Profile = () => {
                                         {
                                             profileInfo.connections.map(connection => (
                                                 <div
-                                                    className="flex items-center justify-center flex-col gap-2 duration-300 hover:opacity-70 cursor-pointer"
+                                                    className="flex items-center justify-center flex-col gap-2 duration-300 hover:opacity-70 cursor-pointer overflow-hidden"
                                                     key={connection._id}
                                                     onClick={() => handleConnectionClick(connection._id)}
                                                 >
@@ -199,7 +199,7 @@ const Profile = () => {
                                                         </div>
                                                     )}
 
-                                                    <p>{connection.name.split(" ")[0]}</p>
+                                                    <p className="max-w-[55px] overflow-ellipsis overflow-hidden">{connection.name.split(" ")[0]}</p>
                                                 </div>
                                             ))
                                         }
