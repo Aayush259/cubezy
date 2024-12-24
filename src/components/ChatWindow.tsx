@@ -44,6 +44,7 @@ const ChatWindow: React.FC = () => {
     // Handle message submit.
     const handleMessageSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+        messageInputRef.current?.focus();
         sendMessage(message);
         setMessage("");
         setShowEmojis(false);
