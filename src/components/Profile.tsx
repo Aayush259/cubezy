@@ -15,7 +15,7 @@ const Profile = () => {
 
     // Getting the state from the ProfileContext.
     const { isProfileOpen, setIsProfileOpen, isLoading, profileInfo } = useProfileContext();
-    const { addDp, updateBio, onlineConnections, receiverId } = useChatContext();     // Function to add the DP to the chat.
+    const { addDp, updateBio, onlineConnections, receiverId, updateReceiverId } = useChatContext();     // Function to add the DP to the chat.
 
     // User state from store.
     const { user } = useSelector((state: RootState) => state.user);
@@ -43,6 +43,11 @@ const Profile = () => {
         updateBio(profileBio);
         setEditBio(false);
     };
+
+    const handleConnectionClick = (connectionId: string) => {
+        updateReceiverId(connectionId);
+        setIsProfileOpen(false);
+    }
 
     // Effect to set the profileBio state.
     useEffect(() => {
@@ -173,7 +178,11 @@ const Profile = () => {
                                     <div className="flex items-center gap-5 w-full overflow-x-auto">
                                         {
                                             profileInfo.connections.map(connection => (
-                                                <div className="flex items-center justify-center flex-col gap-2" key={connection._id}>
+                                                <div
+                                                    className="flex items-center justify-center flex-col gap-2 duration-300 hover:opacity-70 cursor-pointer"
+                                                    key={connection._id}
+                                                    onClick={() => handleConnectionClick(connection._id)}
+                                                >
                                                     {connection.dp ? (
                                                         <span className="block w-[50px] h-[50px] rounded-full overflow-hidden">
                                                             <Image
@@ -199,7 +208,7 @@ const Profile = () => {
                             }
 
                             <div className={`w-full px-4 md:px-8 pt-1 pb-3 border-b border-t-gray-800 border-b-gray-800 ${profileInfo._id !== user?._id && "border-t !pt-3 mt-3"}`}>
-                                <p className="mb-4 lg:mb-0">{profileInfo.email}</p>
+                                <p>{profileInfo.email}</p>
                             </div>
 
                             <div className={`w-full px-4 md:px-8 pt-1 pb-3 border-b border-t-gray-800 border-b-gray-800`}>
