@@ -5,13 +5,18 @@ import { IoClose, IoCameraSharp } from "react-icons/io5";
 import { RiPencilFill } from "react-icons/ri";
 import { FaArrowRightLong } from "react-icons/fa6";
 import { formatDate2 } from "../../utils/funcs/funcs";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../store/store";
 import { useChatContext } from "../contexts/ChatContext";
 import Loader from "./Loader";
 import { useEffect, useRef, useState } from "react";
+import { logout } from "../store/userSlice";
+import { useRouter } from "next/navigation";
 
 const Profile = () => {
+
+    const router = useRouter();
+    const dispatch = useDispatch();
 
     // Getting the state from the ProfileContext.
     const { isProfileOpen, setIsProfileOpen, isLoading, profileInfo } = useProfileContext();
@@ -47,7 +52,15 @@ const Profile = () => {
     const handleConnectionClick = (connectionId: string) => {
         updateReceiverId(connectionId);
         setIsProfileOpen(false);
-    }
+    };
+
+    const handleLogout = () => {
+        if (profileInfo?._id !== user?._id) return;
+
+        localStorage.removeItem("token");
+        dispatch(logout());
+        router.push("/login");
+    };
 
     // Effect to set the profileBio state.
     useEffect(() => {
@@ -214,6 +227,14 @@ const Profile = () => {
                             <div className={`w-full px-4 md:px-8 pt-1 pb-3 border-b border-t-gray-800 border-b-gray-800`}>
                                 <p>Joined on: {formatDate2(profileInfo.createdAt)}</p>
                             </div>
+
+                            {
+                                profileInfo._id === user?._id && (
+                                    <button className="my-4 ml-auto mr-4 duration-300 bg-gray-800 rounded-full outline-none w-fit text-center px-4 py-1.5 text-red-500 hover:bg-transparent border border-gray-800 text-lg" onClick={handleLogout}>
+                                        Logout
+                                    </button>
+                                )
+                            }
                         </div>
                     )
                 }</div>
