@@ -188,11 +188,11 @@ const Profile = () => {
 
                                     <p className="text-xl mb-2">Your Connections:</p>
 
-                                    <div className="flex items-center gap-5 w-full overflow-x-auto">
+                                    <div className="shrink-0 grow-0 flex items-center gap-5 w-full overflow-x-auto">
                                         {
                                             profileInfo.connections.map(connection => (
                                                 <div
-                                                    className="flex items-center justify-center flex-col gap-2 duration-300 hover:opacity-70 cursor-pointer overflow-hidden"
+                                                    className="shrink-0 grow-0 flex items-center justify-center flex-col gap-2 duration-300 hover:opacity-70 cursor-pointer overflow-hidden"
                                                     key={connection._id}
                                                     onClick={() => handleConnectionClick(connection._id)}
                                                 >
