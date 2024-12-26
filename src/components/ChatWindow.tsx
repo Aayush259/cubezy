@@ -10,7 +10,7 @@ import { MdContentCopy, MdDelete } from "react-icons/md";
 import { FaCheck } from "react-icons/fa6";
 import { BsEmojiSmileUpsideDown } from "react-icons/bs";
 import { useEffect, useRef, useState } from "react";
-import { compareDates, copyToClipboard, formatDate } from "../../utils/funcs/funcs";
+import { compareDates, copyToClipboard, formatDate, formatMessage } from "../../utils/funcs/Funcs";
 import Image from "next/image";
 import { useProfileContext } from "../contexts/ProfileContext";
 import Loader from "./Loader";
@@ -244,7 +244,9 @@ const ChatWindow: React.FC = () => {
 
                                                 <div className={`flex items-end md:max-w-[350px] max-w-[90%] py-1 px-2 rounded-lg w-fit lg:text-xl relative ${chat.senderId === user?._id ? "ml-auto bg-blue-700" : "self-start bg-slate-800"}`}>
 
-                                                    {chat.message}
+                                                    <p>
+                                                        {formatMessage(chat.message)}
+                                                    </p>
 
                                                     <div className="flex items-center justify-end gap-1 text-sm text-white whitespace-nowrap pl-4">
                                                         <p className="text-[10px] leading-none">

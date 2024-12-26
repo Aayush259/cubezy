@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { IoClose } from "react-icons/io5";
 import { updateConnections } from "../store/userSlice";
 import { useIdBarContext } from "../contexts/IdBarContext";
-import { getRandomEmoji } from "../../utils/funcs/funcs";
+import { getRandomEmoji } from "../../utils/funcs/Funcs";
 import { RootState } from "../store/store";
 
 const IdBar: React.FC = () => {

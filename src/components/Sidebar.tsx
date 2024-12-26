@@ -6,7 +6,7 @@ import { IoMdAdd } from "react-icons/io";
 import { FaUser } from "react-icons/fa6";
 import { useIdBarContext } from "../contexts/IdBarContext";
 import { useChatContext } from "../contexts/ChatContext";
-import { formatDate, getRandomEmoji } from "../../utils/funcs/funcs";
+import { formatDate, getRandomEmoji } from "../../utils/funcs/Funcs";
 import { useProfileContext } from "../contexts/ProfileContext";
 import Image from "next/image";
 import DP from "../reusables/DP";

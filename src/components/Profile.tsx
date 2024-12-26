@@ -4,7 +4,7 @@ import { useProfileContext } from "../contexts/ProfileContext";
 import { IoClose, IoCameraSharp } from "react-icons/io5";
 import { RiPencilFill } from "react-icons/ri";
 import { FaArrowRightLong } from "react-icons/fa6";
-import { formatDate2 } from "../../utils/funcs/funcs";
+import { formatDate2 } from "../../utils/funcs/Funcs";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../store/store";
 import { useChatContext } from "../contexts/ChatContext";
