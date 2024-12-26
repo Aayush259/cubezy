@@ -16,6 +16,7 @@ const IdBar: React.FC = () => {
 
     const [userEmailToAdd, setUserEmailToAdd] = useState<string>("");   // State to store the email to add.
     const [isAdding, setIsAdding] = useState<boolean>(false);   // State to track whether the user is adding a new email.
+    const [enteredWrongEmail, setEnteredWrongEmail] = useState<boolean>(false);   // State to track if the entered email is wrong.
 
     useEffect(() => {
 
@@ -32,6 +33,7 @@ const IdBar: React.FC = () => {
 
     const addFriend = async () => {
         setIsAdding(true);
+        setEnteredWrongEmail(false);
 
         const isUserAlreadyAdded = user?.connections.some(connection => connection.email === userEmailToAdd);
         const isUsersEmail = user?.email === userEmailToAdd;
@@ -65,6 +67,7 @@ const IdBar: React.FC = () => {
                 }
             } else {
                 console.log("Error adding ID. response:", response);
+                setEnteredWrongEmail(true);
             }
         } catch (error) {
             console.log(error);
@@ -108,6 +111,14 @@ const IdBar: React.FC = () => {
                         Add
                     </button>
                 </form>
+
+                {
+                    enteredWrongEmail && (
+                        <p className="text-sm text-red-500 text-center">
+                            {"Email not found"}
+                        </p>
+                    )
+                }
             </div>
         </div>
     );
