@@ -62,14 +62,15 @@ const IdBar: React.FC = () => {
 
                 if (connections) {
                     dispatch(updateConnections(connections));
-                    setUserEmailToAdd("");
-                    setIsAdding(false);
                 }
             } else {
                 console.log("Error adding ID. response:", response);
             }
         } catch (error) {
             console.log(error);
+        } finally {
+            setIsAdding(false);
+            setUserEmailToAdd("");
         }
     };
 
