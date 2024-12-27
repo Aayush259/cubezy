@@ -39,17 +39,19 @@ export default async function getMessages(req: NextApiRequest, res: NextApiRespo
         const lastMessages = [];
 
         // Get the last message for each chat the user has.
-        const userDeletedChats = await DeletedChats.findOne({ userId: decodedToken.id });
+        const userDeletedChats = await DeletedChats.find({ userId: decodedToken.id });
 
         for (const connection of connections) {
             const chatId = connection.chatId;
             const MessageModel = createMessageModel(chatId);
 
-            // Fetch the last message from the chat which the user has not deleted.
+            const userDeletedChat = userDeletedChats.find(chat => chat.chatId === chatId);
+
+            // Query to exclude deleted messages.
             const query: any = {};
 
-            if (userDeletedChats && userDeletedChats?.deletedMessages?.length > 0) {
-                query._id = { $nin: userDeletedChats.deletedMessages.map((id: string) => new mongoose.Types.ObjectId(id)) };
+            if (userDeletedChat && userDeletedChat?.deletedMessages?.length > 0) {
+                query._id = { $nin: userDeletedChat.deletedMessages.map((id: string) => new mongoose.Types.ObjectId(id)) };
             }
 
             const lastMessage = await MessageModel.findOne(query)
