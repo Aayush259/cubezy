@@ -31,7 +31,15 @@ const IdBar: React.FC = () => {
         };
     }, []);
 
+    useEffect(() => {
+        if (enteredWrongEmail && !idBarOpen) {
+            setEnteredWrongEmail(false);
+        }
+    }, [idBarOpen]);
+
     const addFriend = async () => {
+        if (!userEmailToAdd) return;
+
         setIsAdding(true);
         setEnteredWrongEmail(false);
 
