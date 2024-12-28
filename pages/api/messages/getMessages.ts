@@ -29,32 +29,47 @@ export default async function getMessages(req: NextApiRequest, res: NextApiRespo
         await connectMongoDb();
 
         // Extract chatId from the request body.
-        const { chatId } = req.body;
+        const { chatId, page = 1, limit = 20 } = req.body;
 
         if (!chatId) {
             return res.status(400).json({ message: "Valid chatId is required" });
         }
 
+        const filteredMessages = [];
+        const skip = (page - 1) * limit;
+        let totalMessagesFetched = 0;
+
         // Dynamically create or get chat model.
         const MessageModel = createMessageModel(chatId);
 
-        // Fetch all messages from the collection.
-        let messages = await MessageModel.find().sort({ sentAt: 1 });     // Sorting by sentAt for chronological order.
-
-        // Check if the user has deleted any messages.
         const userDeletedChats = await DeletedChats.findOne({ chatId, userId: decodedToken.id });
 
-        if (userDeletedChats) {
-            // Extract deleted message IDs from the user's deleted chats.
-            const deletedMessageIds = userDeletedChats.deletedMessages;
+        const userDeletedChat = userDeletedChats?.deletedMessages;
 
-            // Filter out messages that have been deleted by the user.
-            messages = messages.filter(message => !deletedMessageIds.includes((message._id as mongoose.Types.ObjectId).toString()));
-        }
+        while (filteredMessages.length < limit) {
+
+            let messages = await MessageModel.find()
+            .sort({ sentAt: -1 })
+            .skip(skip + totalMessagesFetched)
+            .limit(limit - filteredMessages.length);
+
+            if (messages.length === 0) break;
+
+            messages = messages.filter(message => !userDeletedChat?.includes((message._id as mongoose.Types.ObjectId).toString()));
+
+            filteredMessages.push(...messages);
+            totalMessagesFetched += messages.length;
+
+            if (totalMessagesFetched < limit) break;
+        };
+
+        const totalMessages = await MessageModel.countDocuments();
+        const hasMore = (totalMessagesFetched + skip + (userDeletedChat?.length || 0)) < totalMessages;
 
         res.status(200).json({
             message: "Messages fetched successfully",
-            chats: messages,
+            chats: filteredMessages.slice(0, limit).reverse(),
+            hasMore: hasMore,
         });
     } catch (error) {
         console.log("Error fetching messages:", error);
