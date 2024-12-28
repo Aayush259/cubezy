@@ -16,9 +16,12 @@ const ChatContext = createContext<{
     receiverId: string | null;
     updateReceiverId: (id: string | null) => void;
     chats: IChatMessage[];
+    setChats: React.Dispatch<React.SetStateAction<IChatMessage[]>>;
     lastMessages: ILastMessage[];
     loadingChats: boolean;
+    setLoadingChats: (loading: boolean) => void;
     sendMessage: (message: string) => void;
+    markAsRead: (messageIds?: string[]) => void;
     addDp: (event: React.ChangeEvent<HTMLInputElement>) => void;
     updateBio: (bio: string) => void;
     onlineConnections: string[];
@@ -34,14 +37,18 @@ const ChatContext = createContext<{
     addForwardToReceiverId: (id: string) => void;
     removeForwardToReceiverId: (id: string) => void;
     forwardMessages: () => void;
+    chatId: string | null;
 }>({
     socket: null,
     receiverId: null,
     updateReceiverId: () => { },
     lastMessages: [],
     chats: [],
+    setChats: () => { },
     loadingChats: false,
+    setLoadingChats: () => { },
     sendMessage: () => { },
+    markAsRead: () => { },
     addDp: () => { },
     updateBio: () => { },
     onlineConnections: [],
@@ -57,6 +64,7 @@ const ChatContext = createContext<{
     addForwardToReceiverId: () => { },
     removeForwardToReceiverId: () => { },
     forwardMessages: () => { },
+    chatId: null,
 })
 
 const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
@@ -69,7 +77,7 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
     const { addToast } = useToast();
 
     const [socket, setSocket] = useState<Socket | null>(null);      // Socket.
-    const [loadingChats, setLoadingChats] = useState<boolean>(true);    // Loading chats state.
+    const [loadingChats, setLoadingChats] = useState<boolean>(false);    // Loading chats state.
     const [chats, setChats] = useState<IChatMessage[]>([]);     // Chats state.
     const [lastMessages, setLastMessages] = useState<ILastMessage[]>([]);       // Last messages state.
     const [loadingLastMessages, setLoadingLastMessages] = useState<boolean>(true);      // Loading last messages state.
@@ -156,45 +164,8 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
     // Function to update the receiver ID.
     const updateReceiverId = (id: string | null) => {
         if (receiverIdRef.current === id) return;
-        setLoadingChats(true);
+        // setLoadingChats(true);
         setReceiverIdRef(id);
-    };
-
-    // Function to get messages.
-    const getMessages = async (chatId: string) => {
-
-        // Set loading state to true and get the token.
-        setLoadingChats(true);
-        const token = localStorage.getItem("token");
-
-        // Check if token exists.
-        if (!token) {
-            addToast("Something went wrong", false);
-            return
-        };
-
-        try {
-            const response = await fetch('/api/messages/getMessages', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({ chatId })
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-                addToast("Something went wrong", false);
-            }
-
-            const data = await response.json();
-            setChats(data.chats);
-        } catch {
-            addToast("Something went wrong", false);
-        } finally {
-            setLoadingChats(false);
-        }
     };
 
     // Function to send a message.
@@ -494,16 +465,6 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
         })
     };
 
-    useEffect(() => {
-        if (chatId) {
-            setChats([]);
-            getMessages(chatId);
-
-            // Mark all messages as read when the user opens the chat.
-            markAsRead();
-        }
-    }, [chatId]);
-
     // Function to fetch the last messages.
     const fetchLastMessages = async () => {
         // Set loading state to true and get the token.
@@ -644,7 +605,7 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
     }, [chats]);
 
     return (
-        <ChatContext.Provider value={{ socket, receiverId: receiverId, updateReceiverId, lastMessages, chats, loadingChats, sendMessage, addDp, updateBio, onlineConnections, selectedMessages, addSelectedMessage, removeSelectedMessage, clearSelectedMessages, deleteMessage, forwardMessageWindowVisible, openForwardMessageWindow, closeForwardMessageWindow, forwardToReceiverIds, addForwardToReceiverId, removeForwardToReceiverId, forwardMessages }}>
+        <ChatContext.Provider value={{ socket, receiverId: receiverId, updateReceiverId, lastMessages, chats, setChats, loadingChats, setLoadingChats, sendMessage, markAsRead, addDp, updateBio, onlineConnections, selectedMessages, addSelectedMessage, removeSelectedMessage, clearSelectedMessages, deleteMessage, forwardMessageWindowVisible, openForwardMessageWindow, closeForwardMessageWindow, forwardToReceiverIds, addForwardToReceiverId, removeForwardToReceiverId, forwardMessages, chatId }}>
             {
                 loadingLastMessages ? <Loader /> : error ? <p>Something went wrong</p> : children
             }
