@@ -13,7 +13,6 @@ import { useEffect, useRef, useState } from "react";
 import { compareDates, copyToClipboard, formatDate, formatMessage } from "../../utils/funcs/Funcs";
 import Image from "next/image";
 import { useProfileContext } from "../contexts/ProfileContext";
-import Loader from "./Loader";
 import { IChatMessage } from "@/utils/interfaces/interfaces";
 import { emojis } from "@/utils/data";
 import { useToast } from "../contexts/ToastContext";
