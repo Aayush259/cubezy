@@ -350,7 +350,7 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
     };
 
     // Function to mark a message as read.
-    const markAsRead = async (messageIds?: string[]) => {
+    const markAsRead = (messageIds?: string[]) => {
 
         if (socket && chatId) {
             // Emit the messageIds to the server to mark it as read.
@@ -390,10 +390,16 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
     };
 
     // Function to delete a message.
-    const deleteMessage = async () => {
+    const deleteMessage = () => {
         if (!socket || !chatId || selectedMessages.length === 0) return;
 
         const messageIdsToDelete = selectedMessages.map(message => message._id);
+
+        // Update the chats state to remove the deleted messages.
+        setChats(prevChats => prevChats.filter(chat => !messageIdsToDelete.includes(chat._id)));
+        // Update the last messages state to remove the deleted messages.
+        setLastMessages(prevLastMessages => prevLastMessages.filter(prevLastMessage => !messageIdsToDelete.includes(prevLastMessage.lastMessage._id)));
+        clearSelectedMessages();
 
         // Emit the messageIds to the server to delete the messages.
         socket.emit("deleteMessage", {
@@ -402,15 +408,8 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
         }, (response: any) => {
             if (!response.success) {
                 addToast("Failed to delete", false);
-                clearSelectedMessages();
                 return;
             }
-
-            // Update the chats state to remove the deleted messages.
-            setChats(prevChats => prevChats.filter(chat => !messageIdsToDelete.includes(chat._id)));
-            // Update the last messages state to remove the deleted messages.
-            setLastMessages(prevLastMessages => prevLastMessages.filter(prevLastMessage => !messageIdsToDelete.includes(prevLastMessage.lastMessage._id)));
-            clearSelectedMessages();
         });
     };
 
@@ -454,7 +453,7 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
     };
 
     // Function to update bio.
-    const updateBio = async (bio: string) => {
+    const updateBio = (bio: string) => {
         if (!socket || !user) return;
         socket.emit("setBio", { bio }, (response: any) => {
             if (response.success) {
