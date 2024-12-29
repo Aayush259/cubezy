@@ -46,24 +46,26 @@ export default async function getMessages(req: NextApiRequest, res: NextApiRespo
 
         const userDeletedChat = userDeletedChats?.deletedMessages;
 
+        const totalMessages = await MessageModel.countDocuments();
+
         while (filteredMessages.length < limit) {
 
             let messages = await MessageModel.find()
-            .sort({ sentAt: -1 })
-            .skip(skip + totalMessagesFetched)
-            .limit(limit - filteredMessages.length);
+                .sort({ sentAt: -1 })
+                .skip(skip + totalMessagesFetched)
+                .limit(limit - filteredMessages.length);
 
             if (messages.length === 0) break;
+
+            totalMessagesFetched += messages.length;
 
             messages = messages.filter(message => !userDeletedChat?.includes((message._id as mongoose.Types.ObjectId).toString()));
 
             filteredMessages.push(...messages);
-            totalMessagesFetched += messages.length;
 
             if (totalMessagesFetched < limit) break;
         };
 
-        const totalMessages = await MessageModel.countDocuments();
         const hasMore = (totalMessagesFetched + skip + (userDeletedChat?.length || 0)) < totalMessages;
 
         res.status(200).json({
