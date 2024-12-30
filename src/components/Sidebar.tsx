@@ -17,7 +17,7 @@ export default function Sidebar() {
     const { user } = useSelector((state: RootState) => state.user);
 
     const { setIdBarOpen, idBarOpen } = useIdBarContext();
-    const { receiverId, updateReceiverId, lastMessages } = useChatContext();
+    const { receiverId, updateReceiverId, lastMessages, setChats, setPage, setHasMore } = useChatContext();
     const { openProfile, closeProfile } = useProfileContext();
 
     const [greeting, setGreeting] = useState<string>("");   // Greeting message based on the current time.
@@ -119,6 +119,10 @@ export default function Sidebar() {
                                 key={connection._id}
                                 className={`w-full px-6 py-4 flex items-center justify-between lg:hover:bg-gray-900 duration-300 text-lg lg:text-xl ${connection._id === receiverId ? "bg-slate-900" : "bg-transparent"}`}
                                 onClick={() => {
+                                    if (receiverId === connection._id) return;
+                                    setPage(1);
+                                    setHasMore(true);
+                                    setChats([]);
                                     updateReceiverId(connection._id);
                                     closeProfile();
                                 }}

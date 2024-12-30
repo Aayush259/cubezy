@@ -17,6 +17,10 @@ const ChatContext = createContext<{
     updateReceiverId: (id: string | null) => void;
     chats: IChatMessage[];
     setChats: React.Dispatch<React.SetStateAction<IChatMessage[]>>;
+    page: number;
+    setPage: React.Dispatch<React.SetStateAction<number>>;
+    hasMore: boolean;
+    setHasMore: React.Dispatch<React.SetStateAction<boolean>>;
     lastMessages: ILastMessage[];
     loadingChats: boolean;
     setLoadingChats: (loading: boolean) => void;
@@ -45,6 +49,10 @@ const ChatContext = createContext<{
     lastMessages: [],
     chats: [],
     setChats: () => { },
+    page: 1,
+    setPage: () => { },
+    hasMore: true,
+    setHasMore: () => { },
     loadingChats: false,
     setLoadingChats: () => { },
     sendMessage: () => { },
@@ -79,6 +87,8 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
     const [socket, setSocket] = useState<Socket | null>(null);      // Socket.
     const [loadingChats, setLoadingChats] = useState<boolean>(false);    // Loading chats state.
     const [chats, setChats] = useState<IChatMessage[]>([]);     // Chats state.
+    const [page, setPage] = useState<number>(1);       // Page state.
+    const [hasMore, setHasMore] = useState<boolean>(true);       // Has more state.
     const [lastMessages, setLastMessages] = useState<ILastMessage[]>([]);       // Last messages state.
     const [loadingLastMessages, setLoadingLastMessages] = useState<boolean>(true);      // Loading last messages state.
     const [onlineConnections, setOnlineConnections] = useState<string[]>([]);      // Online connections state.
@@ -353,11 +363,18 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
     const markAsRead = (messageIds?: string[]) => {
 
         if (socket && chatId) {
-            // Emit the messageIds to the server to mark it as read.
-            socket.emit("markAsRead", {
+
+            const payload = {
                 chatId: chatId,
                 messageIds: messageIds ? messageIds : chats?.map((chat) => chat._id),
-            });
+            };
+
+            if (payload.messageIds.length === 0) {
+                return;
+            }
+
+            // Emit the messageIds to the server to mark it as read.
+            socket.emit("markAsRead", payload);
 
             // Update the chats state to mark the messages as read.
             setChats(prevChats => {
@@ -604,7 +621,7 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
     }, [chats]);
 
     return (
-        <ChatContext.Provider value={{ socket, receiverId: receiverId, updateReceiverId, lastMessages, chats, setChats, loadingChats, setLoadingChats, sendMessage, markAsRead, addDp, updateBio, onlineConnections, selectedMessages, addSelectedMessage, removeSelectedMessage, clearSelectedMessages, deleteMessage, forwardMessageWindowVisible, openForwardMessageWindow, closeForwardMessageWindow, forwardToReceiverIds, addForwardToReceiverId, removeForwardToReceiverId, forwardMessages, chatId }}>
+        <ChatContext.Provider value={{ socket, receiverId: receiverId, updateReceiverId, lastMessages, chats, setChats, page, setPage, hasMore, setHasMore, loadingChats, setLoadingChats, sendMessage, markAsRead, addDp, updateBio, onlineConnections, selectedMessages, addSelectedMessage, removeSelectedMessage, clearSelectedMessages, deleteMessage, forwardMessageWindowVisible, openForwardMessageWindow, closeForwardMessageWindow, forwardToReceiverIds, addForwardToReceiverId, removeForwardToReceiverId, forwardMessages, chatId }}>
             {
                 loadingLastMessages ? <Loader /> : error ? <p>Something went wrong</p> : children
             }

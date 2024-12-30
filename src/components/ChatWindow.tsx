@@ -21,14 +21,12 @@ const ChatWindow: React.FC = () => {
 
     const { user } = useSelector((state: RootState) => state.user);
 
-    const { receiverId, updateReceiverId, chats, setChats, loadingChats, sendMessage, onlineConnections, selectedMessages, addSelectedMessage, removeSelectedMessage, clearSelectedMessages, deleteMessage, openForwardMessageWindow, chatId, setLoadingChats, markAsRead } = useChatContext();
+    const { receiverId, updateReceiverId, chats, setChats, loadingChats, sendMessage, onlineConnections, selectedMessages, addSelectedMessage, removeSelectedMessage, clearSelectedMessages, deleteMessage, openForwardMessageWindow, chatId, setLoadingChats, page, setPage, hasMore, setHasMore } = useChatContext();
     const { openProfile } = useProfileContext();
     const { addToast } = useToast();
 
     const [message, setMessage] = useState<string>("");
     const [showEmojis, setShowEmojis] = useState<boolean>(false);
-    const [page, setPage] = useState<number>(1);       // Page state.
-    const [hasMore, setHasMore] = useState<boolean>(true);       // Has more state.
     const [previousChatWindowHeight, setPreviousChatWindowHeight] = useState<number>(0);
 
     const receiver = user?.connections.find((connection) => connection._id === receiverId);
@@ -98,6 +96,7 @@ const ChatWindow: React.FC = () => {
         }
 
     };
+
     // Handle message submit.
     const handleMessageSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -173,19 +172,8 @@ const ChatWindow: React.FC = () => {
     };
 
     useEffect(() => {
-        setPage(1);
-        setHasMore(true);
-        if (chatId) {
-            // Reset chats.
-            setChats([]);
-            // Mark all messages as read when the user opens the chat.
-            markAsRead();
-        }
-    }, [chatId]);
-
-    useEffect(() => {
         getMessages();
-    }, [chatId, page, hasMore]);
+    }, [chatId, page]);
 
     useEffect(() => {
         if (chatScrollRef.current && chats.length <= 20) {
@@ -248,7 +236,10 @@ const ChatWindow: React.FC = () => {
 
                     <button
                         className="lg:hidden rounded-full outline-none mx-4"
-                        onClick={() => updateReceiverId(null)}
+                        onClick={() => {
+                            updateReceiverId(null);
+                            setChats([]);
+                        }}
                     >
                         <IoIosArrowBack size={24} />
                     </button>
