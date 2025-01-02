@@ -188,6 +188,30 @@ const ChatWindow: React.FC = () => {
         }
     }, [chats]);
 
+    useEffect(() => {
+        const handleLinkClick = (e: MouseEvent) => {
+            if (selectedMessages.length > 0) {
+                e.preventDefault();
+                return;
+            }
+        };
+
+        const chatWindow = document.querySelector('#chatWindow') as HTMLDivElement;
+
+        if (chatWindow) {
+            const links = chatWindow.querySelectorAll('a');
+            links.forEach(link => {
+                link.addEventListener('click', handleLinkClick);
+            });
+
+            return () => {
+                links.forEach(link => {
+                    link.removeEventListener('click', handleLinkClick);
+                });
+            };
+        }
+    }, [chats, selectedMessages]);
+
     if (!receiverId) return (
         <div className="w-full h-full hidden lg:flex lg:flex-col items-center justify-center gap-6 relative z-20 text-xl font-[200]">
             <Image
@@ -204,7 +228,7 @@ const ChatWindow: React.FC = () => {
 
     return (
         <div className={`w-screen h-screen lg:w-full z-20 fixed top-0 left-0 lg:relative bg-[#0A0A0A] lg:bg-none`}>
-            <div className="h-[85%] w-full overflow-y-auto flex flex-col" ref={chatScrollRef} onScroll={handleChatWindowScroll}>
+            <div id="chatWindow" className="h-[85%] w-full overflow-y-auto flex flex-col" ref={chatScrollRef} onScroll={handleChatWindowScroll}>
                 <div className="sticky top-0 left-0 z-10 w-full lg:px-6 lg:py-4 flex items-center justify-between bg-[#0A0A0A] lg:hover:bg-gray-900 duration-300 border-b border-gray-800 text-xl">
                     {
                         selectedMessages.length > 0 && (
@@ -322,12 +346,12 @@ const ChatWindow: React.FC = () => {
                                         onTouchEnd={() => handleLongPressMessageEnd()}
                                     >
                                         {
-                                            isMessageSelected && <div className="w-screen -right-4 lg:-right-32 rounded-md h-full absolute bg-blue-700/40" />
+                                            isMessageSelected && <div className="w-screen -right-4 lg:-right-32 h-full absolute bg-blue-700/40" />
                                         }
 
                                         <div className={`flex items-end md:max-w-[350px] max-w-[90%] py-1 px-2 rounded-lg w-fit lg:text-xl relative ${chat.senderId === user?._id ? "ml-auto bg-blue-700" : "self-start bg-slate-800"}`}>
 
-                                            <p>
+                                            <p className="break-words break-all">
                                                 {formatMessage(chat.message)}
                                             </p>
 
