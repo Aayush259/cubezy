@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { IoClose } from "react-icons/io5";
 import { updateConnections } from "../store/userSlice";
@@ -17,6 +17,8 @@ const IdBar: React.FC = () => {
     const [userEmailToAdd, setUserEmailToAdd] = useState<string>("");   // State to store the email to add.
     const [isAdding, setIsAdding] = useState<boolean>(false);   // State to track whether the user is adding a new email.
     const [enteredWrongEmail, setEnteredWrongEmail] = useState<boolean>(false);   // State to track if the entered email is wrong.
+
+    const randomEmoji = useMemo(() => getRandomEmoji(), []);
 
     useEffect(() => {
 
@@ -95,7 +97,7 @@ const IdBar: React.FC = () => {
                 </button>
 
                 <div className="text-2xl text-center mt-32 overflow-hidden">
-                    <p>Add new friend {getRandomEmoji()}</p>
+                    <p>Add new friend {randomEmoji}</p>
                 </div>
 
                 <form className="my-4 flex flex-row items-center justify-center" onSubmit={(e) => {
