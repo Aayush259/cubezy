@@ -23,7 +23,7 @@ Square is a real-time chat application built using modern web technologies. It a
     - **Chat Features:**
         - **Messaging:**
             - Real-time send and receive messages using sockets.
-            - Fetch chat history via API for initial render.
+            - Fetch chat history dynamically via the API with pagination. Messages are loaded 20 at a time as the user scrolls up.
             - Group messages by date with labels ("Today," "Yesterday," or specific dates).
             - Display read receipts (single white tick for sent, double blue tick for read).
             - Include timestamps for each message.
@@ -34,6 +34,7 @@ Square is a real-time chat application built using modern web technologies. It a
             - **Forward Messages:**
                 - Forward messages to other connections via a popup interface.
                 - Search and select connections to forward messages.
+        - **Link Formatting:** Automatically detect and format links, emails, and phone numbers in messages. These are displayed as clickable links that open in a new tab.
 
     - **Notifications:** Notify users of new messages from other connections.
 
@@ -57,7 +58,7 @@ Square is a real-time chat application built using modern web technologies. It a
     - `/auth/addConnection`: Add a new connection.
 
 - **Messages:**
-    - `/messages/getMessages`: Fetch chat history for a specific connection.
+    - `/messages/getMessages`: Fetch chat history for a specific connection. Supports pagination with page and limit parameters. By default, returns 20 messages per request, dynamically loaded as the user scrolls up in the chat window.
     - `/messages/getLastMessages`: Fetch last messages for each connection.
     - `/messages/getUnreadMessages`: Retrieve unread messages.
 
