@@ -181,7 +181,7 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
     // Function to send a message.
     const sendMessage = (message: string) => {
         // Check if message is empty.
-        if (!message) return;
+        if (!message || !message.trim()) return;
 
         if (socket && chatId) {
             // Create a temporary message id.
