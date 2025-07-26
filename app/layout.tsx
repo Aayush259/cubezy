@@ -1,36 +1,29 @@
-import localFont from "next/font/local";
-import "./globals.css";
-import AuthProvider from "../src/AuthProvider";
-import StoreProvider from "../src/StoreProvider";
-import { ToastProvider } from "@/src/contexts/ToastContext";
+import "./globals.css"
+import { Geist, Geist_Mono } from "next/font/google"
+import AuthProvider from "@/components/providers/AuthProvider"
+import StoreProvider from "@/components/providers/StoreProvider"
+import { ToastProvider } from "@/components/context/ToastContext"
 
-const geistSans = localFont({
-  src: "./fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
-  weight: "100 900",
-});
-const geistMono = localFont({
-  src: "./fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
-  weight: "100 900",
-});
+const geistSans = Geist({
+    variable: "--font-geist-sans",
+    subsets: ["latin"]
+})
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
-  return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        <ToastProvider>
-          <StoreProvider>
-            <AuthProvider>{children}</AuthProvider>
-          </StoreProvider>
-        </ToastProvider>
-      </body>
-    </html>
-  );
+const geistMono = Geist_Mono({
+    variable: "--font-geist-mono",
+    subsets: ["latin"]
+})
+
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+    return (
+        <html lang="en">
+            <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+                <ToastProvider>
+                    <StoreProvider>
+                        <AuthProvider>{children}</AuthProvider>
+                    </StoreProvider>
+                </ToastProvider>
+            </body>
+        </html>
+    )
 }
