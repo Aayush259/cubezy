@@ -30,7 +30,7 @@ class FileUploadService {
             // Upload image to Cloudinary
             const uploadUrl = await new Promise<string>((resolve, reject) => {
                 const uploadStream = cloudinary.v2.uploader.upload_stream(
-                    { folder: "Square" },
+                    { folder: "Cubezy" },
                     async (error, result) => {
                         if (error) {
                             console.log("Cloudinary upload error:", error)

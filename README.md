@@ -1,6 +1,6 @@
-# 💬 Square - A Real-Time Chat Application
+# 💬 Cubezy - A Real-Time Chat Application
 
-Square is a real-time chat application built using modern web technologies. It allows users to connect, chat, and manage profiles with seamless updates and an intuitive user interface.
+Cubezy is a real-time chat application built using modern web technologies. It allows users to connect, chat, and manage profiles with seamless updates and an intuitive user interface.
 
 ## 🌟 Features
 

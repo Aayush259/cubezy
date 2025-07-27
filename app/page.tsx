@@ -10,8 +10,8 @@ import ForwardMessageWindow from "@/components/dialogs/ForwardMessageWindow"
 import { ProfileContextProvider } from "@/components/context/ProfileContext"
 
 export const metadata: Metadata = {
-    title: "Square",
-    description: "Square - A modern and intuitive chat application for seamless communication and connection."
+    title: "Cubezy",
+    description: "Cubezy - A modern and intuitive chat application for seamless communication and connection."
 }
 
 export default function Home() {

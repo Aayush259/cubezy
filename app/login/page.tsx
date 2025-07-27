@@ -4,8 +4,8 @@ import { Metadata } from "next"
 import LoginForm from "@/components/forms/LoginForm"
 
 export const metadata: Metadata = {
-    title: "Square - Login",
-    description: "Login to Square and connect with friends through a seamless and intuitive chat experience."
+    title: "Cubezy - Login",
+    description: "Login to Cubezy and connect with friends through a seamless and intuitive chat experience."
 }
 
 export default async function LoginPage() {
