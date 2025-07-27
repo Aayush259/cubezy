@@ -1,6 +1,5 @@
-import chatService from '@/services/database/chatService';
-import db from '@/services/database/dbService';
 import { NextResponse } from 'next/server';
+import chatService from '@/services/database/chatService';
 
 export async function POST(req: Request) {
     try {

@@ -1,7 +1,7 @@
 "use client"
+import { useSelector } from "react-redux"
 import { RootState } from "@/lib/store/store"
 import { useChatContext } from "../context/ChatContext"
-import { useSelector } from "react-redux"
 
 const DeleteMessageWindow = () => {
     const { deleteMessage, deleteWindowVisible, closeDeleteWindow, clearSelectedMessages, selectedMessages } = useChatContext()

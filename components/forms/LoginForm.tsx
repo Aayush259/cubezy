@@ -41,7 +41,8 @@ export default function LoginForm() {
             const user = await requests.login({ email: formData.email, password: formData.password })
             dispatch(login(user))
         } catch (error) {
-            addToast(error as string, false)
+            console.error("Login failed:", error)
+            addToast("Invalid credentials", false)
         } finally {
             setIsSubmitting(false)
         }

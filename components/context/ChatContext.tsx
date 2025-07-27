@@ -1,15 +1,15 @@
 "use client"
 import { v4 as uuidv4 } from "uuid"
 import Loader from "../common/Loader"
+import requests from "@/lib/requests"
 import { useToast } from "./ToastContext"
 import { io, Socket } from "socket.io-client"
 import { RootState } from "@/lib/store/store"
-import { useDispatch, useSelector } from "react-redux"
-import { IChatMessage, ILastMessage } from "@/lib/interfaces"
-import { updateConnections, updateUser } from "@/lib/store/features/userSlice"
-import { createContext, useContext, useEffect, useMemo, useRef, useState } from "react"
-import requests from "@/lib/requests"
 import { EVENTS } from "@/helpers/socket-helpers"
+import { useDispatch, useSelector } from "react-redux"
+import { IChatMessage, IConnection, ILastMessage } from "@/lib/interfaces"
+import { updateConnections, updateUser } from "@/lib/store/features/userSlice"
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react"
 
 const SOCKET_PATH = "/api/socket/connect"
 
@@ -166,7 +166,7 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
     }
 
     // Function to send a message.
-    const sendMessage = (message: string) => {
+    const sendMessage = useCallback((message: string) => {
         // Check if message is empty.
         if (!message || !message.trim()) return
 
@@ -192,7 +192,7 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
                 senderId: user?._id,
                 receiverId: receiverIdRef.current,
                 message
-            }, (response: any) => {
+            }, (response: { success: boolean, _id: string, sentAt: Date }) => {
                 // Check if the response is successful.
                 if (!response.success) {
                     // Show error message
@@ -239,18 +239,13 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
             console.error("Socket or chatId is not available.")
             addToast("Something went wrong", false)
         }
-    }
+    }, [socket, chatId, user, addToast, setChats, setLastMessages])
 
     // Function to forward messages.
-    const forwardMessages = () => {
+    const forwardMessages = useCallback(() => {
         closeForwardMessageWindow()
 
-        if (!user?._id) {
-            addToast("Something went wrong", false)
-            return
-        }
-
-        if (!socket) {
+        if (!socket || !user?._id) {
             addToast("Something went wrong", false)
             return
         }
@@ -291,7 +286,7 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
                     senderId: user?._id,
                     receiverId: forwardToReceiverId,
                     message: message.message
-                }, (response: any) => {
+                }, (response: { success: boolean, _id: string, sentAt: Date }) => {
                     if (!response.success) {
                         addToast(`Failed to forward message to ${receiverId}`, false)
 
@@ -342,10 +337,10 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
         // Clear selected messages and receivers after forwarding.
         clearSelectedMessages()
         clearForwardToReceiverIds()
-    }
+    }, [socket, user, selectedMessages, forwardToReceiverIds, addToast, setChats, setLastMessages, closeForwardMessageWindow])
 
     // Function to mark a message as read.
-    const markAsRead = (messageIds?: string[]) => {
+    const markAsRead = useCallback((messageIds?: string[]) => {
         if (socket && chatId) {
             const payload = {
                 chatId: chatId,
@@ -357,7 +352,7 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
             }
 
             // Emit the messageIds to the server to mark it as read.
-            socket.emit(EVENTS.MARK_AS_READ, payload, (res: any) => {
+            socket.emit(EVENTS.MARK_AS_READ, payload, (res: { success: true, message: string }) => {
                 console.log("=> MAKR_AS_READ response:", res);
             })
 
@@ -389,9 +384,9 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
                 return updatedLastMessages
             })
         }
-    }
+    }, [chatId, socket, chats, setChats, setLastMessages])
 
-    const deleteMessage = (flag: "me" | "everyone") => {
+    const deleteMessage = useCallback((flag: "me" | "everyone") => {
         if (!socket || !chatId || selectedMessages.length === 0) return
 
         const messageIdsToDelete = selectedMessages.map(message => message._id)
@@ -403,13 +398,13 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
         clearSelectedMessages()
         closeDeleteWindow()
 
-        socket.emit(flag === "me" ? EVENTS.DELETE_MESSAGE_FOR_ME : EVENTS.DELETE_MESSAGE_FOR_EVERYONE, { chatId, messageIds: messageIdsToDelete }, (res: any) => {
+        socket.emit(flag === "me" ? EVENTS.DELETE_MESSAGE_FOR_ME : EVENTS.DELETE_MESSAGE_FOR_EVERYONE, { chatId, messageIds: messageIdsToDelete }, (res: { success: boolean, message: string } | { chatId: string, messageIds: string[] }) => {
             console.log("EVENTS.DELETE_MESSAGE_FOR_ME", res)
         })
-    }
+    }, [socket, chatId, selectedMessages, setChats, setLastMessages, clearSelectedMessages, closeDeleteWindow])
 
     // Function to add DP.
-    const addDp = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const addDp = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
         if (!socket || !user) return
 
         // Get the selected file from the input element.
@@ -438,27 +433,27 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
         const buffer = await dp.arrayBuffer()
 
         // Emit the buffer to the server.
-        socket.emit(EVENTS.SET_PROFILE_PICTURE, { file: buffer }, (response: any) => {
+        socket.emit(EVENTS.SET_PROFILE_PICTURE, { file: buffer }, (response: { success: boolean, message: string, dp: string }) => {
             if (response.success) {
                 dispatch(updateUser({ ...user, dp: response.dp }))
             } else {
                 addToast("Something went wrong", false)
             }
         })
-    }
+    }, [socket, user, dispatch, addToast])
 
     // Function to update bio.
-    const updateBio = (bio: string) => {
+    const updateBio = useCallback((bio: string) => {
         if (!socket || !user) return
 
-        socket.emit(EVENTS.SET_BIO, { bio }, (response: any) => {
+        socket.emit(EVENTS.SET_BIO, { bio }, (response: { success: boolean, message: string, bio: string }) => {
             if (response.success) {
                 dispatch(updateUser({ ...user, bio: response.bio }))
             } else {
                 addToast("Something went wrong", false)
             }
         })
-    }
+    }, [socket, user, dispatch, addToast])
 
     // Function to fetch the last messages.
     const fetchLastMessages = async () => {
@@ -469,13 +464,120 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
             const messages = await requests.getLastMessages()
             setLastMessages(messages)
         } catch (err) {
-            console.error("Error fetching last messages:", error)
+            console.error("Error fetching last messages:", err)
             setError("Error fetching last messages")
             addToast("Something went wrong", false)
         } finally {
             setLoadingLastMessages(false)
         }
     }
+
+    const handleUserActive = useCallback(({ userId }: { userId: string }) => {
+        setActiveConnections([...activeConnections.current, userId])
+    }, [setActiveConnections])
+
+    const handleUserInactive = useCallback(({ userId }: { userId: string }) => {
+        setActiveConnections(activeConnections.current.filter((id) => id !== userId))
+    }, [setActiveConnections])
+
+    const handleActiveConnections = useCallback(({ activeUserIds }: { activeUserIds: string }) => {
+        setActiveConnections([...activeConnections.current, ...activeUserIds])
+    }, [setActiveConnections])
+
+    const handleConnectionUpdated = useCallback((newConnection: IConnection) => {
+        if (user?.connections) {
+            const updatedConnectionsArray = [...user?.connections, newConnection]
+            dispatch(updateConnections(updatedConnectionsArray))
+        }
+    }, [user?.connections, dispatch])
+
+    const handleReceiveMessage = useCallback((messageDetails: IChatMessage) => {
+        const senderId = messageDetails.senderId
+        if (senderId === receiverIdRef.current) {
+            setChats(prevChats => prevChats ? [...prevChats, messageDetails] : [messageDetails])
+        } else {
+            const senderName = user?.connections.find(connection => connection.userId._id === senderId)?.userId.name.split(" ")[0]
+            console.log(`New message ${senderName ? ("from " + senderName) : ""}`, true)
+            addToast(`New message ${senderName ? ("from " + senderName) : ""}`, true)
+        }
+
+        const nChatId = user?._id as string < messageDetails.senderId ? `${user?._id}_${messageDetails.senderId}` : `${messageDetails.senderId}_${user?._id}`
+        setLastMessages(prevLastMessages => {
+            // Check if the chat ID already exists in the lastMessages array
+            const existingIndex = prevLastMessages.findIndex(lastMessage => lastMessage.chatId === nChatId)
+
+            if (existingIndex !== -1) {
+                // Update the existing lastMessage for this chat
+                return prevLastMessages.map((lastMessage, idx) =>
+                    idx === existingIndex
+                        ? { ...lastMessage, lastMessage: messageDetails }
+                        : lastMessage
+                )
+            } else {
+                // Add a new entry for this chat if it doesn't exist
+                return [
+                    ...prevLastMessages,
+                    {
+                        chatId: nChatId,
+                        lastMessage: messageDetails,
+                    }
+                ]
+            }
+        })
+    }, [user, receiverIdRef, setChats, setLastMessages, addToast])
+
+    const handleMessageRead = useCallback(({ messageIds }: { messageIds: string[] }) => {
+        setChats(prevChats => prevChats?.map(chat => messageIds?.includes(chat._id) ? { ...chat, isRead: true, status: "sent" } : chat) || null)
+    }, [setChats])
+
+    const handleBioUpdated = useCallback(({ userId, bio }: { userId: string, bio: string }) => {
+        const updatedUser = {
+            ...user,
+            connections: user?.connections.map(connection => {
+                if (connection.userId._id === userId) {
+                    return { ...connection, userId: { ...connection.userId, bio } }
+                }
+                return connection
+            })
+        }
+
+        dispatch(updateUser(updatedUser))
+    }, [user, dispatch])
+
+    const handleProfilePictureUpdated = useCallback(({ userId, dp }: { userId: string, dp: string }) => {
+        const updatedUser = {
+            ...user,
+            connections: user?.connections.map(connection => {
+                if (connection.userId._id === userId) {
+                    return { ...connection, userId: { ...connection.userId, dp } }
+                }
+                return connection
+            })
+        }
+
+        dispatch(updateUser(updatedUser))
+    }, [user, dispatch])
+
+    const handleDeleteMessageForEveryone = useCallback(({ chatId: cId, messageIds }: { chatId: string, messageIds: string[] }) => {
+        console.log("Received event EVENTS.DELETE_MESSAGE_FOR_EVERYONE", cId, messageIds)
+        if (chatId === cId) {
+            setChats(prevChats => prevChats?.filter(chat => !messageIds.includes(chat._id)) || null)
+        }
+
+        setLastMessages(prevLastMessages => prevLastMessages.map(lastMessage => {
+            if (lastMessage.chatId === cId) {
+                return {
+                    ...lastMessage,
+                    lastMessage: {
+                        ...lastMessage.lastMessage,
+                        message: "The message has been deleted",
+                        isRead: true
+                    }
+                }
+            }
+            return lastMessage
+        }))
+    }, [chatId, setChats, setLastMessages])
 
     useEffect(() => {
         fetchLastMessages()
@@ -498,118 +600,27 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
     }, [])
 
     useEffect(() => {
-        if (socket) {
-            // Listen for the "userActive" event from the server.
-            socket.on(EVENTS.USER_ACTIVE, ({ userId }) => {
-                setActiveConnections([...activeConnections.current, userId])
-            })
+        if (!socket) return
+        socket.on(EVENTS.USER_ACTIVE, handleUserActive)
+        socket.on(EVENTS.USER_INACTIVE, handleUserInactive)
+        socket.on(EVENTS.ACTIVE_CONNECTIONS, handleActiveConnections)
+        socket.on(EVENTS.CONNECTION_UPDATED, handleConnectionUpdated)
+        socket.on(EVENTS.RECEIVE_MESSAGE, handleReceiveMessage)
+        socket.on(EVENTS.MESSAGE_READ, handleMessageRead)
+        socket.on(EVENTS.BIO_UPDATED, handleBioUpdated)
+        socket.on(EVENTS.PROFILE_PICUTRE_UPDATED, handleProfilePictureUpdated)
+        socket.on(EVENTS.DELETE_MESSAGE_FOR_EVERYONE, handleDeleteMessageForEveryone)
 
-            // Listen for the "userInactive" event from the server.
-            socket.on(EVENTS.USER_INACTIVE, ({ userId }) => {
-                setActiveConnections(activeConnections.current.filter((id) => id !== userId))
-            })
-
-            socket.on(EVENTS.ACTIVE_CONNECTIONS, ({ activeUserIds }) => {
-                setActiveConnections([...activeConnections.current, ...activeUserIds])
-            })
-
-            // Listen for the "connectionUpdated" event from the server.
-            socket.on(EVENTS.CONNECTION_UPDATED, (newConnection) => {
-                if (user?.connections) {
-                    const updatedConnectionsArray = [...user?.connections, newConnection]
-                    dispatch(updateConnections(updatedConnectionsArray))
-                }
-            })
-
-            // Listen for the "receiveMessage" event from the server.
-            socket.on(EVENTS.RECEIVE_MESSAGE, (messageDetails) => {
-                const senderId = messageDetails.senderId
-                if (senderId === receiverIdRef.current) {
-                    setChats(prevChats => prevChats ? [...prevChats, messageDetails] : [messageDetails])
-                } else {
-                    const senderName = user?.connections.find(connection => connection.userId === senderId)?.userId.name.split(" ")[0]
-                    console.log(`New message ${senderName ? ("from " + senderName) : ""}`, true)
-                    addToast(`New message ${senderName ? ("from " + senderName) : ""}`, true)
-                }
-
-                const nChatId = user?._id as string < messageDetails.senderId ? `${user?._id}_${messageDetails.senderId}` : `${messageDetails.senderId}_${user?._id}`
-                setLastMessages(prevLastMessages => {
-                    // Check if the chat ID already exists in the lastMessages array
-                    const existingIndex = prevLastMessages.findIndex(lastMessage => lastMessage.chatId === nChatId)
-
-                    if (existingIndex !== -1) {
-                        // Update the existing lastMessage for this chat
-                        return prevLastMessages.map((lastMessage, idx) =>
-                            idx === existingIndex
-                                ? { ...lastMessage, lastMessage: messageDetails }
-                                : lastMessage
-                        )
-                    } else {
-                        // Add a new entry for this chat if it doesn't exist
-                        return [
-                            ...prevLastMessages,
-                            {
-                                chatId: nChatId,
-                                lastMessage: messageDetails,
-                            }
-                        ]
-                    }
-                })
-            })
-
-            // Listen for the "messageRead" event from the server.
-            socket.on(EVENTS.MESSAGE_READ, ({ messageIds }) => {
-                setChats(prevChats => prevChats?.map(chat => messageIds?.includes(chat._id) ? { ...chat, isRead: true, status: "sent" } : chat) || null)
-            })
-
-            socket.on(EVENTS.BIO_UPDATED, ({ userId, bio }) => {
-                const updatedUser = {
-                    ...user,
-                    connections: user?.connections.map(connection => {
-                        if (connection.userId._id === userId) {
-                            return { ...connection, userId: { ...connection.userId, bio } }
-                        }
-                        return connection
-                    })
-                }
-
-                dispatch(updateUser(updatedUser))
-            })
-
-            // Listen for the "profilePictureUpdated" event from the server.
-            socket.on(EVENTS.PROFILE_PICUTRE_UPDATED, ({ userId, dp }) => {
-                const updatedUser = {
-                    ...user,
-                    connections: user?.connections.map(connection => {
-                        if (connection.userId._id === userId) {
-                            return { ...connection, userId: { ...connection.userId, dp } }
-                        }
-                        return connection
-                    })
-                }
-
-                dispatch(updateUser(updatedUser))
-            })
-
-            socket.on(EVENTS.DELETE_MESSAGE_FOR_EVERYONE, ({ chatId: cId, messageIds }) => {
-                console.log("Received event EVENTS.DELETE_MESSAGE_FOR_EVERYONE", cId, messageIds)
-                if (chatId === cId) {
-                    setChats(prevChats => prevChats?.filter(chat => !messageIds.includes(chat._id)) || null)
-                }
-
-                setLastMessages(prevLastMessages => prevLastMessages.map(lastMessage => {
-                    if (lastMessage.chatId === cId) {
-                        return {
-                            ...lastMessage,
-                            lastMessage: {
-                                ...lastMessage.lastMessage,
-                                isRead: true
-                            }
-                        }
-                    }
-                    return lastMessage
-                }))
-            })
+        return () => {
+            socket.off(EVENTS.USER_ACTIVE, handleUserActive)
+            socket.off(EVENTS.USER_INACTIVE, handleUserInactive)
+            socket.off(EVENTS.ACTIVE_CONNECTIONS, handleActiveConnections)
+            socket.off(EVENTS.CONNECTION_UPDATED, handleConnectionUpdated)
+            socket.off(EVENTS.RECEIVE_MESSAGE, handleReceiveMessage)
+            socket.off(EVENTS.MESSAGE_READ, handleMessageRead)
+            socket.off(EVENTS.BIO_UPDATED, handleBioUpdated)
+            socket.off(EVENTS.PROFILE_PICUTRE_UPDATED, handleProfilePictureUpdated)
+            socket.off(EVENTS.DELETE_MESSAGE_FOR_EVERYONE, handleDeleteMessageForEveryone)
         }
     }, [socket])
 

@@ -1,7 +1,7 @@
-import chatService from '@/services/database/chatService'
-import userService from '@/services/database/userService'
 import { headers } from 'next/headers'
 import { NextResponse } from 'next/server'
+import chatService from '@/services/database/chatService'
+import userService from '@/services/database/userService'
 
 export async function GET() {
     try {
@@ -9,6 +9,7 @@ export async function GET() {
         const user = JSON.parse(headersList.get('user') || '{}')
         const userId = user?.id.toString()
         const { data } = await userService.getProfileById({ id: userId })
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const unreadMessages: Record<string, any[]> = {}
 
         for (const connection of data.profile.connections) {

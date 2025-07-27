@@ -1,6 +1,5 @@
-import db from '@/services/database/dbService';
-import userService from '@/services/database/userService';
 import { NextResponse } from 'next/server';
+import userService from '@/services/database/userService';
 
 export async function POST(req: Request) {
     try {

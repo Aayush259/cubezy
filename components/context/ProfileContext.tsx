@@ -36,6 +36,7 @@ const ProfileContextProvider = ({ children }: { children: React.ReactNode }) => 
                 createdAt: user.createdAt,
             }
         } else {
+            // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
             const profile = user?.connections.find(connection => connection.userId._id === profileId)!
             console.log("profile", profile)
             return {

@@ -1,4 +1,3 @@
-// import Image from "next/image"
 import { Metadata } from "next"
 import IdBar from "@/components/chat/IdBar"
 import Sidebar from "@/components/chat/Sidebar"
@@ -6,9 +5,9 @@ import Profile from "@/components/chat/Profile"
 import ChatWindow from "@/components/chat/ChatWindow"
 import { ChatContextProvider } from "@/components/context/ChatContext"
 import { IdBarContextProvider } from "@/components/context/IdBarContext"
+import DeleteMessageWindow from "@/components/dialogs/DeleteMessageWindow"
 import ForwardMessageWindow from "@/components/dialogs/ForwardMessageWindow"
 import { ProfileContextProvider } from "@/components/context/ProfileContext"
-import DeleteMessageWindow from "@/components/dialogs/DeleteMessageWindow"
 
 export const metadata: Metadata = {
     title: "Square",
@@ -26,13 +25,6 @@ export default function Home() {
                     </IdBarContextProvider>
 
                     <div className="h-full flex-grow relative">
-                        {/* <Image
-                            src="/images/chat_window_bg.webp"
-                            height={4160}
-                            width={6240}
-                            alt="Chat Window Background"
-                            className="object-cover object-center absolute z-10 top-0 left-0 opacity-10 w-full h-full"
-                        /> */}
                         <ChatWindow />
                         <ForwardMessageWindow />
                         <DeleteMessageWindow />
@@ -40,8 +32,6 @@ export default function Home() {
                     </div>
                 </ProfileContextProvider>
             </ChatContextProvider>
-
-            {/* <button onClick={sendMessage}>Send</button> */}
         </div>
     )
 }

@@ -1,7 +1,7 @@
+import mongoose from "mongoose"
 import { Socket as NetSocket } from "node:net"
 import { Server as HTTPServer } from "node:http"
 import { Server as IOServer, Socket } from "socket.io"
-import mongoose from "mongoose"
 
 export interface CustomSocket extends Socket {
     data: {

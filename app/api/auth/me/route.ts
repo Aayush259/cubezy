@@ -1,6 +1,6 @@
-import userService from '@/services/database/userService';
 import { headers } from 'next/headers';
 import { NextResponse } from 'next/server';
+import userService from '@/services/database/userService';
 
 export async function GET() {
     try {

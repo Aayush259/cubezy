@@ -1,6 +1,7 @@
 "use client"
 import Image from "next/image"
 import { emojis } from "@/lib/data"
+import requests from "@/lib/requests"
 import { IoSend } from "react-icons/io5"
 import { GoClock } from "react-icons/go"
 import { useSelector } from "react-redux"
@@ -16,7 +17,6 @@ import { IoCheckmarkDone, IoClose } from "react-icons/io5"
 import { useProfileContext } from "../context/ProfileContext"
 import { IoMdCheckmark, IoIosArrowBack, IoMdShareAlt } from "react-icons/io"
 import { compareDates, copyToClipboard, formatDate, formatMessage } from "@/lib/Funcs"
-import requests from "@/lib/requests"
 
 const ChatWindow: React.FC = () => {
     const { user } = useSelector((state: RootState) => state.user)
