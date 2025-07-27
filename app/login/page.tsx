@@ -1,15 +1,14 @@
-import LoginForm from "@/src/components/LoginForm";
-import Image from "next/image";
-import Link from "next/link";
-import { Metadata } from "next";
+import Link from "next/link"
+import Image from "next/image"
+import { Metadata } from "next"
+import LoginForm from "@/components/forms/LoginForm"
 
 export const metadata: Metadata = {
     title: "Square - Login",
-    description: "Login to Square and connect with friends through a seamless and intuitive chat experience.",
-};
+    description: "Login to Square and connect with friends through a seamless and intuitive chat experience."
+}
 
-export default function LoginPage() {
-
+export default async function LoginPage() {
     return (
         <div className="w-screen min-h-screen flex items-center justify-center bg-black">
             <div className="w-[800px] flex flex-col sm:flex-row items-center justify-center rounded-xl max-w-[95vw] overflow-hidden">
@@ -19,18 +18,18 @@ export default function LoginPage() {
                     height={300}
                     alt="Signup now"
                     priority
-                    className="fixed opacity-30 sm:opacity-100 backdrop-blur-sm sm:backdrop-blur-0 sm:blur-0 blur-sm w-full h-full object-cover sm:static sm:w-[44%]"
+                    className="fixed opacity-30 sm:opacity-100 backdrop-blur-sm sm:backdrop-blur-0 w-full h-full object-cover sm:static sm:w-[44%]"
                 />
 
                 <div className="w-full sm:w-[56%] p-4 sm:p-10 relative">
                     <LoginForm />
 
                     <p className="text-lg my-10 text-center">
-                        Don&apos;t have an account?{" "}
+                        {"Don't have an account? "}
                         <Link href="/signup" className="text-blue-500">Sign Up</Link>
                     </p>
                 </div>
             </div>
         </div>
-    );
-};
+    )
+}

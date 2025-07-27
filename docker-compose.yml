@@ -1,0 +1,41 @@
+services:
+    cubezy-db:
+        image: mongo:latest
+        container_name: cubezy-db
+        restart: unless-stopped
+        environment:
+            - MONGO_INITDB_ROOT_USERNAME=${MONGO_DB_USERNAME}
+            - MONGO_INITDB_ROOT_PASSWORD=${MONGO_DB_PASSWORD}
+        volumes:
+            - mongo-data:/data/db
+
+    cubezy-db-admin:
+        image: mongo-express:latest
+        container_name: cubezy-db-admin
+        restart: unless-stopped
+        environment:
+            - ME_CONFIG_MONGODB_SERVER=${ME_CONFIG_MONGODB_SERVER}
+            - ME_CONFIG_MONGODB_PORT=${ME_CONFIG_MONGODB_PORT}
+            - ME_CONFIG_MONGODB_AUTH_DATABASE=admin
+            - ME_CONFIG_MONGODB_ADMINUSERNAME=${MONGO_DB_USERNAME}
+            - ME_CONFIG_MONGODB_ADMINPASSWORD=${MONGO_DB_PASSWORD}
+            - ME_CONFIG_BASICAUTH_USERNAME=${ME_CONFIG_BASICAUTH_USERNAME}
+            - ME_CONFIG_BASICAUTH_PASSWORD=${ME_CONFIG_BASICAUTH_PASSWORD}
+        depends_on:
+            - cubezy-db
+        ports:
+            - "127.0.0.1:8001:8081"
+
+    cubezy-web:
+        container_name: cubezy-web
+        build: .
+        ports:
+            - "8000:3000"
+        environment:
+            - NODE_ENV=production
+        restart: unless-stopped
+        depends_on:
+            - cubezy-db
+
+volumes:
+    mongo-data:
