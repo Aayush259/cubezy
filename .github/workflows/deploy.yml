@@ -1,38 +1,38 @@
 name: 🚀 Deploying Cubezy
 
 on:
-    push:
-        branches:
-            - main
+  push:
+    branches:
+      - main
 
 jobs:
-    deploy:
-        name: Deploy to VPS
-        runs-on: ubuntu-latest
+  deploy:
+    name: Deploying Cubezy
+    runs-on: ubuntu-latest
 
-        steps:
-        - name: ⏬ Checkout code
+    steps:
+      - name: ⏬ Checkout code
         uses: actions/checkout@v4
 
-        - name: 📦 Setup SSH key
+      - name: 📦 Setup SSH key
         run: |
-            mkdir -p ~/.ssh
-            echo "${{ secrets.VPS_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-            chmod 600 ~/.ssh/id_rsa
-            ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
+          mkdir -p ~/.ssh
+          echo "${{ secrets.VPS_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
 
-        - name: 🚀 Deploy via SSH
+      - name: 🚀 Deploy via SSH
         run: |
-            ssh ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << 'EOF'
-            cd cubezy
+          ssh ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << 'EOF'
+          cd cubezy
 
-            echo "Pulling latest changes..."
-            git fetch origin
-            git reset --hard origin/main
-            git pull origin main
+          echo "Pulling latest changes..."
+          git fetch origin
+          git reset --hard origin/main
+          git pull origin main
 
-            docker compose down
-            docker compose up -d --build
+          docker compose down
+          docker compose up -d --build
 
-            echo "Deployment completed successfully!"
-            EOF
+          echo "Deployment completed successfully!"
+          EOF
