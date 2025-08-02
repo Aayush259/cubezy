@@ -28,7 +28,7 @@ const userSlice = createSlice({
             state.user = updatedUser
         }
     }
-});
+})
 
 export const { login, logout, updateConnections, updateUser } = userSlice.actions
 export default userSlice.reducer
