@@ -3,8 +3,8 @@ import type { NextRequest } from 'next/server'
 import joseService from './services/jose/joseService'
 
 // Define public routes that don't require authentication
-const publicRoutes = ['/login', '/signup']
-const publicApiRoutes = ['/api/auth/login', '/api/auth/signup', '/api/socket/connect']
+const publicRoutes = ['/login', '/signup', '/verify']
+const publicApiRoutes = ['/api/auth/login', '/api/auth/signup', "/api/auth/verify", '/api/socket/connect']
 
 export async function middleware(request: NextRequest) {
     console.log('Middleware called')
