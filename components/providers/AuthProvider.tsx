@@ -23,7 +23,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
             router.push("/")
         } catch {
             dispatch(logout())
-            if (pathname !== "/login" && pathname !== "/signup") {
+            if (pathname !== "/login" && pathname !== "/signup" && pathname !== "/verify") {
                 router.push("/login")
             }
             setIsAuthenticated(false)
@@ -44,7 +44,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
         )
     }
 
-    if (!isAuthenticated && pathname !== "/signup" && pathname !== "/login") {
+    if (!isAuthenticated && pathname !== "/signup" && pathname !== "/login" && pathname !== "/verify") {
         return null
     }
 

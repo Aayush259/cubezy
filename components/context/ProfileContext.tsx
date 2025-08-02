@@ -24,7 +24,7 @@ const ProfileContextProvider = ({ children }: { children: React.ReactNode }) => 
     const [profileId, setProfileId] = useState<string | null>(null)    // The id of the profile to be opened.
 
     const profileInfo = useMemo(() => {
-        if (!profileId) return null;
+        if (!profileId) return null
         if (profileId === user?._id) {
             return {
                 _id: user._id,
@@ -36,9 +36,9 @@ const ProfileContextProvider = ({ children }: { children: React.ReactNode }) => 
                 createdAt: user.createdAt,
             }
         } else {
-            // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
-            const profile = user?.connections.find(connection => connection.userId._id === profileId)!
+            const profile = user?.connections.find(connection => connection.userId._id === profileId)
             console.log("profile", profile)
+            if (!profile) return null
             return {
                 _id: profile.userId._id,
                 bio: profile.userId.bio,
@@ -48,7 +48,7 @@ const ProfileContextProvider = ({ children }: { children: React.ReactNode }) => 
                 createdAt: profile.userId.createdAt,
             }
         }
-    }, [profileId, user]);
+    }, [profileId, user])
 
     // Function to open the profile.
     const openProfile = (id: string) => {

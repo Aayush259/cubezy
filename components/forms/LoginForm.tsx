@@ -7,17 +7,15 @@ import { RootState } from "@/lib/store/store"
 import { useToast } from "../context/ToastContext"
 import { login } from "@/lib/store/features/userSlice"
 import { useDispatch, useSelector } from "react-redux"
+import { setEmail, setPassword } from "@/lib/store/features/authSlice"
 
 export default function LoginForm() {
     const { addToast } = useToast()
     const { isLoggedIn, user } = useSelector((state: RootState) => state.user)
+    const { email, password } = useSelector((state: RootState) => state.auth)
     const dispatch = useDispatch()
     const router = useRouter()
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
-    const [formData, setFormData] = useState({
-        email: "",
-        password: ""
-    })
     const [error, setError] = useState<boolean>(false)
 
     useEffect(() => {
@@ -29,7 +27,7 @@ export default function LoginForm() {
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
 
-        if (!formData.email || !formData.password) {
+        if (!email.trim() || !password.trim()) {
             setError(true)
             setIsSubmitting(false)
             return
@@ -38,8 +36,12 @@ export default function LoginForm() {
         setIsSubmitting(true)
 
         try {
-            const user = await requests.login({ email: formData.email, password: formData.password })
-            dispatch(login(user))
+            const loginResponse = await requests.login({ email, password })
+            if ("redirect" in loginResponse) {
+                router.push(loginResponse?.redirect)
+            } else {
+                dispatch(login(loginResponse))
+            }
         } catch (error) {
             console.error("Login failed:", error)
             addToast("Invalid credentials", false)
@@ -59,30 +61,30 @@ export default function LoginForm() {
             <label htmlFor="email" className="flex flex-col gap-2 text-lg">
                 <p className="flex items-center justify-between">
                     <span>{"Email:"}</span>
-                    {error && !formData.email && <span className="text-sm text-red-500 font-semibold">{"Required*"}</span>}
+                    {error && !email.trim() && <span className="text-sm text-red-500 font-semibold">{"Required*"}</span>}
                 </p>
                 <input
                     type="email"
                     id="email"
                     placeholder="Enter your email"
                     className="w-full px-4 py-2 bg-transparent border border-white/80 rounded-lg"
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    value={email}
+                    onChange={(e) => dispatch(setEmail(e.target.value))}
                 />
             </label>
 
             <label htmlFor="name" className="flex flex-col gap-2 text-lg">
                 <p className="flex items-center justify-between">
                     <span>{"Password:"}</span>
-                    {error && !formData.password && <span className="text-sm text-red-500 font-semibold">Required*</span>}
+                    {error && !password.trim() && <span className="text-sm text-red-500 font-semibold">{"Required*"}</span>}
                 </p>
                 <input
                     type="password"
                     id="password"
                     placeholder="Enter your password"
                     className="w-full px-4 py-2 bg-transparent border border-white/80 rounded-lg"
-                    value={formData.password}
-                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                    value={password}
+                    onChange={(e) => dispatch(setPassword(e.target.value))}
                 />
             </label>
 

@@ -23,7 +23,7 @@ class Requests {
         }
     }
 
-    async login({ email, password }: { email: string, password: string }): Promise<IUser> {
+    async login({ email, password }: { email: string, password: string }): Promise<{ redirect: string } | IUser> {
         try {
             const { data } = await api.post("/auth/login", { email, password })
             console.log("Request service => login: ", data)
@@ -31,6 +31,8 @@ class Requests {
             if (data?.user && data?.token) {
                 localStorage.setItem("token", data.token)
                 return data.user
+            } else if (data?.data?.redirect) {
+                return { redirect: data.data.redirect }
             } else {
                 localStorage.removeItem("token")
                 throw new Error("Something went wrong", { cause: data })
@@ -40,10 +42,25 @@ class Requests {
         }
     }
 
-    async signup({ name, email, password }: { name: string, email: string, password: string }): Promise<IUser> {
+    async signup({ name, email, password }: { name: string, email: string, password: string }): Promise<{ redirect: string }> {
         try {
             const { data } = await api.post("/auth/signup", { name, email, password })
             console.log("Request service => signup: ", data)
+
+            if (data?.data?.redirect) {
+                return { redirect: data.data.redirect }
+            } else {
+                throw new Error("Something went wrong", { cause: data })
+            }
+        } catch (error) {
+            throw error
+        }
+    }
+
+    async verifyOTP({ email, otp, password }: { email: string, otp: string, password: string }): Promise<IUser> {
+        try {
+            const { data } = await api.post("/auth/verify", { email, otp, password })
+            console.log("Request service => verifyOTP: ", data)
 
             if (data?.user && data?.token) {
                 localStorage.setItem("token", data.token)
@@ -82,7 +99,7 @@ class Requests {
         }
     }
 
-    async getMessages({ chatId, page = 1, limit = 20 }: { chatId: string, page?: number; limit?: number }): Promise<{ chats: IChatMessage[], hasMore: boolean }> {
+    async getMessages({ chatId, page = 1, limit = 20 }: { chatId: string, page?: number, limit?: number }): Promise<{ chats: IChatMessage[], hasMore: boolean }> {
         try {
             const { data } = await api.post("/messages/get-messages", { chatId, page, limit })
             console.log("Request service => get messages: ", data)

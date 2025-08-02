@@ -102,6 +102,7 @@ export const otpMail = (otp: string) => {
                     </p>
                 </td>
             </tr>
+            ${footer}
         </table>
         `
     })

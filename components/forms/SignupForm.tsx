@@ -5,20 +5,16 @@ import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import { RootState } from "@/lib/store/store"
 import { useToast } from "../context/ToastContext"
-import { login } from "@/lib/store/features/userSlice"
 import { useDispatch, useSelector } from "react-redux"
+import { setEmail, setName, setPassword } from "@/lib/store/features/authSlice"
 
 export default function SignupForm() {
     const dispatch = useDispatch()
     const { addToast } = useToast()
     const { isLoggedIn, user } = useSelector((state: RootState) => state.user)
+    const { email, password, name } = useSelector((state: RootState) => state.auth)
     const router = useRouter()
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
-    const [formData, setFormData] = useState({
-        name: "",
-        email: "",
-        password: ""
-    })
     const [error, setError] = useState<boolean>(false)
 
     useEffect(() => {
@@ -31,15 +27,16 @@ export default function SignupForm() {
         e.preventDefault()
         setIsSubmitting(true)
 
-        if (!formData.name || !formData.email || !formData.password) {
+        if (!name?.trim() || !email.trim() || !password.trim()) {
             setError(true)
             setIsSubmitting(false)
             return
         }
 
         try {
-            const user = await requests.signup({ name: formData.name, email: formData.email, password: formData.password })
-            dispatch(login(user))
+            const { redirect } = await requests.signup({ name, email, password })
+            console.log("PUSHING TO", redirect)
+            router.push(redirect)
         } catch {
             addToast("Something went wrong", false)
         } finally {
@@ -59,7 +56,7 @@ export default function SignupForm() {
                 <p className="flex items-center justify-between">
                     <span>{"Username:"}</span>
                     {
-                        error && !formData.name && <span className="text-sm text-red-500 font-semibold">{"Required*"}</span>
+                        error && !name?.trim() && <span className="text-sm text-red-500 font-semibold">{"Required*"}</span>
                     }
                 </p>
                 <input
@@ -67,8 +64,8 @@ export default function SignupForm() {
                     id="name"
                     placeholder="Enter your name"
                     className="w-full px-4 py-2 bg-transparent border border-white/80 rounded-lg"
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    value={name || ""}
+                    onChange={(e) => dispatch(setName(e.target.value))}
                 />
             </label>
 
@@ -76,7 +73,7 @@ export default function SignupForm() {
                 <p className="flex items-center justify-between">
                     <span>{"Email:"}</span>
                     {
-                        error && !formData.email && <span className="text-sm text-red-500 font-semibold">{"Required*"}</span>
+                        error && !email.trim() && <span className="text-sm text-red-500 font-semibold">{"Required*"}</span>
                     }
                 </p>
                 <input
@@ -84,8 +81,8 @@ export default function SignupForm() {
                     id="email"
                     placeholder="Enter your email"
                     className="w-full px-4 py-2 bg-transparent border border-white/80 rounded-lg"
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    value={email}
+                    onChange={(e) => dispatch(setEmail(e.target.value))}
                 />
             </label>
 
@@ -93,7 +90,7 @@ export default function SignupForm() {
                 <p className="flex items-center justify-between">
                     <span>{"Password:"}</span>
                     {
-                        error && !formData.password && <span className="text-sm text-red-500 font-semibold">{"Required*"}</span>
+                        error && !password.trim() && <span className="text-sm text-red-500 font-semibold">{"Required*"}</span>
                     }
                 </p>
                 <input
@@ -101,8 +98,8 @@ export default function SignupForm() {
                     id="password"
                     placeholder="Enter your password"
                     className="w-full px-4 py-2 bg-transparent border border-white/80 rounded-lg"
-                    value={formData.password}
-                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                    value={password}
+                    onChange={(e) => dispatch(setPassword(e.target.value))}
                 />
             </label>
 

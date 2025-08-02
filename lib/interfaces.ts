@@ -36,6 +36,13 @@ export interface IUserSlice {
     user: IUser | null
 }
 
+export interface IAuthSlice {
+    email: string
+    password: string
+    name?: string
+    otp?: string
+}
+
 export interface IChatMessage {
     _id: string
     senderId: string
