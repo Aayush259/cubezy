@@ -1,7 +1,8 @@
-import bcrypt from "bcryptjs"
-import mongoose, { Document, Model, Schema } from "mongoose"
 import db from "./dbService"
+import bcrypt from "bcryptjs"
+import OTPService from "./otpService"
 import { JoseService } from "../jose/joseService"
+import mongoose, { Document, Model, Schema } from "mongoose"
 
 export interface IUser extends Document {
     _id: mongoose.Types.ObjectId
@@ -11,6 +12,7 @@ export interface IUser extends Document {
     bio: string
     dp: string | null
     connections: { chatId: string, userId: mongoose.Types.ObjectId }[]
+    verified?: boolean
     comparePassword(password: string): Promise<boolean>
     createdAt: Date
     updatedAt: Date
@@ -33,6 +35,7 @@ export class UserService extends JoseService {
                     userId: { type: Schema.Types.ObjectId, ref: "User", required: true },    // Receiver's User ID.
                 },
             ],
+            verified: { type: Boolean, default: false },
         }, { timestamps: true })
 
         // Hash password before saving.
@@ -64,21 +67,15 @@ export class UserService extends JoseService {
         // Create new user.
         const newUser = await this.userModel.create({ name, email, password })
 
-        const accessToken = await this.signToken({
-            id: newUser._id.toString(),
-        })
+        const otpService = new OTPService()
+        const sentOtp = await otpService.sendOTP(email)
+        console.log("SERVICE: signup => OTP sent", sentOtp)
 
-        const refreshToken = await this.signToken({
-            id: newUser._id.toString(),
-        })
-
-        console.log("SERVICE: signup => SUCCESS")
         return {
             success: true,
-            message: "Signup successful",
+            message: "Signup successful, please verify your email",
+            redirect: "/verify",
             data: {
-                accessToken,
-                refreshToken,
                 newUser: {
                     _id: newUser._id.toString(),
                     name: newUser.name,
@@ -112,6 +109,30 @@ export class UserService extends JoseService {
             throw new Error("Invalid password")
         }
 
+        if (!user.verified) {
+            const otpService = new OTPService()
+            const sentOtp = await otpService.sendOTP(email)
+            console.log("SERVICE: login => OTP sent", sentOtp)
+
+            return {
+                success: true,
+                message: "Signup was successful, please verify your email",
+                redirect: "/verify",
+                data: {
+                    user: {
+                        _id: user._id.toString(),
+                        name: user.name,
+                        email: user.email,
+                        bio: user.bio,
+                        dp: user.dp,
+                        connections: user.connections,
+                        createdAt: user.createdAt,
+                        updatedAt: user.updatedAt,
+                    }
+                }
+            }
+        }
+
         const accessToken = await this.signToken({
             id: user._id.toString(),
         })
@@ -139,6 +160,13 @@ export class UserService extends JoseService {
                 }
             }
         }
+    }
+
+    async verifyUser({ email }: { email: string }) {
+        console.log("\n\nSERVICE: verifyUser", { email })
+        await this.userModel.findOneAndUpdate({ email }, { verified: true })
+        console.log("SERVICE: verifyUser => User verified successfully")
+        return true
     }
 
     async me({ token }: { token: string }) {

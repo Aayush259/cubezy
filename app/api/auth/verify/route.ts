@@ -1,21 +1,21 @@
 import { NextResponse } from 'next/server'
+import OTPService from '@/services/database/otpService'
 import userService from '@/services/database/userService'
 
 export async function POST(req: Request) {
     try {
-        const { email, password } = await req.json()
-        const loginData = await userService.login({ email, password })
+        const { email, otp, password } = await req.json()
+        const otpService = new OTPService()
 
-        if (loginData?.redirect) {
-            return NextResponse.json({
-                message: "OTP Sent",
-                data: {
-                    redirect: loginData.redirect,
-                }
-            }, { status: 200 })
+        const verified = otpService.verifyOtp({ email, otp })
+
+        if (!verified) {
+            return NextResponse.json({ message: 'Invalid OTP' }, { status: 400 })
         }
 
-        // Create response
+        await userService.verifyUser({ email })
+        const loginData = await userService.login({ email, password })
+
         const response = NextResponse.json({
             token: loginData.data.accessToken,
             user: loginData.data.user
@@ -33,7 +33,7 @@ export async function POST(req: Request) {
         })
         return response
     } catch (error) {
-        console.error('Login error:', error)
+        console.error('Registration error:', error)
         return NextResponse.json(
             { message: error },
             { status: 500 }

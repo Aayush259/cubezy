@@ -13,15 +13,12 @@ export class MailService {
                 user: env.SMTP_USER,
                 pass: env.SMTP_PASSWORD,
             },
-            logger: true,
-            debug: true,
         }) as SMTPTransport.Options)
     }
 
     async sendMail({ to, subject, content }: { to: string, subject: string, content: string }) {
-        console.log("\n\nSERVICE: sendMail", { to, subject, content })
+        console.log("\n\nSERVICE: sendMail")
         try {
-            console.log(env.SMTP_FROM, env.SMTP_HOST, env.SMTP_PORT, env.SMTP_USER, env.SMTP_PASSWORD)
             const mailOptions = {
                 from: `Cubezy <${env.SMTP_FROM}>`,
                 to,
@@ -29,8 +26,7 @@ export class MailService {
                 html: content
             }
 
-            const info = await this.transporter.sendMail(mailOptions)
-            console.log("SERVICE: sendMail => Mail sent", { to, subject, content, info })
+            await this.transporter.sendMail(mailOptions)
             return true
         } catch (error) {
             throw error

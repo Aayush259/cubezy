@@ -1,33 +1,22 @@
-import { NextResponse } from 'next/server';
-import userService from '@/services/database/userService';
+import { NextResponse } from 'next/server'
+import userService from '@/services/database/userService'
 
 export async function POST(req: Request) {
     try {
-        const { email, password, name } = await req.json();
-        const { data } = await userService.signup({ name, email, password });
+        const { email, password, name } = await req.json()
+        const signupData = await userService.signup({ name, email, password })
 
-        // Create response
-        const response = NextResponse.json({
-            token: data.accessToken,
-            user: data.newUser
-        }, { status: 201 });
-
-        // Set cookie
-        response.cookies.set({
-            name: 'token',
-            value: data.refreshToken,
-            httpOnly: true,
-            secure: false,
-            sameSite: 'lax',
-            path: '/',
-            maxAge: 7 * 24 * 60 * 60
-        });
-        return response;
+        return NextResponse.json({
+            message: "OTP Sent",
+            data: {
+                redirect: signupData.redirect,
+            }
+        }, { status: 200 })
     } catch (error) {
-        console.error('Registration error:', error);
+        console.error('Registration error:', error)
         return NextResponse.json(
             { message: error },
             { status: 500 }
-        );
+        )
     }
 }
