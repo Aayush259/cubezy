@@ -21,7 +21,7 @@ export async function POST(req: Request) {
     } catch (error) {
         console.error('Connection added error:', error);
         return NextResponse.json(
-            { message: error },
+            { message: "Connection added failed" },
             { status: 500 }
         );
     }

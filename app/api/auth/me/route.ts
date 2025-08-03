@@ -1,3 +1,4 @@
+import env from '@/config/envConf'
 import { headers } from 'next/headers'
 import { NextResponse } from 'next/server'
 import userService from '@/services/database/userService'
@@ -25,7 +26,7 @@ export async function GET() {
             name: 'token',
             value: data.refreshToken,
             httpOnly: true,
-            secure: false,
+            secure: env.NODE_ENV === 'production',
             sameSite: 'lax',
             path: '/',
             maxAge: 7 * 24 * 60 * 60
@@ -34,7 +35,7 @@ export async function GET() {
     } catch (error) {
         console.error('Me error:', error)
         return NextResponse.json(
-            { message: error },
+            { message: "Authentication failed" },
             { status: 500 }
         )
     }

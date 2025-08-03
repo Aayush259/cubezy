@@ -20,7 +20,7 @@ export async function POST(req: Request) {
     } catch (error) {
         console.error('Error:', error)
         return NextResponse.json(
-            { message: error },
+            { message: "Profile fetch failed" },
             { status: 500 }
         )
     }

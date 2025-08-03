@@ -8,6 +8,7 @@ const env = {
     SMTP_USER: String(process.env.SMTP_USER),
     SMTP_PASSWORD: String(process.env.SMTP_PASSWORD),
     SMTP_FROM: String(process.env.SMTP_FROM),
+    NODE_ENV: String(process.env.NODE_ENV),
 }
 
 export default env

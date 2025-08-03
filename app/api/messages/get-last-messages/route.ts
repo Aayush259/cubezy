@@ -12,13 +12,13 @@ export async function GET() {
         const lastMessages = await chatService.getLastMessages({ user: data.profile })
 
         return NextResponse.json({
-            message: "Connection added",
+            message: "Last messages fetched",
             lastMessages
         }, { status: 200 })
     } catch (error) {
-        console.error('Connection added error:', error)
+        console.error('Fetch last messages failed:', error)
         return NextResponse.json(
-            { message: error },
+            { message: "Fetch last messages failed" },
             { status: 500 }
         )
     }

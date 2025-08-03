@@ -1,3 +1,4 @@
+import env from '@/config/envConf'
 import { NextResponse } from 'next/server'
 
 export async function POST() {
@@ -9,7 +10,7 @@ export async function POST() {
             name: 'token',
             value: "",
             httpOnly: true,
-            secure: false,
+            secure: env.NODE_ENV === 'production',
             sameSite: 'lax',
             path: '/',
             maxAge: 7 * 24 * 60 * 60
@@ -18,7 +19,7 @@ export async function POST() {
     } catch (error) {
         console.error('Logout error:', error)
         return NextResponse.json(
-            { message: error },
+            { message: "Logout failed" },
             { status: 500 }
         )
     }

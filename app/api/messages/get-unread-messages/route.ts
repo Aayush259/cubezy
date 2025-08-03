@@ -28,7 +28,7 @@ export async function GET() {
     } catch (error) {
         console.error('Connection added error:', error)
         return NextResponse.json(
-            { message: error },
+            { message: "Unread messages fetch failed" },
             { status: 500 }
         )
     }
