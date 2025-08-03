@@ -4,8 +4,7 @@ import { createSlice } from "@reduxjs/toolkit"
 const initialState: IAuthSlice = {
     email: "",
     password: "",
-    name: undefined,
-    otp: undefined
+    name: undefined
 }
 
 const authSlice = createSlice({
@@ -20,12 +19,9 @@ const authSlice = createSlice({
         },
         setName: (state, action) => {
             state.name = action.payload
-        },
-        setOtp: (state, action) => {
-            state.otp = action.payload
         }
     }
 })
 
-export const { setEmail, setName, setPassword, setOtp } = authSlice.actions
+export const { setEmail, setName, setPassword } = authSlice.actions
 export default authSlice.reducer

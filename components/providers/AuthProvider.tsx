@@ -6,6 +6,7 @@ import { RootState } from "@/lib/store/store"
 import { useDispatch, useSelector } from "react-redux"
 import { usePathname, useRouter } from "next/navigation"
 import { login, logout } from "@/lib/store/features/userSlice"
+import { publicRoutes } from "@/lib/data"
 
 const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const { isLoggedIn } = useSelector((state: RootState) => state.user)
@@ -23,7 +24,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
             router.push("/")
         } catch {
             dispatch(logout())
-            if (pathname !== "/login" && pathname !== "/signup" && pathname !== "/verify") {
+            if (!publicRoutes.includes(pathname as string)) {
                 router.push("/login")
             }
             setIsAuthenticated(false)
@@ -44,7 +45,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
         )
     }
 
-    if (!isAuthenticated && pathname !== "/signup" && pathname !== "/login" && pathname !== "/verify") {
+    if (!isAuthenticated && !publicRoutes.includes(pathname as string)) {
         return null
     }
 
