@@ -63,7 +63,7 @@ export const otpMail = (otp: string) => {
                         <tr>
                             <!-- Logo image cell -->
                             <td valign="middle" style="padding-right: 10px;">
-                                <img src="./logo.png" alt="Cubezy Logo"
+                                <img src="https://cubezy.in/icons/logo.png" alt="Cubezy Logo"
                                     style="height: 50px; width: auto; display: block;">
                             </td>
                             <!-- Text cell -->

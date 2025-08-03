@@ -1,12 +1,12 @@
 "use client"
 import Loader from "../common/Loader"
 import requests from "@/lib/requests"
+import { publicRoutes } from "@/lib/data"
 import { useEffect, useState } from "react"
 import { RootState } from "@/lib/store/store"
 import { useDispatch, useSelector } from "react-redux"
 import { usePathname, useRouter } from "next/navigation"
 import { login, logout } from "@/lib/store/features/userSlice"
-import { publicRoutes } from "@/lib/data"
 
 const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const { isLoggedIn } = useSelector((state: RootState) => state.user)
