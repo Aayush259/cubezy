@@ -1,10 +1,7 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import joseService from './services/jose/joseService'
-
-// Define public routes that don't require authentication
-const publicRoutes = ['/login', '/signup', '/verify']
-const publicApiRoutes = ['/api/auth/login', '/api/auth/signup', "/api/auth/verify", '/api/socket/connect']
+import { publicApiRoutes, publicRoutes } from './lib/data'
 
 export async function middleware(request: NextRequest) {
     console.log('Middleware called')
@@ -69,6 +66,4 @@ export async function middleware(request: NextRequest) {
 export const config = {
     // Match all routes except static files and api routes
     matcher: ['/((?!_next/static|_next/image|favicon.ico|images/|icons/).*)']
-    
-    // matcher: ['/((?!_next/static|_next/image|favicon.ico).*)']
 }
