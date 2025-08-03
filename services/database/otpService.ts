@@ -1,6 +1,7 @@
-import mongoose, { Document, Model } from "mongoose"
+import crypto from "node:crypto"
 import mailService from "../mail/mailService"
 import { otpMail } from "@/helpers/html-content"
+import mongoose, { Document, Model } from "mongoose"
 
 export interface IOTP extends Document {
     _id: mongoose.Types.ObjectId
@@ -26,7 +27,7 @@ export default class OTPService {
 
     async sendOTP(email: string) {
         console.log("\n\nSERVICE: sendOTP", { email })
-        const otp = Math.floor(100000 + Math.random() * 900000).toFixed(0) // Generate a 6-digit OTP
+        const otp = crypto.randomInt(100000, 999999).toString() // Generate a 6-digit OTP
         const expiresAt = new Date(Date.now() + 10 * 60 * 1000) // 10 minutes from now
         const newOtp = await this.otpModel.findOneAndUpdate(
             { email },
