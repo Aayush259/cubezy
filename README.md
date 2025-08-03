@@ -10,7 +10,7 @@ Cubezy is a real-time chat application built using modern web technologies. It a
    - User passwords are securely hashed using *bcrypt*.
    - **Profile Management:**
         - View profile with name, email, optional profile picture, bio, connections list, and joining date.
-        - Update and Edit profile picture using Cloudinary for storage by clicking on profile picture.
+        - Update and Edit profile picture by clicking on profile picture.
         - Update bio by clicking on the *"Edit" (Pencil)* button.
         - Real-time profile updates reflected across all connections.
 
@@ -75,7 +75,7 @@ Cubezy is a real-time chat application built using modern web technologies. It a
 
 - Framework: Next JS with TypeScript
 - Frontend: Tailwind CSS, React Icons, Redux Toolkit, Socket.io-client, uuid
-- Backend: MongoDB, Socket.io, bcrypt, JWT, Cloudinary
+- Backend: MongoDB, Socket.io, bcrypt, JWT
 
 ## 📬 Feedback and Suggestions
 

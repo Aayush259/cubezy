@@ -1,50 +1,51 @@
-import env from "@/config/envConf"
-import cloudinary from 'cloudinary'
-import { Readable } from "node:stream"
+import path from "node:path"
+import crypto from "node:crypto"
+import { promises as fs } from "node:fs"
+import { fileTypeFromBuffer } from "file-type"
 
 class FileUploadService {
-    private cloudName
-    private apiKey
-    private apiSecret
+    private allowedMimeTypes = [
+        // Images
+        "image/jpeg", "image/png", "image/gif", "image/webp", "image/svg+xml", "image/tiff",
+        // Audio
+        "audio/mpeg", "audio/wav", "audio/ogg", "audio/webm",
+        // Video
+        "video/mp4", "video/webm", "video/ogg",
+        // Documents
+        "application/pdf", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "application/vnd.ms-excel", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "text/plain"
+    ]
 
-    constructor() {
-        this.cloudName = env.CLOUD_NAME
-        this.apiKey = env.API_KEY
-        this.apiSecret = env.API_SECRET
-
-        cloudinary.v2.config({
-            cloud_name: this.cloudName,
-            api_key: this.apiKey,
-            api_secret: this.apiSecret,
-            secure: true,
-        })
-    }
-
-    async upload({ file }: { file: Buffer }) {
+    async upload({ file, location }: { file: Buffer, location?: string }) {
         try {
             if (!file) throw new Error("No file provided")
 
-            // Convert the file buffer to a Readable stream
-            const stream = Readable.from(file)
+            // Detect file tye from buffer
+            const detectedType = await fileTypeFromBuffer(file)
+            if (!detectedType) {
+                throw new Error("Unable to detect file type")
+            }
 
-            // Upload image to Cloudinary
-            const uploadUrl = await new Promise<string>((resolve, reject) => {
-                const uploadStream = cloudinary.v2.uploader.upload_stream(
-                    { folder: "Cubezy" },
-                    async (error, result) => {
-                        if (error) {
-                            console.log("Cloudinary upload error:", error)
-                            reject(new Error("Cloudinary upload error:"))
-                        } else {
-                            resolve(result?.secure_url as string)
-                        }
-                    }
-                )
+            // Security check: allow only known safe MIME types
+            if (!this.allowedMimeTypes.includes(detectedType.mime)) {
+                throw new Error("File type not allowed: " + detectedType.mime)
+            }
 
-                stream.pipe(uploadStream)
-            })
+            // Create the upload directory if it doesn't exist
+            const uploadPath = location ? `uploads/${location}` : "uploads"
+            const uploadDir = path.join(process.cwd(), "public", uploadPath)
 
-            return uploadUrl
+            try {
+                await fs.access(uploadDir)
+            } catch (error) {
+                await fs.mkdir(uploadDir, { recursive: true })
+            }
+
+            // Generate unique file name with correct extension
+            const uniqueName = `${crypto.randomUUID()}.${detectedType.ext}`
+            const filePath = path.join(uploadDir, uniqueName)
+
+            await fs.writeFile(filePath, file)
+            return `/${uploadPath}/${uniqueName}`
         } catch (error) {
             console.log("Error uploading file:", error)
             throw error
