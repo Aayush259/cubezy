@@ -22,13 +22,13 @@ export async function GET() {
         }
 
         return NextResponse.json({
-            message: "Connection added",
+            message: "Fetched unread messages successfully",
             unreadMessages,
         }, { status: 200 })
     } catch (error) {
-        console.error('Connection added error:', error)
+        console.error('Error fetching unread messages:', error)
         return NextResponse.json(
-            { message: error },
+            { message: "Error fetching unread messages" },
             { status: 500 }
         )
     }

@@ -22,9 +22,9 @@ export async function POST(req: Request) {
             addedConnection: data.addedConnection,
         }, { status: 200 })
     } catch (error) {
-        console.error('Connection added error:', error)
+        console.error('Failed to add connection:', error)
         return NextResponse.json(
-            { message: error },
+            { message: "Failed to add connection" },
             { status: 500 }
         )
     }

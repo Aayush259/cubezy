@@ -9,20 +9,19 @@ import { IoIosArrowRoundBack } from "react-icons/io"
 import { useChatContext } from "../context/ChatContext"
 
 export default function ForwardMessageWindow() {
-    const { user } = useSelector((state: RootState) => state.user);
-    const { forwardMessageWindowVisible, closeForwardMessageWindow, forwardToReceiverIds, addForwardToReceiverId, removeForwardToReceiverId, forwardMessages } = useChatContext();
-
-    const [searchQuery, setSearchQuery] = useState<string>("");
+    const { user } = useSelector((state: RootState) => state.user)
+    const [searchQuery, setSearchQuery] = useState<string>("")
+    const { forwardMessageWindowVisible, closeForwardMessageWindow, forwardToReceiverIds, addForwardToReceiverId, removeForwardToReceiverId, forwardMessages } = useChatContext()
 
     const filteredConnections = useMemo(() => {
         if (searchQuery === "") {
-            return user?.connections;
+            return user?.connections
         }
 
-        return user?.connections?.filter(connection => connection.userId.name.toLowerCase().includes(searchQuery.toLowerCase()));
-    }, [searchQuery, user?.connections]);
+        return user?.connections?.filter(connection => connection.userId.name.toLowerCase().includes(searchQuery.toLowerCase()))
+    }, [searchQuery, user?.connections])
 
-    if (!forwardMessageWindowVisible) return null;
+    if (!forwardMessageWindowVisible) return null
 
     return (
         <div className="fixed w-screen min-h-screen top-0 left-0 z-[999] flex items-center justify-center bg-black/50">
@@ -60,9 +59,9 @@ export default function ForwardMessageWindow() {
                                 checked={forwardToReceiverIds.includes(connection.userId._id)}
                                 onChange={() => {
                                     if (forwardToReceiverIds.includes(connection.userId._id)) {
-                                        removeForwardToReceiverId(connection.userId._id);
+                                        removeForwardToReceiverId(connection.userId._id)
                                     } else {
-                                        addForwardToReceiverId(connection.userId._id);
+                                        addForwardToReceiverId(connection.userId._id)
                                     }
                                 }}
                             />

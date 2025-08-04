@@ -45,7 +45,7 @@ const ChatWindow: React.FC = () => {
         const chatWindowScrollHeight = chatWindow.scrollHeight
         const chatWindowClientHeight = chatWindow.clientHeight
 
-        if (chatWindowScrollHeight <= chatWindowClientHeight) return;
+        if (chatWindowScrollHeight <= chatWindowClientHeight) return
 
         if (chatWindowScrollTop === 0 && !loadingChats) {
             setPage(prev => prev + 1)
@@ -74,7 +74,7 @@ const ChatWindow: React.FC = () => {
             setChats(prevChats => [...newChats, ...prevChats])
             setHasMore(messages.hasMore)
         } catch {
-            addToast("Something went wrong", false);
+            addToast("Something went wrong", false)
         } finally {
             setLoadingChats(false)
         }
@@ -89,7 +89,7 @@ const ChatWindow: React.FC = () => {
         setShowEmojis(false)
         setTimeout(() => {
             if (chatScrollRef.current) {
-                chatScrollRef.current.scrollTop = chatScrollRef.current.scrollHeight;
+                chatScrollRef.current.scrollTop = chatScrollRef.current.scrollHeight
             }
         }, 200)
     }
@@ -240,8 +240,8 @@ const ChatWindow: React.FC = () => {
                     <button
                         className="lg:hidden rounded-full outline-none mx-4"
                         onClick={() => {
-                            updateReceiverId(null);
-                            setChats([]);
+                            updateReceiverId(null)
+                            setChats([])
                         }}
                     >
                         <IoIosArrowBack size={24} />
@@ -285,10 +285,8 @@ const ChatWindow: React.FC = () => {
                     </div>}
 
                     {chats?.map((chat, index) => {
-
-                        const isMessageSelected = selectedMessages.filter(selectedMessage => selectedMessage._id === chat._id).length > 0;
-
-                        const comparedDate = compareDates(chats[index - 1]?.sentAt, chat.sentAt);
+                        const isMessageSelected = selectedMessages.filter(selectedMessage => selectedMessage._id === chat._id).length > 0
+                        const comparedDate = compareDates(chats[index - 1]?.sentAt, chat.sentAt)
 
                         return (
                             <div key={chat._id} className={`w-full relative duration-300 ${selectedMessages.length > 0 ? "md:pl-8" : "pl-0"}`}>

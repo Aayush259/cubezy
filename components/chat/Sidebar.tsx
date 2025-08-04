@@ -78,7 +78,7 @@ export default function Sidebar() {
                 <button
                     className="w-[50px] h-[50px] lg:w-[60px] lg:h-[60px] rounded-full overflow-hidden border-2 border-gray-800 flex items-end"
                     onClick={() => {
-                        if (user?._id) openProfile(user._id);
+                        if (user?._id) openProfile(user._id)
                     }}
                 >
                     {user?.dp ? (
@@ -104,19 +104,19 @@ export default function Sidebar() {
                 />}
 
                 {sortedConnections.map((connection, idx) => {
-                    const lastMessage = lastMessages.find(message => message.chatId === connection.chatId)?.lastMessage;
+                    const lastMessage = lastMessages.find(message => message.chatId === connection.chatId)?.lastMessage
 
                     return (
                         <button
                             key={idx}
                             className={`w-full px-6 py-4 flex items-center justify-between lg:hover:bg-gray-900 duration-300 text-lg lg:text-xl ${connection.userId._id === receiverId ? "bg-slate-900" : "bg-transparent"}`}
                             onClick={() => {
-                                if (receiverId === connection.userId._id) return;
-                                setPage(1);
-                                setHasMore(true);
-                                setChats([]);
-                                updateReceiverId(connection.userId._id);
-                                closeProfile();
+                                if (receiverId === connection.userId._id) return
+                                setPage(1)
+                                setHasMore(true)
+                                setChats([])
+                                updateReceiverId(connection.userId._id)
+                                closeProfile()
                             }}
                         >
                             <span className="flex items-center gap-4 flex-grow pr-7">
@@ -160,7 +160,7 @@ export default function Sidebar() {
                     <div className="text-center text-xl w-full h-full flex items-center justify-center text-white/70">
                         <button
                             onClick={(e) => {
-                                e.stopPropagation();
+                                e.stopPropagation()
                                 setIdBarOpen(true)
                             }}
                             className="lg:hover:text-white duration-300"
@@ -174,7 +174,7 @@ export default function Sidebar() {
             <button
                 className={`w-fit rounded-full absolute bottom-16 right-8 lg:hover:opacity-70 lg:hover:rotate-45 duration-300 z-20 bg-blue-700 flex items-center justify-center p-2.5 ${idBarOpen && "rotate-45"}`}
                 onClick={(e) => {
-                    e.stopPropagation();
+                    e.stopPropagation()
                     setIdBarOpen(prev => !prev)
                 }}
             >

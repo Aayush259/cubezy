@@ -14,13 +14,13 @@ export async function POST(req: Request) {
         const { data } = await userService.getProfileById({ id: userId })
 
         return NextResponse.json({
-            message: "Connection added",
+            message: "Profile fetched successfully",
             profile: data.profile,
         }, { status: 200 })
     } catch (error) {
-        console.error('Error:', error)
+        console.error('Failed to fetch profile:', error)
         return NextResponse.json(
-            { message: error },
+            { message: "Failed to fetch profile" },
             { status: 500 }
         )
     }

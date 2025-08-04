@@ -80,8 +80,8 @@ const IdBar: React.FC = () => {
                 </div>
 
                 <form className="my-4 flex flex-row items-center justify-center" onSubmit={(e) => {
-                    e.preventDefault();
-                    addFriend();
+                    e.preventDefault()
+                    addFriend()
                 }}>
                     <input
                         type="email"

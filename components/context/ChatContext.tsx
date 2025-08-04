@@ -353,7 +353,7 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
 
             // Emit the messageIds to the server to mark it as read.
             socket.emit(EVENTS.MARK_AS_READ, payload, (res: { success: true, message: string }) => {
-                console.log("=> MAKR_AS_READ response:", res);
+                console.log("=> MAKR_AS_READ response:", res)
             })
 
             // Update the chats state to mark the messages as read.

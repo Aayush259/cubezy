@@ -50,15 +50,14 @@ const Profile = () => {
     const handleConnectionClick = (connectionId: string) => {
         updateReceiverId(connectionId)
         setIsProfileOpen(false)
-    };
+    }
 
     const handleLogout = () => {
         if (profileInfo?._id !== user?._id) return
-
         localStorage.removeItem("token")
         dispatch(logout())
         router.push("/login")
-    };
+    }
 
     // Effect to set the profileBio state.
     useEffect(() => {

@@ -21,7 +21,6 @@ export const footer = `
 `
 
 export const htmlContent = ({ title, content }: { title: string, content: string }) => {
-
     return `
     <!DOCTYPE html>
     <html lang="en">
@@ -53,7 +52,6 @@ export const htmlContent = ({ title, content }: { title: string, content: string
 }
 
 export const otpMail = (otp: string) => {
-
     return htmlContent({
         title: "Cubezy - OTP Verification",
         content: `

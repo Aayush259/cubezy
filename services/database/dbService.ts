@@ -1,5 +1,5 @@
-import env from "@/config/envConf"
 import mongoose from "mongoose"
+import env from "@/config/envConf"
 
 declare global {
   // Cache the database connection across serverless hot reloads

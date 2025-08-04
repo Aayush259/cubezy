@@ -1,6 +1,6 @@
-import mongoose, { Document, Model } from "mongoose"
 import mailService from "../mail/mailService"
 import { otpMail } from "@/helpers/html-content"
+import mongoose, { Document, Model } from "mongoose"
 
 export interface IOTP extends Document {
     _id: mongoose.Types.ObjectId
