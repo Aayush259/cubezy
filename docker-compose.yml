@@ -36,8 +36,6 @@ services:
         restart: unless-stopped
         depends_on:
             - cubezy-db
-        extra_hosts:
-            - "${SMTP_HOST}:${SMTP_IP}"
 
 volumes:
     mongo-data:
