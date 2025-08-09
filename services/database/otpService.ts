@@ -33,7 +33,7 @@ export default class OTPService {
             { otp, expiresAt },
             { upsert: true, new: true }
         )
-        mailService.sendMail({
+        await mailService.sendMail({
             to: email,
             subject: "Your OTP Code",
             content: otpMail(otp)
