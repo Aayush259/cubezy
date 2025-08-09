@@ -4,15 +4,15 @@ export async function POST() {
     try {
         const response = NextResponse.json({ message: "Logged out successfully" }, { status: 200 })
 
-        // Set cookie
+        // Clear refresh cookie
         response.cookies.set({
-            name: 'token',
-            value: "",
+            name: 'refreshToken',
+            value: '',
             httpOnly: true,
-            secure: false,
-            sameSite: 'lax',
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
             path: '/',
-            maxAge: 7 * 24 * 60 * 60
+            maxAge: 0
         })
         return response
     } catch (error) {

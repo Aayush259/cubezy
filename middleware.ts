@@ -19,7 +19,7 @@ export async function middleware(request: NextRequest) {
     // Get token from header for API routes or from cookies for pages
     const token = request.nextUrl.pathname.startsWith('/api')
         ? request.headers.get('authorization')?.split(' ')[1]
-        : request.cookies.get('token')?.value
+        : request.cookies.get('refreshToken')?.value
 
     if (!token) {
         // For API routes, return JSON response

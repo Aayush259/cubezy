@@ -7,5 +7,5 @@ export const publicRoutes = [
 ]
 
 export const publicApiRoutes = [
-    "/api/auth/login", "/api/auth/signup", "/api/auth/verify", "/api/socket/connect"
+    "/api/auth/login", "/api/auth/signup", "/api/auth/verify", "/api/socket/connect", "/api/auth/refresh"
 ]

@@ -8,11 +8,19 @@ export class JoseService {
         this.secret = new TextEncoder().encode(env.JWT_SECRET)
     }
 
-    protected async signToken(payload: Record<string, any>) {
+    protected async signAccessToken(payload: Record<string, any>) {
         return await new SignJWT(payload) // this only works if payload is flat and doesn't contain reserved claims
             .setProtectedHeader({ alg: 'HS256' })
             .setIssuedAt()
-            .setExpirationTime('1d')
+            .setExpirationTime('15m')
+            .sign(this.secret)
+    }
+
+    async signRefreshToken(payload: Record<string, any>) {
+        return await new SignJWT(payload) // this only works if payload is flat and doesn't contain reserved claims
+            .setProtectedHeader({ alg: 'HS256' })
+            .setIssuedAt()
+            .setExpirationTime('7d')
             .sign(this.secret)
     }
 

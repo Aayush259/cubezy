@@ -133,11 +133,11 @@ export class UserService extends JoseService {
             }
         }
 
-        const accessToken = await this.signToken({
+        const accessToken = await this.signAccessToken({
             id: user._id.toString(),
         })
 
-        const refreshToken = await this.signToken({
+        const refreshToken = await this.signRefreshToken({
             id: user._id.toString(),
         })
 
@@ -188,21 +188,11 @@ export class UserService extends JoseService {
             throw Error("User not found")
         }
 
-        const accessToken = await this.signToken({
-            id: user._id.toString(),
-        })
-
-        const refreshToken = await this.signToken({
-            id: user._id.toString(),
-        })
-
         console.log("SERVICE: me => SUCCESS")
         return {
             success: true,
             message: "Logged in sucessfully",
             data: {
-                accessToken,
-                refreshToken,
                 user: {
                     _id: user._id.toString(),
                     name: user.name,
@@ -216,6 +206,37 @@ export class UserService extends JoseService {
             }
         }
 
+    }
+
+    async refresh({ refreshToken }: { refreshToken: string }) {
+        console.log("\n\nSERVICE: refresh", { refreshToken })
+        const decoded = await this.verifyToken(refreshToken)
+        if (!decoded) {
+            console.log("SERVICE: refresh => ERROR: Invalid refreshToken")
+            throw Error("Invaid refreshToken")
+        }
+
+        const user = await this.userModel.findById(decoded.id).populate([
+            {
+                path: "connections.userId",
+                select: "name email bio dp createdAt"
+            }
+        ])
+        if (!user) {
+            console.log("SERVICE: refresh => ERROR: User not found")
+            throw Error("User not found")
+        }
+
+        const newAccessToken = await this.signAccessToken({
+            id: user._id.toString(),
+        })
+
+        console.log("SERVICE: refresh => SUCCESS")
+        return {
+            success: true,
+            message: "Logged in sucessfully",
+            data: { token: newAccessToken }
+        }
     }
 
     async getProfileByEmail({ email }: { email: string }) {

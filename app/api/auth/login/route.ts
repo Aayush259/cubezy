@@ -23,11 +23,11 @@ export async function POST(req: Request) {
 
         // Set cookie
         response.cookies.set({
-            name: 'token',
+            name: 'refreshToken',
             value: loginData.data.refreshToken as string,
             httpOnly: true,
-            secure: false,
-            sameSite: 'lax',
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
             path: '/',
             maxAge: 7 * 24 * 60 * 60
         })

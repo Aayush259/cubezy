@@ -14,11 +14,9 @@ class Requests {
             if (data?.user) {
                 return data.user
             } else {
-                localStorage.removeItem("token")
                 throw new Error("Something went wrong", { cause: data })
             }
         } catch (error) {
-            localStorage.removeItem("token")
             throw error
         }
     }
