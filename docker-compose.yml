@@ -8,6 +8,8 @@ services:
             - MONGO_INITDB_ROOT_PASSWORD=${MONGO_DB_PASSWORD}
         volumes:
             - mongo-data:/data/db
+        networks:
+            - cubezy-net
 
     cubezy-db-admin:
         image: mongo-express:latest
@@ -25,6 +27,8 @@ services:
             - cubezy-db
         ports:
             - "127.0.0.1:8001:8081"
+        networks:
+            - cubezy-net
 
     cubezy-web:
         container_name: cubezy-web
