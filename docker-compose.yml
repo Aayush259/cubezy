@@ -47,7 +47,7 @@ services:
 
 networks:
     cubezy-net:
-        driver: bridge
+        external: true
 
 volumes:
     mongo-data:
