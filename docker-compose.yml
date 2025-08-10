@@ -36,6 +36,8 @@ services:
         restart: unless-stopped
         depends_on:
             - cubezy-db
+        extra_hosts:
+            - "host.docker.internal:host-gateway"
 
 volumes:
     mongo-data:
