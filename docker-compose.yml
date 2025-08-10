@@ -38,6 +38,12 @@ services:
             - cubezy-db
         extra_hosts:
             - "host.docker.internal:host-gateway"
+        networks:
+            - cubezy-net
+
+networks:
+    cubezy-net:
+        driver: bridge
 
 volumes:
     mongo-data:
