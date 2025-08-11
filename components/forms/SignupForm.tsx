@@ -7,6 +7,7 @@ import { RootState } from "@/lib/store/store"
 import { useToast } from "../context/ToastContext"
 import { useDispatch, useSelector } from "react-redux"
 import { setEmail, setName, setPassword } from "@/lib/store/features/authSlice"
+import { Input } from "../ui/Input"
 
 export default function SignupForm() {
     const dispatch = useDispatch()
@@ -52,56 +53,35 @@ export default function SignupForm() {
 
     return (
         <form className="w-full flex flex-col gap-6" onSubmit={handleSubmit}>
-            <label htmlFor="name" className="flex flex-col gap-2 text-lg">
-                <p className="flex items-center justify-between">
-                    <span>{"Username:"}</span>
-                    {
-                        error && !name?.trim() && <span className="text-sm text-red-500 font-semibold">{"Required*"}</span>
-                    }
-                </p>
-                <input
-                    type="text"
-                    id="name"
-                    placeholder="Enter your name"
-                    className="w-full px-4 py-2 bg-transparent border border-white/80 rounded-lg"
-                    value={name || ""}
-                    onChange={(e) => dispatch(setName(e.target.value))}
-                />
-            </label>
+            <Input
+                type="text"
+                id="name"
+                label="Name"
+                placeholder="Name"
+                value={name || ""}
+                onChange={(e) => dispatch(setName(e.target.value))}
+                error={error && !name?.trim()}
+            />
 
-            <label htmlFor="email" className="flex flex-col gap-2 text-lg">
-                <p className="flex items-center justify-between">
-                    <span>{"Email:"}</span>
-                    {
-                        error && !email.trim() && <span className="text-sm text-red-500 font-semibold">{"Required*"}</span>
-                    }
-                </p>
-                <input
-                    type="email"
-                    id="email"
-                    placeholder="Enter your email"
-                    className="w-full px-4 py-2 bg-transparent border border-white/80 rounded-lg"
-                    value={email}
-                    onChange={(e) => dispatch(setEmail(e.target.value))}
-                />
-            </label>
+            <Input
+                type="email"
+                id="email"
+                label="Email"
+                placeholder="Email"
+                value={email || ""}
+                onChange={(e) => dispatch(setEmail(e.target.value))}
+                error={error && !email?.trim()}
+            />
 
-            <label htmlFor="name" className="flex flex-col gap-2 text-lg">
-                <p className="flex items-center justify-between">
-                    <span>{"Password:"}</span>
-                    {
-                        error && !password.trim() && <span className="text-sm text-red-500 font-semibold">{"Required*"}</span>
-                    }
-                </p>
-                <input
-                    type="password"
-                    id="password"
-                    placeholder="Enter your password"
-                    className="w-full px-4 py-2 bg-transparent border border-white/80 rounded-lg"
-                    value={password}
-                    onChange={(e) => dispatch(setPassword(e.target.value))}
-                />
-            </label>
+            <Input
+                type="password"
+                id="password"
+                label="Password"
+                placeholder="Password"
+                value={password || ""}
+                onChange={(e) => dispatch(setPassword(e.target.value))}
+                error={error && !password?.trim()}
+            />
 
             <button type="submit" className={`px-4 py-2 my-2 w-full bg-orange-700 rounded-lg mx-auto ${isSubmitting ? "opacity-50" : "opacity-100"}`}>
                 {"Sign Up"}
