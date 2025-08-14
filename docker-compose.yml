@@ -39,3 +39,8 @@ services:
 
 volumes:
     mongo-data:
+
+networks:
+    default:
+        external: true
+        name: cubezy-network
