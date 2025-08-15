@@ -37,7 +37,7 @@ services:
         depends_on:
             - cubezy-db
         extra_hosts:
-            - "mail.cubezy.in:172.20.0.2"
+            - "mail.cubezy.in:mailserver"
 
 volumes:
     mongo-data:
