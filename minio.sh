@@ -35,19 +35,42 @@ else
 fi
 
 # Check current bucket policy
-CURRENT_POLICY=$($MC anonymous list $MINIO_ALIAS/$BUCKET_NAME | grep -q . && echo "public" || echo "none")
+# CURRENT_POLICY=$($MC anonymous list $MINIO_ALIAS/$BUCKET_NAME | grep -q . && echo "public" || echo "none")
 
-if [[ "$CURRENT_POLICY" != "public" ]]; then
-    echo "Setting bucket policy to public..."
-    $MC anonymous set download $MINIO_ALIAS/$BUCKET_NAME
-else
-    echo "Bucket '$BUCKET_NAME' is already public."
-fi
+# if [[ "$CURRENT_POLICY" != "public" ]]; then
+#     echo "Setting bucket policy to public..."
+#     $MC anonymous set download $MINIO_ALIAS/$BUCKET_NAME
+# else
+#     echo "Bucket '$BUCKET_NAME' is already public."
+# fi
 
-# Cleanup if mc was installed locally
-if [ "$TEMP_MC" = true ]; then
-    echo "Cleaning up temporary mc binary..."
-    rm -f ./mc
-fi
+# # Cleanup if mc was installed locally
+# if [ "$TEMP_MC" = true ]; then
+#     echo "Cleaning up temporary mc binary..."
+#     rm -f ./mc
+# fi
+
+# Apply a custom bucket policy: allow GetObject but deny ListBucket
+POLICY_JSON=$(mktemp)
+cat > "$POLICY_JSON" <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": "*",
+      "Action": ["s3:GetObject"],
+      "Resource": ["arn:aws:s3:::${BUCKET_NAME}/*"]
+    }
+  ]
+}
+EOF
+
+echo "Applying custom policy to bucket '$BUCKET_NAME'..."
+$MC alias set $MINIO_ALIAS $MINIO_URL $MINIO_USER $MINIO_PASS >/dev/null 2>&1
+$MC admin policy add $MINIO_ALIAS ${BUCKET_NAME}-readonly "$POLICY_JSON"
+$MC anonymous set-json "$POLICY_JSON" $MINIO_ALIAS/$BUCKET_NAME
+
+rm -f "$POLICY_JSON"
 
 echo "Done."
