@@ -55,23 +55,6 @@ class FileUploadService {
 
             // Return the public URL
             return `/uploads/${key}`
-
-            // Create the upload directory if it doesn't exist
-            // const uploadPath = location ? `uploads/${location}` : "uploads"
-            // const uploadDir = path.join(process.cwd(), "public", uploadPath)
-
-            // try {
-            //     await fs.access(uploadDir)
-            // } catch (error) {
-            //     await fs.mkdir(uploadDir, { recursive: true })
-            // }
-
-            // // Generate unique file name with correct extension
-            // const uniqueName = `${crypto.randomUUID()}.${detectedType.ext}`
-            // const filePath = path.join(uploadDir, uniqueName)
-
-            // await fs.writeFile(filePath, file)
-            // return `/${uploadPath}/${uniqueName}`
         } catch (error) {
             console.log("Error uploading file:", error)
             throw error
