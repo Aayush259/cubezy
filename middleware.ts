@@ -41,7 +41,6 @@ export async function middleware(request: NextRequest) {
 
         // Add user info to request headers
         const requestHeaders = new Headers(request.headers)
-        console.log('Decoded token:', decoded)
         requestHeaders.set('user', JSON.stringify(decoded))
 
         return NextResponse.next({

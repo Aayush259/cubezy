@@ -169,7 +169,6 @@ export const sendMessage = async (
         }
 
         const chatId = senderId < receiverId ? `${senderId}_${receiverId}` : `${receiverId}_${senderId}`
-        console.log("=> Chat ID:", chatId)
 
         const isSenderInReceiverConnection = receiver.profile.connections.some(connection => connection.userId._id.toString() === senderId)
         console.log("=> Is sender in receiver's connection:", isSenderInReceiverConnection)

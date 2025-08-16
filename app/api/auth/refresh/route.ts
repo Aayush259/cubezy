@@ -7,7 +7,6 @@ export async function POST() {
         const headersList = await headers()
         const cookieHeader = headersList.get('cookie') || ''
         const refreshToken = cookieHeader.split('refreshToken=')[1]?.split(';')[0]
-        console.log("\n\n/api/auth/refresh --> Token: ", refreshToken)
 
         if (!refreshToken) {
             return NextResponse.json({ message: 'Unauthorized' }, { status: 401 })

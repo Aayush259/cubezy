@@ -7,7 +7,6 @@ export async function GET() {
         const headersList = await headers()
         const authHeader = headersList.get('authorization')
         const token = authHeader?.split(' ')[1] || headersList.get('cookie')?.split('refreshToken=')[1]?.split(';')[0]
-        console.log("\n\n/api/auth/me --> Token: ", token)
         if (!token) {
             return NextResponse.json({ message: 'Unauthorized' }, { status: 401 })
         }
