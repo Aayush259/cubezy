@@ -12,12 +12,16 @@ MINIO_USER="${MINIO_ROOT_USER:-minioadmin}"
 MINIO_PASS="${MINIO_ROOT_PASSWORD:-minioadmin}"
 BUCKET_NAME="${MINIO_BUCKET:-uploads}"
 
+# Track if mc was installed temporarily
+TEMP_MC=false
+
 # Check if mc exists
 if ! command -v mc &> /dev/null; then
     echo "mc not found. Downloading..."
     wget https://dl.min.io/client/mc/release/linux-amd64/mc -O mc
     chmod +x mc
     MC="./mc"
+    TEMP_MC=true
 else
     MC="mc"
 fi
@@ -38,6 +42,12 @@ if [[ "$CURRENT_POLICY" != "public" ]]; then
     $MC anonymous set download $MINIO_ALIAS/$BUCKET_NAME
 else
     echo "Bucket '$BUCKET_NAME' is already public."
+fi
+
+# Cleanup if mc was installed locally
+if [ "$TEMP_MC" = true ]; then
+    echo "Cleaning up temporary mc binary..."
+    rm -f ./mc
 fi
 
 echo "Done."
