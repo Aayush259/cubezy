@@ -11,6 +11,8 @@ const env = {
     MINIO_ENDPOINT: String(process.env.MINIO_ENDPOINT),
     MINIO_ROOT_USER: String(process.env.MINIO_ROOT_USER),
     MINIO_ROOT_PASSWORD: String(process.env.MINIO_ROOT_PASSWORD),
+    MINIO_BUCKET: String(process.env.MINIO_BUCKET),
+    MINIO_REGION: String(process.env.MINIO_REGION),
 }
 
 export default env

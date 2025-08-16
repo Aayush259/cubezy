@@ -16,7 +16,7 @@ class FileUploadService {
     ]
 
     private s3 = new S3Client({
-        region: "us-east-1",
+        region: env.MINIO_REGION,
         endpoint: env.MINIO_ENDPOINT,
         credentials: {
             accessKeyId: env.MINIO_ROOT_USER,
@@ -46,7 +46,7 @@ class FileUploadService {
 
             // Upload to MinIO
             await this.s3.send(new PutObjectCommand({
-                Bucket: "uploads",
+                Bucket: env.MINIO_BUCKET,
                 Key: key,
                 Body: file,
                 ACL: "public-read", // makes the object publicly accessible
