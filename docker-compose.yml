@@ -39,29 +39,6 @@ services:
         extra_hosts:
             - "${EXTRA_HOST_MAIL_DOMAIN}:${EXTRA_HOST_MAIL_IP}"
 
-    cubezy-nginx:
-        image: nginx:latest
-        container_name: cubezy-nginx
-        restart: unless-stopped
-        volumes:
-            - ./nginx/conf.d:/etc/nginx/conf.d
-            - ./nginx/certbot:/etc/letsencrypt
-            - ./nginx/certbot-data:/var/www/certbot
-        ports:
-            - "80:80"
-            - "443:443"
-        depends_on:
-            - cubezy-web
-
-    cubezy-certbot:
-        image: certbot/certbot
-        container_name: cubezy-certbot
-        volumes:
-            - ./nginx/certbot:/etc/letsencrypt
-            - ./nginx/certbot-data:/var/www/certbot
-        entrypoint: >
-            sh -c "trap exit TERM; while :; do certbot renew --webroot -w /var/www/certbot --quiet; sleep 12h & wait $${!}; done"
-
 volumes:
     mongo-data:
 
