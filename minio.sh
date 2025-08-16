@@ -31,10 +31,11 @@ else
 fi
 
 # Check current bucket policy
-CURRENT_POLICY=$($MC policy info $MINIO_ALIAS/$BUCKET_NAME | grep -o "Policy: .*" | awk '{print $2}' || echo "none")
+CURRENT_POLICY=$($MC anonymous list $MINIO_ALIAS/$BUCKET_NAME | grep -q . && echo "public" || echo "none")
+
 if [[ "$CURRENT_POLICY" != "public" ]]; then
     echo "Setting bucket policy to public..."
-    $MC policy set public $MINIO_ALIAS/$BUCKET_NAME
+    $MC anonymous set download $MINIO_ALIAS/$BUCKET_NAME
 else
     echo "Bucket '$BUCKET_NAME' is already public."
 fi
