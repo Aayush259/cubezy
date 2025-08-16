@@ -35,4 +35,9 @@ jobs:
           docker compose up -d --build
 
           echo "Deployment completed successfully!"
+
+          chmod +x minio.sh
+          echo "Running MinIO setup script..."
+          ./minio.sh
+          echo "MinIO setup completed!"
           EOF
