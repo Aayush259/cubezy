@@ -21,9 +21,9 @@ class Requests {
         }
     }
 
-    async login({ email, password }: { email: string, password: string }): Promise<{ redirect: string } | IUser> {
+    async login({ email, password, captchaToken }: { email: string, password: string, captchaToken: string }): Promise<{ redirect: string } | IUser> {
         try {
-            const { data } = await api.post("/auth/login", { email, password })
+            const { data } = await api.post("/auth/login", { email, password, captchaToken })
             console.log("Request service => login: ", data)
 
             if (data?.user && data?.token) {
@@ -40,9 +40,9 @@ class Requests {
         }
     }
 
-    async signup({ name, email, password }: { name: string, email: string, password: string }): Promise<{ redirect: string }> {
+    async signup({ name, email, password, captchaToken }: { name: string, email: string, password: string, captchaToken: string }): Promise<{ redirect: string }> {
         try {
-            const { data } = await api.post("/auth/signup", { name, email, password })
+            const { data } = await api.post("/auth/signup", { name, email, password, captchaToken })
             console.log("Request service => signup: ", data)
 
             if (data?.data?.redirect) {

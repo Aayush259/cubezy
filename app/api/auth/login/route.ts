@@ -3,8 +3,8 @@ import userService from '@/services/database/userService'
 
 export async function POST(req: Request) {
     try {
-        const { email, password } = await req.json()
-        const loginData = await userService.login({ email, password })
+        const { email, password, captchaToken } = await req.json()
+        const loginData = await userService.login({ email, password, captchaToken })
 
         if (loginData?.redirect) {
             return NextResponse.json({

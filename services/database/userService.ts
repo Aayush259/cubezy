@@ -1,5 +1,6 @@
 import db from "./dbService"
 import bcrypt from "bcryptjs"
+import env from "@/config/envConf"
 import OTPService from "./otpService"
 import { JoseService } from "../jose/joseService"
 import mongoose, { Document, Model, Schema } from "mongoose"
@@ -55,8 +56,23 @@ export class UserService extends JoseService {
         this.userModel = User
     }
 
-    async signup({ name, email, password }: { name: string, email: string, password: string }) {
+    private async verifyCaptcha(captchaToken: string): Promise<boolean> {
+        const verify = await fetch(`https://www.google.com/recaptcha/api/siteverify`, {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: `secret=${env.CAPTCHA_SECRET_KEY}&response=${captchaToken}`,
+        })
+        const captchaRes = await verify.json()
+        return captchaRes.success
+    }
+
+    async signup({ name, email, password, captchaToken }: { name: string, email: string, password: string, captchaToken: string }) {
         console.log("\n\nSERVICE: signup", { name, email, password })
+        if (!(await this.verifyCaptcha(captchaToken))) {
+            console.log("SERVICE: signup => ERROR: Captcha verification failed")
+            throw new Error("Captcha verification failed")
+        }
+
         const userExists = await this.userModel.findOne({ email })
 
         if (userExists) {
@@ -90,8 +106,13 @@ export class UserService extends JoseService {
         }
     }
 
-    async login({ email, password }: { email: string, password: string }) {
-        console.log("\n\nSERVICE: login", { email, password })
+    async login({ email, password, validateCaptcha = true, captchaToken }: { email: string, password: string, validateCaptcha?: boolean, captchaToken?: string }) {
+        console.log("\n\nSERVICE: login", { email, password, captchaToken })
+        if (validateCaptcha && !(await this.verifyCaptcha(captchaToken as string))) {
+            console.log("SERVICE: login => ERROR: Captcha verification failed")
+            throw new Error("Captcha verification failed")
+        }
+
         const user = await this.userModel.findOne({ email }).populate([
             {
                 path: "connections.userId",

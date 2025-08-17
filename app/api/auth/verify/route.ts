@@ -14,7 +14,7 @@ export async function POST(req: Request) {
         }
 
         await userService.verifyUser({ email })
-        const loginData = await userService.login({ email, password })
+        const loginData = await userService.login({ email, password, validateCaptcha: false })
 
         const response = NextResponse.json({
             token: loginData.data.accessToken,

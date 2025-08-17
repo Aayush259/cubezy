@@ -3,8 +3,8 @@ import userService from '@/services/database/userService'
 
 export async function POST(req: Request) {
     try {
-        const { email, password, name } = await req.json()
-        const signupData = await userService.signup({ name, email, password })
+        const { email, password, name, captchaToken } = await req.json()
+        const signupData = await userService.signup({ name, email, password, captchaToken })
 
         return NextResponse.json({
             message: "OTP Sent",

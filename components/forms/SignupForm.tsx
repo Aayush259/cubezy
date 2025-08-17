@@ -1,13 +1,15 @@
 "use client"
+import env from "@/config/envConf"
+import { Input } from "../ui/Input"
 import Loader from "../common/Loader"
 import requests from "@/lib/requests"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import { RootState } from "@/lib/store/store"
+import ReCAPTCHA from "react-google-recaptcha"
 import { useToast } from "../context/ToastContext"
 import { useDispatch, useSelector } from "react-redux"
 import { setEmail, setName, setPassword } from "@/lib/store/features/authSlice"
-import { Input } from "../ui/Input"
 
 export default function SignupForm() {
     const dispatch = useDispatch()
@@ -16,6 +18,7 @@ export default function SignupForm() {
     const { email, password, name } = useSelector((state: RootState) => state.auth)
     const router = useRouter()
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
+    const [captchaToken, setCaptchaToken] = useState<string | null>(null)
     const [error, setError] = useState<boolean>(false)
 
     useEffect(() => {
@@ -28,14 +31,14 @@ export default function SignupForm() {
         e.preventDefault()
         setIsSubmitting(true)
 
-        if (!name?.trim() || !email.trim() || !password.trim()) {
+        if (!name?.trim() || !email.trim() || !password.trim() || !captchaToken) {
             setError(true)
             setIsSubmitting(false)
             return
         }
 
         try {
-            const { redirect } = await requests.signup({ name, email, password })
+            const { redirect } = await requests.signup({ name, email, password, captchaToken })
             console.log("PUSHING TO", redirect)
             router.push(redirect)
         } catch {
@@ -81,6 +84,12 @@ export default function SignupForm() {
                 value={password || ""}
                 onChange={(e) => dispatch(setPassword(e.target.value))}
                 error={error && !password?.trim()}
+            />
+
+            <ReCAPTCHA
+                sitekey={env.NEXT_PUBLIC_CAPTCHA_SITE_KEY}
+                onChange={(token) => setCaptchaToken(token)}
+                className="mx-auto"
             />
 
             <button type="submit" className={`px-4 py-2 my-2 w-full bg-orange-700 rounded-lg mx-auto ${isSubmitting ? "opacity-50" : "opacity-100"}`}>
