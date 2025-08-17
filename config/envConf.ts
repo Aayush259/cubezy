@@ -9,6 +9,7 @@ const env = {
     SMTP_PASSWORD: String(process.env.SMTP_PASSWORD),
     SMTP_FROM: String(process.env.SMTP_FROM),
     MINIO_ENDPOINT: String(process.env.MINIO_ENDPOINT),
+    MINIO_URL: String(process.env.MINIO_URL),
     MINIO_ROOT_USER: String(process.env.MINIO_ROOT_USER),
     MINIO_ROOT_PASSWORD: String(process.env.MINIO_ROOT_PASSWORD),
     MINIO_BUCKET: String(process.env.MINIO_BUCKET),

@@ -54,7 +54,7 @@ class FileUploadService {
             }))
 
             // Return the public URL
-            return `/uploads/${key}`
+            return `${env.MINIO_URL}/${env.MINIO_BUCKET}/${key}`
         } catch (error) {
             console.log("Error uploading file:", error)
             throw error
