@@ -72,10 +72,13 @@ $MC alias set $MINIO_ALIAS $MINIO_URL $MINIO_USER $MINIO_PASS >/dev/null 2>&1
 # $MC anonymous set-json "$POLICY_JSON" $MINIO_ALIAS/$BUCKET_NAME
 
 # Create a named policy from our JSON
-$MC admin policy create $MINIO_ALIAS ${BUCKET_NAME}-readonly "$POLICY_JSON"
+# $MC admin policy create $MINIO_ALIAS ${BUCKET_NAME}-readonly "$POLICY_JSON"
 
 # Attach policy to the bucket anonymously (public read-only objects)
-$MC anonymous set ${BUCKET_NAME}-readonly $MINIO_ALIAS/$BUCKET_NAME
+# $MC anonymous set ${BUCKET_NAME}-readonly $MINIO_ALIAS/$BUCKET_NAME
+
+# Apply the JSON policy directly to the bucket for anonymous access
+$MC anonymous set-json "$POLICY_JSON" $MINIO_ALIAS/$BUCKET_NAME
 
 rm -f "$POLICY_JSON"
 
