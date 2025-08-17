@@ -88,7 +88,7 @@ export default function LoginForm() {
                 className="mx-auto"
             />
 
-            <button type="submit" className={`px-4 py-2 my-2 w-full bg-blue-700 rounded-lg mx-auto ${isSubmitting ? "opacity-50" : "opacity-100"}`}>
+            <button type="submit" className={`px-4 py-2 my-2 w-full max-w-sm bg-blue-700 rounded-lg mx-auto ${isSubmitting ? "opacity-50" : "opacity-100"}`}>
                 {"Sign In"}
             </button>
         </form>
