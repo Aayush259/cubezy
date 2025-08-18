@@ -1,6 +1,6 @@
 "use client"
 import Loader from "../common/Loader"
-import requests from "@/lib/requests"
+import requests from "@/lib/services/requests"
 import { publicRoutes } from "@/lib/data"
 import { useEffect, useState } from "react"
 import { RootState } from "@/lib/store/store"

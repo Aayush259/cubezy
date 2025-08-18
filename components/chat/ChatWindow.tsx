@@ -1,7 +1,7 @@
 "use client"
 import Image from "next/image"
 import { emojis } from "@/lib/data"
-import requests from "@/lib/requests"
+import requests from "@/lib/services/requests"
 import { IoSend } from "react-icons/io5"
 import { GoClock } from "react-icons/go"
 import { useSelector } from "react-redux"

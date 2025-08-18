@@ -1,7 +1,7 @@
 "use client"
 import { v4 as uuidv4 } from "uuid"
 import Loader from "../common/Loader"
-import requests from "@/lib/requests"
+import requests from "@/lib/services/requests"
 import { useToast } from "./ToastContext"
 import { io, Socket } from "socket.io-client"
 import { RootState } from "@/lib/store/store"
