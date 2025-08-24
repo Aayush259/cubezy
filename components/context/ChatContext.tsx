@@ -1,7 +1,7 @@
 "use client"
 import { v4 as uuidv4 } from "uuid"
 import Loader from "../common/Loader"
-import requests from "@/lib/requests"
+import requests from "@/lib/services/requests"
 import { useToast } from "./ToastContext"
 import { io, Socket } from "socket.io-client"
 import { RootState } from "@/lib/store/store"
@@ -478,6 +478,19 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
 
     const handleUserInactive = useCallback(({ userId }: { userId: string }) => {
         setActiveConnections(activeConnections.current.filter((id) => id !== userId))
+        if (!user?.connections || user.connections.length <= 0) return
+        const updatedUserConnections = [...user.connections]
+        const userIndex = updatedUserConnections.findIndex(connection => connection.userId._id === userId)
+        if (userIndex === -1) return
+        const connection = updatedUserConnections[userIndex]
+        updatedUserConnections[userIndex] = {
+            ...connection,
+            userId: {
+                ...connection.userId,
+                lastSeen: new Date().toISOString()
+            }
+        }
+        dispatch(updateUser({ ...user, connections: [...updatedUserConnections] }))
     }, [setActiveConnections])
 
     const handleActiveConnections = useCallback(({ activeUserIds }: { activeUserIds: string }) => {

@@ -41,10 +41,11 @@ export const handleNewUserConnection = (
     }
 }
 
-export const handleUserDisconnection = (
+export const handleUserDisconnection = async (
     { io, socket }: { io: IOServer, socket: CustomSocket }
 ) => {
     console.log("\n\n == HANDLE USER DISCONNECTION ==", socket.data.user.name)
+    await userService.setLastSeen({ id: socket.data.user._id })
 
     console.log("=> Notifying existing connections about disconnected user")
     socket.data.user.connections.forEach(async (connection) => {
@@ -190,7 +191,8 @@ export const sendMessage = async (
                         name: socket.data.user.name,
                         bio: socket.data.user.bio,
                         email: socket.data.user.email,
-                        dp: socket.data.user.dp
+                        dp: socket.data.user.dp,
+                        lastSeen: socket.data.user?.lastSeen
                     },
                 });
 
@@ -201,7 +203,8 @@ export const sendMessage = async (
                         name: socket.data.user.name,
                         bio: socket.data.user.bio,
                         email: socket.data.user.email,
-                        dp: socket.data.user.dp
+                        dp: socket.data.user.dp,
+                        lastSeen: socket.data.user?.lastSeen
                     }
                 })
 
@@ -217,7 +220,8 @@ export const sendMessage = async (
                 name: receiver.profile.name,
                 bio: receiver.profile.bio,
                 email: receiver.profile.email,
-                dp: receiver.profile.dp
+                dp: receiver.profile.dp,
+                lastSeen: receiver.profile?.lastSeen
             }
         })
 
@@ -364,3 +368,19 @@ export const deleteMessagesForEveryone = async (
         })
     }
 }
+
+// export const syncIndexedDb = async (
+//     { socket, callback }: { socket: CustomSocket, callback: Function }
+// ) => {
+//     console.log("\n\n == SYNC INDEXED DB ==")
+//     try {
+        
+//     } catch (error) {
+//         console.log("Error syncing indexed db:", error)
+//         callback({
+//             success: false,
+//             message: "Error syncing indexed db",
+//             error
+//         })
+//     }
+// }

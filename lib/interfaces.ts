@@ -7,6 +7,7 @@ export interface IConnection {
         bio: string
         dp: string | null
         createdAt: Date
+        lastSeen?: Date | string | null
     }
 }
 
@@ -19,6 +20,7 @@ export interface IUser {
     connections: IConnection[]
     createdAt: Date
     updatedAt: Date
+    lastSeen?: Date | string | null
 }
 
 export interface IProfile {
@@ -29,6 +31,7 @@ export interface IProfile {
     dp: string | null
     connections?: IConnection[]
     createdAt: Date
+    lastSeen?: Date | string | null
 }
 
 export interface IUserSlice {

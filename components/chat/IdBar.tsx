@@ -1,5 +1,5 @@
 "use client"
-import requests from "@/lib/requests"
+import requests from "@/lib/services/requests"
 import { IUser } from "@/lib/interfaces"
 import { IoClose } from "react-icons/io5"
 import { getRandomEmoji } from "@/lib/Funcs"

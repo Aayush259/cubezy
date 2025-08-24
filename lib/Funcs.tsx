@@ -27,16 +27,6 @@ export const formatDate2 = (date: Date) => {
     return `${day} ${month} ${year}`
 }
 
-// Function to generate a random emoji
-export const getRandomEmoji = () => {
-    const emojis = [
-        "😃", "😄", "😘", "🤓", "😉", "🤗", "🥳", "🙃", "😊", "😎", "🤠", "😁"
-    ]
-
-    const randomIndex = Math.floor(Math.random() * emojis.length)
-    return emojis[randomIndex]
-}
-
 // Function to compare dates
 export const compareDates = (date1: string | Date, date2: string | Date) => {
     const firstDate = new Date(date1)
@@ -100,6 +90,35 @@ export const compareDates = (date1: string | Date, date2: string | Date) => {
     const formattedDate = `${String(secondDay.day).padStart(2, "0")} ${secondDate.toLocaleString("en-GB", { month: "short" })
         } ${secondDay.year}`
     return formattedDate
+}
+
+export const getLastSeen = (lastSeen: Date | string) => {
+    lastSeen = new Date(lastSeen)
+    const now = new Date()
+
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+    const yesterday = new Date(today)
+    yesterday.setDate(today.getDate() - 1)
+
+    const givenDay = new Date(lastSeen.getFullYear(), lastSeen.getMonth(), lastSeen.getDate())
+
+    if (givenDay.getTime() === today.getTime()) {
+        return `today at ${formatDate(lastSeen)}`
+    } else if (givenDay.getTime() === yesterday.getTime()) {
+        return `yesterday at ${formatDate(lastSeen)}`
+    } else {
+        return `${formatDate2(lastSeen)} at ${formatDate(lastSeen)}`
+    }
+}
+
+// Function to generate a random emoji
+export const getRandomEmoji = () => {
+    const emojis = [
+        "😃", "😄", "😘", "🤓", "😉", "🤗", "🥳", "🙃", "😊", "😎", "🤠", "😁"
+    ]
+
+    const randomIndex = Math.floor(Math.random() * emojis.length)
+    return emojis[randomIndex]
 }
 
 // Function to copy the user's ID to the clipboard

@@ -1,6 +1,6 @@
 "use client"
 import Loader from "../common/Loader"
-import requests from "@/lib/requests"
+import requests from "@/lib/services/requests"
 import OTPInput from "../ui/OTPInput"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"

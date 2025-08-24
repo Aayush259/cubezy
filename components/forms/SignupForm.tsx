@@ -2,7 +2,7 @@
 import env from "@/config/envConf"
 import { Input } from "../ui/Input"
 import Loader from "../common/Loader"
-import requests from "@/lib/requests"
+import requests from "@/lib/services/requests"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import { RootState } from "@/lib/store/store"
