@@ -14,6 +14,8 @@ const env = {
     MINIO_ROOT_PASSWORD: String(process.env.MINIO_ROOT_PASSWORD),
     MINIO_BUCKET: String(process.env.MINIO_BUCKET),
     MINIO_REGION: String(process.env.MINIO_REGION),
+    INDEXED_DB_NAME: String(process.env.NEXT_PUBLIC_INDEXED_DB_NAME),
+    INDEXED_DB_VERSION: Number(process.env.NEXT_PUBLIC_INDEXED_DB_VERSION),
     NEXT_PUBLIC_CAPTCHA_SITE_KEY: String(process.env.NEXT_PUBLIC_CAPTCHA_SITE_KEY),
     CAPTCHA_SECRET_KEY: String(process.env.CAPTCHA_SECRET_KEY),
 }
