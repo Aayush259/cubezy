@@ -16,7 +16,7 @@ import { MdContentCopy, MdDelete } from "react-icons/md"
 import { IoCheckmarkDone, IoClose } from "react-icons/io5"
 import { useProfileContext } from "../context/ProfileContext"
 import { IoMdCheckmark, IoIosArrowBack, IoMdShareAlt } from "react-icons/io"
-import { compareDates, copyToClipboard, formatDate, formatMessage } from "@/lib/Funcs"
+import { compareDates, copyToClipboard, formatDate, formatMessage, getLastSeen } from "@/lib/Funcs"
 
 const ChatWindow: React.FC = () => {
     const { user } = useSelector((state: RootState) => state.user)
@@ -264,10 +264,17 @@ const ChatWindow: React.FC = () => {
                             </span>
                         )}
 
-                        <span className="flex flex-col lg:gap-1">
+                        <span className="flex flex-col lg:gap-1 text-left">
                             <span>
                                 {receiver?.userId?.name}
                             </span>
+
+                            {(receiver?.userId?.lastSeen && !onlineConnections.includes(receiverId)) && (
+                                <span className="text-xs flex items-center gap-2">
+                                    <span className="h-2 w-2 bg-yellow-500 rounded-full block" />
+                                    {" Last seen " + getLastSeen(receiver.userId.lastSeen)}
+                                </span>
+                            )}
 
                             {onlineConnections.includes(receiverId) && (
                                 <span className="text-xs flex items-center gap-2 animate-heightActive">

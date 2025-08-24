@@ -13,6 +13,7 @@ export interface IUser extends Document {
     bio: string
     dp: string | null
     connections: { chatId: string, userId: mongoose.Types.ObjectId }[]
+    lastSeen?: Date
     verified?: boolean
     comparePassword(password: string): Promise<boolean>
     createdAt: Date
@@ -36,6 +37,7 @@ export class UserService extends JoseService {
                     userId: { type: Schema.Types.ObjectId, ref: "User", required: true },    // Receiver's User ID.
                 },
             ],
+            lastSeen: { type: Date, default: null },
             verified: { type: Boolean, default: false },
         }, { timestamps: true })
 
@@ -99,6 +101,7 @@ export class UserService extends JoseService {
                     bio: newUser.bio,
                     dp: newUser.dp,
                     connections: newUser.connections,
+                    lastSeen: newUser.lastSeen,
                     createdAt: newUser.createdAt,
                     updatedAt: newUser.updatedAt,
                 }
@@ -107,7 +110,7 @@ export class UserService extends JoseService {
     }
 
     async login({ email, password, validateCaptcha = true, captchaToken }: { email: string, password: string, validateCaptcha?: boolean, captchaToken?: string }) {
-        console.log("\n\nSERVICE: login", { email, password, captchaToken })
+        console.log("\n\nSERVICE: login", { email })
         if (validateCaptcha && !(await this.verifyCaptcha(captchaToken as string))) {
             console.log("SERVICE: login => ERROR: Captcha verification failed")
             throw new Error("Captcha verification failed")
@@ -116,7 +119,7 @@ export class UserService extends JoseService {
         const user = await this.userModel.findOne({ email }).populate([
             {
                 path: "connections.userId",
-                select: "name email bio dp createdAt"
+                select: "name email bio dp lastSeen createdAt"
             }
         ])
         if (!user) {
@@ -147,6 +150,7 @@ export class UserService extends JoseService {
                         bio: user.bio,
                         dp: user.dp,
                         connections: user.connections,
+                        lastSeen: user.lastSeen,
                         createdAt: user.createdAt,
                         updatedAt: user.updatedAt,
                     }
@@ -176,6 +180,7 @@ export class UserService extends JoseService {
                     bio: user.bio,
                     dp: user.dp,
                     connections: user.connections,
+                    lastSeen: user?.lastSeen,
                     createdAt: user.createdAt,
                     updatedAt: user.updatedAt,
                 }
@@ -191,7 +196,6 @@ export class UserService extends JoseService {
     }
 
     async me({ token }: { token: string }) {
-        console.log("\n\nSERVICE: me", { token })
         const decoded = await this.verifyToken(token)
         if (!decoded) {
             console.log("SERVICE: me => ERROR: Invalid token")
@@ -201,7 +205,7 @@ export class UserService extends JoseService {
         const user = await this.userModel.findById(decoded.id).populate([
             {
                 path: "connections.userId",
-                select: "name email bio dp createdAt"
+                select: "name email bio dp lastSeen createdAt"
             }
         ])
         if (!user) {
@@ -221,6 +225,7 @@ export class UserService extends JoseService {
                     bio: user.bio,
                     dp: user.dp,
                     connections: user.connections,
+                    lastSeen: user?.lastSeen,
                     createdAt: user.createdAt,
                     updatedAt: user.updatedAt,
                 }
@@ -240,7 +245,7 @@ export class UserService extends JoseService {
         const user = await this.userModel.findById(decoded.id).populate([
             {
                 path: "connections.userId",
-                select: "name email bio dp createdAt"
+                select: "name email bio dp lastSeen createdAt"
             }
         ])
         if (!user) {
@@ -281,7 +286,7 @@ export class UserService extends JoseService {
         const profile = await this.userModel.findById(id).select(["-password"]).populate([
             {
                 path: "connections.userId",
-                select: "name email bio dp createdAt"
+                select: "name email bio dp lastSeen createdAt"
             }
         ])
 
@@ -342,6 +347,7 @@ export class UserService extends JoseService {
                         email: userToAdd.email,
                         bio: userToAdd.bio,
                         dp: userToAdd.dp,
+                        lastSeen: userToAdd?.lastSeen,
                         createdAt: userToAdd.createdAt,
                         updatedAt: userToAdd.updatedAt,
                     }
@@ -358,6 +364,11 @@ export class UserService extends JoseService {
     async setBio({ id, bio }: { id: string, bio: string }) {
         console.log("\n\nSERVICE: setBio", { id, bio })
         return await this.userModel.findByIdAndUpdate(id, { bio }, { new: true })
+    }
+
+    async setLastSeen({ id }: { id: string }) {
+        console.log("\n\nSERVICE: setLastSeen", { id })
+        return await this.userModel.findByIdAndUpdate(id, { lastSeen: new Date() }, { new: true })
     }
 }
 

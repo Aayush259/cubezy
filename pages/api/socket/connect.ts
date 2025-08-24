@@ -10,7 +10,8 @@ import {
     markMessageAsRead,
     sendMessage,
     setBio,
-    setProfilePicture
+    setProfilePicture,
+    // syncIndexedDb
 } from "@/helpers/socket-funcs"
 
 let io: IOServer
@@ -38,6 +39,7 @@ export default async function handler(_: NextApiRequest, res: ExtendedNextApiRes
                     name: data.user.name,
                     bio: data.user.bio,
                     dp: data.user.dp,
+                    lastSeen: data.user?.lastSeen,
                     connections: data.user.connections.map(connection => ({
                         chatId: connection.chatId.toString(),
                         userId: connection.userId
@@ -52,6 +54,8 @@ export default async function handler(_: NextApiRequest, res: ExtendedNextApiRes
         io.on("connection", (socket: CustomSocket) => {
             console.log("User connected:", socket.data.user.name)
             handleNewUserConnection({ io, socket })
+
+            // socket.on(EVENTS.SYNC_INDEXED_DB, (callback) => syncIndexedDb({ socket, callback }))
 
             socket.on(
                 EVENTS.SET_PROFILE_PICTURE,
