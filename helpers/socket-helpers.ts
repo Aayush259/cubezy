@@ -46,6 +46,7 @@ export const EVENTS = {
     CONNECTION_UPDATED: "connection-updated",
     SEND_MESSAGE: "send-message",
     RECEIVE_MESSAGE: "receive-message",
+    SENT_MESSAGE: "sent-message",
     MARK_AS_READ: "mark-as-read",
     MESSAGE_READ: "message-read",
     DELETE_MESSAGE_FOR_ME: "delete-message-for-me",

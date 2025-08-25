@@ -539,6 +539,36 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
         })
     }, [user, receiverIdRef, setChats, setLastMessages, addToast])
 
+    const handleSentMessage = useCallback(({ messageDetails, receiverId }: { messageDetails: IChatMessage, receiverId: string }) => {
+        if (receiverIdRef.current === receiverId) {
+            setChats(prevChats => prevChats ? [...prevChats, messageDetails] : [messageDetails])
+        }
+
+        const nChatId = user?._id as string < receiverId ? `${user?._id}_${receiverId}` : `${receiverId}_${user?._id}`
+        setLastMessages(prevLastMessages => {
+            // Check if the chat ID already exists in the lastMessages array
+            const existingIndex = prevLastMessages.findIndex(lastMessage => lastMessage.chatId === nChatId)
+
+            if (existingIndex !== -1) {
+                // Update the existing lastMessage for this chat
+                return prevLastMessages.map((lastMessage, idx) =>
+                    idx === existingIndex
+                        ? { ...lastMessage, lastMessage: messageDetails }
+                        : lastMessage
+                )
+            } else {
+                // Add a new entry for this chat if it doesn't exist
+                return [
+                    ...prevLastMessages,
+                    {
+                        chatId: nChatId,
+                        lastMessage: messageDetails,
+                    }
+                ]
+            }
+        })
+    }, [user, receiverIdRef, setChats, setLastMessages])
+
     const handleMessageRead = useCallback(({ messageIds }: { messageIds: string[] }) => {
         setChats(prevChats => prevChats?.map(chat => messageIds?.includes(chat._id) ? { ...chat, isRead: true, status: "sent" } : chat) || null)
     }, [setChats])
@@ -572,7 +602,7 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
     }, [user, dispatch])
 
     const handleDeleteMessageForEveryone = useCallback(({ chatId: cId, messageIds }: { chatId: string, messageIds: string[] }) => {
-        console.log("Received event EVENTS.DELETE_MESSAGE_FOR_EVERYONE", cId, messageIds)
+        console.log("Received event EVENTS.DELETE_MESSAGE_FOR_EVERYONE/EVENTS.DELETE_MESSAGE_FOR_ME", cId, messageIds)
         if (chatId === cId) {
             setChats(prevChats => prevChats?.filter(chat => !messageIds.includes(chat._id)) || null)
         }
@@ -619,9 +649,11 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
         socket.on(EVENTS.ACTIVE_CONNECTIONS, handleActiveConnections)
         socket.on(EVENTS.CONNECTION_UPDATED, handleConnectionUpdated)
         socket.on(EVENTS.RECEIVE_MESSAGE, handleReceiveMessage)
+        socket.on(EVENTS.SENT_MESSAGE, handleSentMessage)
         socket.on(EVENTS.MESSAGE_READ, handleMessageRead)
         socket.on(EVENTS.BIO_UPDATED, handleBioUpdated)
         socket.on(EVENTS.PROFILE_PICUTRE_UPDATED, handleProfilePictureUpdated)
+        socket.on(EVENTS.DELETE_MESSAGE_FOR_ME, handleDeleteMessageForEveryone)
         socket.on(EVENTS.DELETE_MESSAGE_FOR_EVERYONE, handleDeleteMessageForEveryone)
 
         return () => {
@@ -630,9 +662,11 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
             socket.off(EVENTS.ACTIVE_CONNECTIONS, handleActiveConnections)
             socket.off(EVENTS.CONNECTION_UPDATED, handleConnectionUpdated)
             socket.off(EVENTS.RECEIVE_MESSAGE, handleReceiveMessage)
+            socket.off(EVENTS.SENT_MESSAGE, handleSentMessage)
             socket.off(EVENTS.MESSAGE_READ, handleMessageRead)
             socket.off(EVENTS.BIO_UPDATED, handleBioUpdated)
             socket.off(EVENTS.PROFILE_PICUTRE_UPDATED, handleProfilePictureUpdated)
+            socket.off(EVENTS.DELETE_MESSAGE_FOR_ME, handleDeleteMessageForEveryone)
             socket.off(EVENTS.DELETE_MESSAGE_FOR_EVERYONE, handleDeleteMessageForEveryone)
         }
     }, [socket])
