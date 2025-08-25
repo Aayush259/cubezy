@@ -79,7 +79,7 @@ export default async function handler(_: NextApiRequest, res: ExtendedNextApiRes
 
             socket.on(
                 EVENTS.DELETE_MESSAGE_FOR_ME,
-                ({ chatId, messageIds }: { chatId: string, messageIds: string[] }, callback) => deleteMessagesForMe({ chatId, messageIds, callback })
+                ({ chatId, messageIds }: { chatId: string, messageIds: string[] }, callback) => deleteMessagesForMe({ socket, io, chatId, messageIds, callback })
             )
 
             socket.on(
