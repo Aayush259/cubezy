@@ -39,6 +39,7 @@ export const EVENTS = {
     USER_ACTIVE: "user-active",
     USER_INACTIVE: "user-inactive",
     ACTIVE_CONNECTIONS: "active-connections",
+    ADD_CONNECTION: "add-connection",
     SET_PROFILE_PICTURE: "set-profile-picture",
     PROFILE_PICUTRE_UPDATED: "profile-picture-updated",
     SET_BIO: "set-bio",

@@ -403,6 +403,43 @@ export const markMessageAsRead = async (
     }
 }
 
+export const addConnection = async (
+    { socket, io, userEmailToAdd, callback }: { socket: CustomSocket, io: IOServer, userEmailToAdd: string, callback: Function }
+) => {
+    console.log("\n\n == ADD CONNECTION ==", userEmailToAdd)
+    try {
+        if (!userEmailToAdd.trim()) {
+            return callback({
+                success: false,
+                message: "User email is required"
+            })
+        }
+
+        const userId = socket.data.user._id
+        const { data } = await userService.addConnection({ id: userId, userEmailToAdd })
+        callback({
+            success: true,
+            message: "Connection added",
+            addedConnection: data.addedConnection
+        })
+
+        const otherSocketInstances = getOtherSocketInstances(io, socket)
+        otherSocketInstances.forEach(otherSocket => {
+            // Emitting update to other instances of the user
+            otherSocket.emit(EVENTS.ADD_CONNECTION, {
+                addedConnection: data.addedConnection
+            })
+        })
+    } catch (error) {
+        console.log("Error adding connection:", error)
+        callback({
+            success: false,
+            message: "Error adding connection",
+            error
+        })
+    }
+}
+
 export const deleteMessagesForMe = async (
     { socket, io, chatId, messageIds, callback }: { socket: CustomSocket, io: IOServer, chatId: string, messageIds: string[], callback: Function }
 ) => {

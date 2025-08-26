@@ -3,6 +3,7 @@ import { Server as IOServer } from "socket.io"
 import userService from "@/services/database/userService"
 import { CustomSocket, EVENTS, ExtendedNextApiResponse } from "@/helpers/socket-helpers"
 import {
+    addConnection,
     deleteMessagesForEveryone,
     deleteMessagesForMe,
     handleNewUserConnection,
@@ -65,6 +66,11 @@ export default async function handler(_: NextApiRequest, res: ExtendedNextApiRes
             socket.on(
                 EVENTS.SET_BIO,
                 ({ bio }: { bio: string }, callback) => setBio({ socket, io, bio, callback })
+            )
+
+            socket.on(
+                EVENTS.ADD_CONNECTION,
+                ({ userEmailToAdd }: { userEmailToAdd: string }, callback) => addConnection({ socket, io, userEmailToAdd, callback })
             )
 
             socket.on(
