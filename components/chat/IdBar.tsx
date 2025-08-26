@@ -8,12 +8,14 @@ import { useEffect, useMemo, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { useIdBarContext } from "../context/IdBarContext"
 import { updateConnections } from "@/lib/store/features/userSlice"
+import { useChatContext } from "../context/ChatContext"
 
 const IdBar: React.FC = () => {
     const { user } = useSelector((state: RootState) => state.user)
     const dispatch = useDispatch()
 
     const { idBarOpen, setIdBarOpen } = useIdBarContext()
+    const { addConnection } = useChatContext()
 
     const [userEmailToAdd, setUserEmailToAdd] = useState<string>("")   // State to store the email to add.
     const [isAdding, setIsAdding] = useState<boolean>(false)   // State to track whether the user is adding a new email.
@@ -55,17 +57,30 @@ const IdBar: React.FC = () => {
             return
         }
 
-        try {
-            const addedUser = await requests.addConnection({ userEmailToAdd })
-            dispatch(updateConnections([...(user as IUser).connections, addedUser]))
-        } catch (error) {
-            console.log("Error adding ID. response:", error)
-            setEnteredWrongEmail(true)
-            console.log(error)
-        } finally {
-            setIsAdding(false)
-            setUserEmailToAdd("")
-        }
+        addConnection({
+            userEmailToAdd,
+            success: () => {
+                setIsAdding(false)
+                setUserEmailToAdd("")
+            },
+            failure: () => {
+                setEnteredWrongEmail(true)
+                setIsAdding(false)
+                setUserEmailToAdd("")
+            }
+        })
+
+        // try {
+        //     const addedUser = await requests.addConnection({ userEmailToAdd })
+        //     dispatch(updateConnections([...(user as IUser).connections, addedUser]))
+        // } catch (error) {
+        //     console.log("Error adding ID. response:", error)
+        //     setEnteredWrongEmail(true)
+        //     console.log(error)
+        // } finally {
+        //     setIsAdding(false)
+        //     setUserEmailToAdd("")
+        // }
     }
 
     return (

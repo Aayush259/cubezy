@@ -7,7 +7,7 @@ import { io, Socket } from "socket.io-client"
 import { RootState } from "@/lib/store/store"
 import { EVENTS } from "@/helpers/socket-helpers"
 import { useDispatch, useSelector } from "react-redux"
-import { IChatMessage, IConnection, ILastMessage } from "@/lib/interfaces"
+import { IChatMessage, IConnection, ILastMessage, IUser } from "@/lib/interfaces"
 import { updateConnections, updateUser } from "@/lib/store/features/userSlice"
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react"
 
@@ -29,6 +29,7 @@ interface IChatContext {
     sendMessage: (message: string) => void
     markAsRead: (messageIds?: string[]) => void
     addDp: (event: React.ChangeEvent<HTMLInputElement>) => void
+    addConnection: ({ userEmailToAdd, success, failure }: { userEmailToAdd: string, success: Function, failure: Function }) => void
     updateBio: (bio: string) => void
     onlineConnections: string[]
     selectedMessages: IChatMessage[]
@@ -455,6 +456,19 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
         })
     }, [socket, user, dispatch, addToast])
 
+    // Function to add connection.
+    const addConnection = useCallback(({ userEmailToAdd, success, failure }: { userEmailToAdd: string, success: Function, failure: Function }) => {
+        if (!socket) return failure()
+        socket.emit(EVENTS.ADD_CONNECTION, { userEmailToAdd }, (response: { success: boolean, message: string, addedConnection?: IConnection }) => {
+            if (response.success && response.addedConnection) {
+                dispatch(updateConnections([...(user as IUser).connections, response.addedConnection]))
+                success()
+            } else {
+                failure()
+            }
+        })
+    }, [socket, user, dispatch])
+
     // Function to fetch the last messages.
     const fetchLastMessages = async () => {
         // Set loading state to true and get the token.
@@ -583,8 +597,13 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
                 return connection
             })
         }
-
         dispatch(updateUser(updatedUser))
+    }, [user, dispatch])
+
+    const handleConnectionAdded = useCallback(({ addedConnection }: { addedConnection: IConnection }) => {
+        console.log("New connection added:", addedConnection)
+        console.log("Current user:", user)
+        dispatch(updateConnections([...(user as IUser).connections, addedConnection]))
     }, [user, dispatch])
 
     const handleProfilePictureUpdated = useCallback(({ userId, dp }: { userId: string, dp: string }) => {
@@ -647,6 +666,7 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
         socket.on(EVENTS.USER_ACTIVE, handleUserActive)
         socket.on(EVENTS.USER_INACTIVE, handleUserInactive)
         socket.on(EVENTS.ACTIVE_CONNECTIONS, handleActiveConnections)
+        socket.on(EVENTS.ADD_CONNECTION, handleConnectionAdded)
         socket.on(EVENTS.CONNECTION_UPDATED, handleConnectionUpdated)
         socket.on(EVENTS.RECEIVE_MESSAGE, handleReceiveMessage)
         socket.on(EVENTS.SENT_MESSAGE, handleSentMessage)
@@ -660,6 +680,7 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
             socket.off(EVENTS.USER_ACTIVE, handleUserActive)
             socket.off(EVENTS.USER_INACTIVE, handleUserInactive)
             socket.off(EVENTS.ACTIVE_CONNECTIONS, handleActiveConnections)
+            socket.off(EVENTS.ADD_CONNECTION, handleConnectionAdded)
             socket.off(EVENTS.CONNECTION_UPDATED, handleConnectionUpdated)
             socket.off(EVENTS.RECEIVE_MESSAGE, handleReceiveMessage)
             socket.off(EVENTS.SENT_MESSAGE, handleSentMessage)
@@ -681,7 +702,7 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
     }, [chats])
 
     return (
-        <ChatContext.Provider value={{ socket, receiverId, updateReceiverId, lastMessages, chats, setChats, page, setPage, hasMore, setHasMore, loadingChats, setLoadingChats, sendMessage, markAsRead, addDp, updateBio, onlineConnections, selectedMessages, addSelectedMessage, removeSelectedMessage, clearSelectedMessages, deleteMessage, forwardMessageWindowVisible, openForwardMessageWindow, closeForwardMessageWindow, forwardToReceiverIds, addForwardToReceiverId, removeForwardToReceiverId, forwardMessages, chatId, deleteWindowVisible, openDeleteWindow, closeDeleteWindow }}>
+        <ChatContext.Provider value={{ socket, receiverId, updateReceiverId, lastMessages, chats, setChats, page, setPage, hasMore, setHasMore, loadingChats, setLoadingChats, sendMessage, markAsRead, addDp, addConnection, updateBio, onlineConnections, selectedMessages, addSelectedMessage, removeSelectedMessage, clearSelectedMessages, deleteMessage, forwardMessageWindowVisible, openForwardMessageWindow, closeForwardMessageWindow, forwardToReceiverIds, addForwardToReceiverId, removeForwardToReceiverId, forwardMessages, chatId, deleteWindowVisible, openDeleteWindow, closeDeleteWindow }}>
             {
                 loadingLastMessages ? <Loader /> : error ? <p>Something went wrong</p> : children
             }
