@@ -1,19 +1,14 @@
 "use client"
-import requests from "@/lib/services/requests"
-import { IUser } from "@/lib/interfaces"
 import { IoClose } from "react-icons/io5"
 import { getRandomEmoji } from "@/lib/Funcs"
 import { RootState } from "@/lib/store/store"
 import { useEffect, useMemo, useState } from "react"
-import { useDispatch, useSelector } from "react-redux"
+import { useSelector } from "react-redux"
 import { useIdBarContext } from "../context/IdBarContext"
-import { updateConnections } from "@/lib/store/features/userSlice"
 import { useChatContext } from "../context/ChatContext"
 
 const IdBar: React.FC = () => {
     const { user } = useSelector((state: RootState) => state.user)
-    const dispatch = useDispatch()
-
     const { idBarOpen, setIdBarOpen } = useIdBarContext()
     const { addConnection } = useChatContext()
 

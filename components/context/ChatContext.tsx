@@ -29,7 +29,7 @@ interface IChatContext {
     sendMessage: (message: string) => void
     markAsRead: (messageIds?: string[]) => void
     addDp: (event: React.ChangeEvent<HTMLInputElement>) => void
-    addConnection: ({ userEmailToAdd, success, failure }: { userEmailToAdd: string, success: Function, failure: Function }) => void
+    addConnection: ({ userEmailToAdd, success, failure }: { userEmailToAdd: string, success: () => void, failure: () => void }) => void
     updateBio: (bio: string) => void
     onlineConnections: string[]
     selectedMessages: IChatMessage[]
@@ -457,7 +457,7 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
     }, [socket, user, dispatch, addToast])
 
     // Function to add connection.
-    const addConnection = useCallback(({ userEmailToAdd, success, failure }: { userEmailToAdd: string, success: Function, failure: Function }) => {
+    const addConnection = useCallback(({ userEmailToAdd, success, failure }: { userEmailToAdd: string, success: () => void, failure: () => void }) => {
         if (!socket) return failure()
         socket.emit(EVENTS.ADD_CONNECTION, { userEmailToAdd }, (response: { success: boolean, message: string, addedConnection?: IConnection }) => {
             if (response.success && response.addedConnection) {
