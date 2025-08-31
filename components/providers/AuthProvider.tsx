@@ -21,7 +21,11 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
             const user = await requests.getMe()
             dispatch(login(user))
             setIsAuthenticated(true)
-            router.push("/")
+            // Don't redirect from "/" route - allow both authenticated and non-authenticated users
+            if (publicRoutes.includes(pathname as string) && pathname !== "/") {
+                router.push("/chat")
+            }
+            // router.push("/")
         } catch {
             dispatch(logout())
             if (!publicRoutes.includes(pathname as string)) {

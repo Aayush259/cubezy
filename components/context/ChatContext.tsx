@@ -642,24 +642,34 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
     }, [chatId, setChats, setLastMessages])
 
     useEffect(() => {
-        fetchLastMessages()
-    }, [])
+        // Only fetch last messages if user is authenticated
+        if (user?._id) {
+            fetchLastMessages()
+        } else {
+            setLoadingLastMessages(false)
+        }
+    }, [user?._id])
 
     useEffect(() => {
-        // Connect to the backend Socket.IO server.
-        const newSocket = io("", {
-            path: SOCKET_PATH,
-            auth: {
-                token: localStorage.getItem("token")
-            }
-        })
-        setSocket(newSocket)
+        // Only connect to socket if user is authenticated
+        if (user?._id) {
+            // Connect to the backend Socket.IO server.
+            const newSocket = io("", {
+                path: SOCKET_PATH,
+                auth: {
+                    token: localStorage.getItem("token")
+                }
+            })
+            setSocket(newSocket)
 
-        // Clean up the socket connection when the component unmounts.
-        return () => {
-            newSocket.disconnect()
+            // Clean up the socket connection when the component unmounts.
+            return () => {
+                newSocket.disconnect()
+            }
+        } else {
+            setSocket(null)
         }
-    }, [])
+    }, [user?._id])
 
     useEffect(() => {
         if (!socket) return
@@ -704,7 +714,11 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
     return (
         <ChatContext.Provider value={{ socket, receiverId, updateReceiverId, lastMessages, chats, setChats, page, setPage, hasMore, setHasMore, loadingChats, setLoadingChats, sendMessage, markAsRead, addDp, addConnection, updateBio, onlineConnections, selectedMessages, addSelectedMessage, removeSelectedMessage, clearSelectedMessages, deleteMessage, forwardMessageWindowVisible, openForwardMessageWindow, closeForwardMessageWindow, forwardToReceiverIds, addForwardToReceiverId, removeForwardToReceiverId, forwardMessages, chatId, deleteWindowVisible, openDeleteWindow, closeDeleteWindow }}>
             {
-                loadingLastMessages ? <Loader /> : error ? <p>Something went wrong</p> : children
+                loadingLastMessages ? (
+                    <div className="h-screen w-screen flex items-center justify-center">
+                        <Loader />
+                    </div>
+                ) : error ? <p>Something went wrong</p> : children
             }
         </ChatContext.Provider>
     )

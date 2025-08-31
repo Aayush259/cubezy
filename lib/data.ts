@@ -3,7 +3,7 @@ export const emojis = [
 ]
 
 export const publicRoutes = [
-    "/login", "/signup", "/verify"
+    "/login", "/signup", "/verify", "/"
 ]
 
 export const publicApiRoutes = [
