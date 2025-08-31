@@ -27,14 +27,25 @@ let requestQueue: Array<(token: string | null) => void> = []
 
 async function refreshAccessToken(): Promise<string | null> {
     try {
-        const { data } = await api.post('/auth/refresh')
+        const response = await fetch("/api/auth/refresh", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include"
+        })
+
+        if (!response.ok) {
+            throw new Error(`Refresh failed: ${response.status}`)
+        }
+
+        const data = await response.json()
         const newToken = data?.data?.token || data?.data?.accessToken
         if (newToken) {
             localStorage.setItem('token', newToken)
             return newToken
         }
         return null
-    } catch {
+    } catch (error) {
+        console.log("Caught error while refreshing token:", error)
         return null
     }
 }

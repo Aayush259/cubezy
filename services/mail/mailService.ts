@@ -13,8 +13,8 @@ export class MailService {
                 user: env.SMTP_USER,
                 pass: env.SMTP_PASSWORD,
             },
-            debug: true,
-            logger: true,
+            // debug: true,
+            // logger: true,
         }) as SMTPTransport.Options)
     }
 

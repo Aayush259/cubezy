@@ -3,6 +3,7 @@ import { Server as IOServer } from "socket.io"
 import userService from "@/services/database/userService"
 import { CustomSocket, EVENTS, ExtendedNextApiResponse } from "@/helpers/socket-helpers"
 import {
+    addConnection,
     deleteMessagesForEveryone,
     deleteMessagesForMe,
     handleNewUserConnection,
@@ -10,7 +11,8 @@ import {
     markMessageAsRead,
     sendMessage,
     setBio,
-    setProfilePicture
+    setProfilePicture,
+    // syncIndexedDb
 } from "@/helpers/socket-funcs"
 
 let io: IOServer
@@ -38,6 +40,7 @@ export default async function handler(_: NextApiRequest, res: ExtendedNextApiRes
                     name: data.user.name,
                     bio: data.user.bio,
                     dp: data.user.dp,
+                    lastSeen: data.user?.lastSeen,
                     connections: data.user.connections.map(connection => ({
                         chatId: connection.chatId.toString(),
                         userId: connection.userId
@@ -53,6 +56,8 @@ export default async function handler(_: NextApiRequest, res: ExtendedNextApiRes
             console.log("User connected:", socket.data.user.name)
             handleNewUserConnection({ io, socket })
 
+            // socket.on(EVENTS.SYNC_INDEXED_DB, (callback) => syncIndexedDb({ socket, callback }))
+
             socket.on(
                 EVENTS.SET_PROFILE_PICTURE,
                 ({ file }: { file: Buffer }, callback) => setProfilePicture({ socket, io, file, callback })
@@ -61,6 +66,11 @@ export default async function handler(_: NextApiRequest, res: ExtendedNextApiRes
             socket.on(
                 EVENTS.SET_BIO,
                 ({ bio }: { bio: string }, callback) => setBio({ socket, io, bio, callback })
+            )
+
+            socket.on(
+                EVENTS.ADD_CONNECTION,
+                ({ userEmailToAdd }: { userEmailToAdd: string }, callback) => addConnection({ socket, io, userEmailToAdd, callback })
             )
 
             socket.on(
@@ -75,7 +85,7 @@ export default async function handler(_: NextApiRequest, res: ExtendedNextApiRes
 
             socket.on(
                 EVENTS.DELETE_MESSAGE_FOR_ME,
-                ({ chatId, messageIds }: { chatId: string, messageIds: string[] }, callback) => deleteMessagesForMe({ chatId, messageIds, callback })
+                ({ chatId, messageIds }: { chatId: string, messageIds: string[] }, callback) => deleteMessagesForMe({ socket, io, chatId, messageIds, callback })
             )
 
             socket.on(

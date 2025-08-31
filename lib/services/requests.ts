@@ -1,6 +1,6 @@
-import api from "./axios"
+import api from "@/lib/axios"
 import { IUser } from "@/services/database/userService"
-import { IChatMessage, IConnection, ILastMessage } from "./interfaces"
+import { IChatMessage, IConnection, ILastMessage } from "@/lib/interfaces"
 
 class Requests {
     async getMe(): Promise<IUser> {
