@@ -9,3 +9,26 @@ export const publicRoutes = [
 export const publicApiRoutes = [
     "/api/auth/login", "/api/auth/signup", "/api/auth/verify", "/api/socket/connect", "/api/auth/refresh"
 ]
+
+export const navLinks = [
+    {
+        label: "Home",
+        href: "/"
+    },
+    {
+        label: "Features",
+        href: "/about"
+    },
+    {
+        label: "Pricing",
+        href: "/pricing"
+    },
+    {
+        label: "Contact",
+        href: "/contact"
+    },
+    {
+        label: "FAQ",
+        href: "/faq"
+    }
+]
