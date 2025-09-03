@@ -9,9 +9,17 @@ export const H1: React.FC<React.HTMLAttributes<HTMLHeadingElement>> = ({ childre
     )
 }
 
+export const H2: React.FC<React.HTMLAttributes<HTMLHeadingElement>> = ({ children, className, ...props }) => {
+    return (
+        <h2 className={cn("text-2xl md:text-4xl font-bold", className)} {...props}>
+            {children}
+        </h2>
+    )
+}
+
 export const P: React.FC<React.HTMLAttributes<HTMLParagraphElement>> = ({ children, className, ...props }) => {
     return (
-        <p className={cn("text-lg text-gray-300 max-w-[85%] leading-[1.8] tracking-wide", className)} {...props}>
+        <p className={cn("text-lg text-gray-300 leading-[1.8] tracking-wide", className)} {...props}>
             {children}
         </p>
     )
