@@ -12,8 +12,8 @@ export default function Hero() {
     const { isLoggedIn, user } = useSelector((state: RootState) => state.user)
 
     return (
-        <section className="relative">
-            <div className="px-6 min-h-fit h-screen max-h-[700px] lg:px-20 grid lg:grid-cols-2 items-center gap-12 py-20">
+        <section className="relative min-h-fit h-[875px] max-h-[calc(100vh-90px)] flex items-center justify-center bg-whit">
+            <div className="px-6 min-h-fit h-screen max-h-[700px] lg:px-20 grid lg:grid-cols-2 items-center gap-12 py-10">
 
                 {/* Left Content */}
                 <div className="space-y-6">
@@ -21,7 +21,7 @@ export default function Hero() {
                         {"Effortless task management and communication with "}
                         <span>{"Cubezy"}</span>
                     </H1>
-                    <P>
+                    <P className="max-w-[85%]">
                         {"Manage tasks and projects easily with an all-in-one platform designed for seamless communication and collaboration."}
                     </P>
 
@@ -65,39 +65,39 @@ export default function Hero() {
                 </div>
 
                 {/* Right Content - Image + Chat Bubbles */}
-                <div className="relative flex justify-center">
+                <div className="relative flex justify-center opacity-40 lg:opacity-100">
                     <div className="relative">
                         <Image
                             src="/images/hero.png" // Replace with actual image path
                             alt="Girl using phone"
                             width={640}
                             height={426}
-                            className="!w-full !h-auto"
+                            className="!w-full !h-auto !min-h-[calc(100vh-130px)] hidden lg:block"
                         />
 
-                        <div className="absolute bottom-10 -left-12 rotate-12 bg-white shadow-lg rounded-xl px-4 py-3 w-60 flex items-center gap-2">
+                        <div className="absolute bottom-10 -left-12 rotate-12 bg-white shadow-lg rounded-xl px-4 py-3 w-80 flex items-center gap-2">
                             <Image
                                 src="/images/avatar4.webp"
                                 alt="Ronald"
-                                width={40}
-                                height={40}
+                                width={60}
+                                height={60}
                                 className="rounded-full"
                             />
-                            <p className="text-xs text-gray-600">
+                            <p className="text-lg text-gray-600">
                                 {"One of the best platform I have ever used."}
                             </p>
                         </div>
 
                         {/* Chat Bubble 2 */}
-                        <div className="absolute bottom-56 -right-10 -rotate-6 bg-white shadow-lg rounded-xl px-4 py-3 w-72 flex items-center gap-2">
+                        <div className="absolute bottom-56 -right-10 -rotate-6 bg-white shadow-lg rounded-xl px-4 py-3 w-96 flex items-center gap-2">
                             <Image
                                 src="/images/avatar3.webp"
                                 alt="Jenny"
-                                width={40}
-                                height={40}
+                                width={60}
+                                height={60}
                                 className="rounded-full"
                             />
-                            <p className="text-xs text-gray-600">
+                            <p className="text-lg text-gray-600">
                                 {"I commented on Figma, I want to add some fancy icons. Do you have any icon set?"}
                             </p>
                         </div>
