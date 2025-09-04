@@ -1,3 +1,7 @@
+import { FaTasks } from "react-icons/fa"
+import { IoChatbubbles } from "react-icons/io5"
+import { RiChatPrivateLine } from "react-icons/ri"
+
 export const emojis = [
     "😀", "😃", "😄", "😁", "😆", "😅", "😂", "🤣", "🥲", "🥹", "☺️", "😊", "😇", "🙂", "🙃", "😉", "😌", "😍", "🥰", "😘", "😗", "😙", "😚", "😋", "😛", "😝", "😜", "🤪", "🤨", "🧐", "🤓", "😎", "🥸", "🤩", "🥳", "🙂‍↕️", "😏", "😒", "🙂‍↔️", "😞", "😔", "😟", "😕", "🙁", "☹️", "😣", "😖", "😫", "😩", "🥺", "😢", "😭", "😮‍💨", "😤", "😠", "😡", "🤬", "🤯", "😳", "🥵", "🥶", "😱", "😨", "😰", "😥", "😓", "🫣", "🤗", "🫡", "🤔", "🫢", "🤭", "🤫", "🤥", "😶", "😶‍🌫️", "😐", "😑", "😬", "🫨", "🫠", "🙄", "😯", "😦", "😧", "😮", "😲", "🥱", "😴", "🤤", "😪", "😵", "😵‍💫", "🫥", "🤐", "🥴", "🤢", "🤮", "🤧", "😷", "🤒", "🤕", "🤑", "🤠", "😈", "👿", "👹", "👺", "🤡", "💩", "👻", "💀", "☠️", "👽", "👾", "🤖", "🎃", "😺", "😸", "😹", "😻", "😼", "😽", "🙀", "😿", "😾"
 ]
@@ -30,5 +34,29 @@ export const navLinks = [
     {
         label: "FAQ",
         href: "/faq"
+    }
+]
+
+export const featuresForBetterExperience = [
+    {
+        icon: IoChatbubbles,
+        bgColor: "#FD600333",
+        iconColor: "#F23936",
+        title: "Seamless communication",
+        description: "Engage in real-time conversations with team members, ensuring everyone stays informed and connected."
+    },
+    {
+        icon: FaTasks,
+        bgColor: "#4DA44E33",
+        iconColor: "#4DA44E",
+        title: "Efficient task management",
+        description: "Organize tasks efficiently with intuitive management tools that help you prioritize and track progress effortlessly."
+    },
+    {
+        icon: RiChatPrivateLine,
+        bgColor: "#FB8E0B33",
+        iconColor: "#FB8E0B",
+        title: "Keep safe and private",
+        description: "Enjoy secure messaging with end-to-end encryption, ensuring your conversations remain confidential."
     }
 ]
