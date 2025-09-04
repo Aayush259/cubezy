@@ -12,7 +12,7 @@ export default function Hero() {
     const { isLoggedIn, user } = useSelector((state: RootState) => state.user)
 
     return (
-        <section className="relative min-h-fit h-[875px] max-h-[calc(100vh-90px)] flex items-center justify-center bg-whit">
+        <section className="relative min-h-fit h-[600px] lg:h-[875px] max-h-[calc(100vh-90px)] flex items-center justify-center bg-whit">
             <div className="px-6 min-h-fit h-screen max-h-[700px] lg:px-20 grid lg:grid-cols-2 items-center gap-12 py-10">
 
                 {/* Left Content */}
@@ -65,17 +65,17 @@ export default function Hero() {
                 </div>
 
                 {/* Right Content - Image + Chat Bubbles */}
-                <div className="relative flex justify-center opacity-40 lg:opacity-100">
-                    <div className="relative">
+                <div className="relative flex justify-center [@media(max-width:550px)]:hidden opacity-40 lg:opacity-100">
+                    <div className="relative w-full">
                         <Image
-                            src="/images/hero.png" // Replace with actual image path
+                            src="/images/hero.webp" // Replace with actual image path
                             alt="Girl using phone"
-                            width={640}
-                            height={426}
-                            className="!w-full !h-auto !min-h-[calc(100vh-130px)] hidden lg:block"
+                            width={667}
+                            height={747}
+                            className="!w-full !h-auto [@media(min-width:1900px)]:!min-h-[calc(100vh-130px)] hidden lg:block"
                         />
 
-                        <div className="absolute bottom-10 -left-12 rotate-12 bg-white shadow-lg rounded-xl px-4 py-3 w-80 flex items-center gap-2">
+                        <div className="absolute bottom-40 -left-12 rotate-12 bg-white shadow-lg rounded-xl px-4 py-3 w-80 flex items-center gap-2">
                             <Image
                                 src="/images/avatar4.webp"
                                 alt="Ronald"
@@ -89,7 +89,7 @@ export default function Hero() {
                         </div>
 
                         {/* Chat Bubble 2 */}
-                        <div className="absolute bottom-56 -right-10 -rotate-6 bg-white shadow-lg rounded-xl px-4 py-3 w-96 flex items-center gap-2">
+                        <div className="absolute bottom-80 -right-10 -rotate-6 bg-white shadow-lg rounded-xl px-4 py-3 w-96 flex items-center gap-2">
                             <Image
                                 src="/images/avatar3.webp"
                                 alt="Jenny"
