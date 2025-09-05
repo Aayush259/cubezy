@@ -89,7 +89,7 @@ export default function Hero() {
                         </div>
 
                         {/* Chat Bubble 2 */}
-                        <div className="absolute bottom-80 -right-10 -rotate-6 bg-white shadow-lg rounded-xl px-4 py-3 w-96 flex items-center gap-2">
+                        <div className="absolute bottom-80 right-0 lg:-right-10 -rotate-6 bg-white shadow-lg rounded-xl px-4 py-3 w-96 flex items-center gap-2">
                             <Image
                                 src="/images/avatar3.webp"
                                 alt="Jenny"

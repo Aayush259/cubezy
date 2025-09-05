@@ -33,7 +33,7 @@ const Header = () => {
                     {"Cubezy"}
                 </Link>
 
-                <div className="absolute top-[90px] left-0 lg:static flex flex-col w-screen lg:w-fit lg:flex-row items-center lg:gap-8 text-xl duration-400 z-50 bg-black/80" style={{ transform: hamActive ? "translateX(0)" : "translateX(-100%)" }}>
+                <div className="absolute top-[90px] lg:static flex flex-col w-screen lg:w-fit lg:flex-row items-center lg:gap-8 text-xl duration-400 z-50 bg-black/80 lg:bg-transparent" style={{ left: hamActive ? "0" : "-100%" }}>
                     {navLinks.map((link, idx) => (
                         <Link href={link.href} key={idx} className="hover:opacity-80 px-8 lg:px-0 py-4 lg:py-0 duration-200 w-full lg:w-fit text-center">
                             {link.label}
