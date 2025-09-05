@@ -1,4 +1,6 @@
 import { FaTasks } from "react-icons/fa"
+import { FaDiagramProject } from "react-icons/fa6"
+import { GoGoal, GoTasklist } from "react-icons/go"
 import { IoChatbubbles } from "react-icons/io5"
 import { RiChatPrivateLine } from "react-icons/ri"
 
@@ -58,5 +60,26 @@ export const featuresForBetterExperience = [
         iconColor: "#FB8E0B",
         title: "Keep safe and private",
         description: "Enjoy secure messaging with end-to-end encryption, ensuring your conversations remain confidential."
+    }
+]
+
+export const workflowFeatures = [
+    {
+        icon: GoGoal,
+        title: "Optimize Your Goals",
+        description: "Set, track, and achieve your objectives with tools designed to keep you focused and motivated.",
+        color: "#ED4546"
+    },
+    {
+        icon: FaDiagramProject,
+        title: "Project Tracking",
+        description: "Monitor project timelines and milestones in real-time. Keep projects on track and meet your deadlines with confidence.",
+        color: "#008EFF"
+    },
+    {
+        icon: GoTasklist,
+        title: "Task Management",
+        description: "Easily manage tasks, deadlines, and priorities to keep projects running smoothly.",
+        color: "#77F393"
     }
 ]

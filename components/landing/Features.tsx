@@ -5,7 +5,7 @@ import { featuresForBetterExperience } from "@/lib/data"
 const Features = () => {
     return (
         <section className="py-10">
-            <H2 className="text-center">{"Features for a better experience"}</H2>
+            <H2 className="text-center max-w-[97vw] mx-auto">{"Features for a better experience"}</H2>
             <P className="text-center my-4 max-w-[85%] md:max-w-[40%] mx-auto">{"Explore the essential tools designed to streamline your workflows, enhance team collaboration, and ensure your projects run smoothly from start to finish"}</P>
 
             <div className="flex items-center justify-center [@media(min-width:1760px)]:justify-between gap-12 px-20 my-20 flex-wrap">
