@@ -28,12 +28,12 @@ const Header = () => {
     return (
         <header className="w-full sticky top-0 left-0 px-3 md:px-10 py-4 border-b border-gray-800 backdrop-blur-lg z-50">
             <div className="flex items-center justify-between gap-4">
-                <Link href="/" className="flex items-center gap-2 text-3xl font-semibold system-font">
-                    <Image src="/icons/logo.png" alt="Cubezy" width={56} height={56} className="!w-14 !h-auto" />
+                <Link href="/" className="flex items-center gap-1 md:gap-2 text-xl md:text-3xl font-semibold system-font">
+                    <Image src="/icons/logo.png" alt="Cubezy" width={56} height={56} className="!w-10 md:!w-14 !h-auto" />
                     {"Cubezy"}
                 </Link>
 
-                <div className="absolute top-[90px] lg:static flex flex-col w-screen lg:w-fit lg:flex-row items-center lg:gap-8 text-xl duration-400 z-50 bg-black/80 lg:bg-transparent" style={{ left: hamActive ? "0" : "-100%" }}>
+                <div className="absolute top-[73px] md:top-[90px] lg:static flex flex-col w-screen lg:w-fit lg:flex-row items-center lg:gap-8 text-xl duration-400 z-50 bg-black/80 lg:bg-transparent" style={{ left: hamActive ? "0" : "-100%" }}>
                     {navLinks.map((link, idx) => (
                         <Link href={link.href} key={idx} className="hover:opacity-80 px-8 lg:px-0 py-4 lg:py-0 duration-200 w-full lg:w-fit text-center">
                             {link.label}
@@ -45,9 +45,11 @@ const Header = () => {
                     {isLoggedIn && user ? (
                         <Button onClick={() => router.push("/chat")}>{"Go to Chat"}</Button>
                     ) : (
-                        <div className="flex items-center gap-4">
-                            <Button className="bg-transparent" onClick={() => router.push("/login")}>{"Login"}</Button>
-                            <Button onClick={() => router.push("/signup")}>{"Get started for free"}</Button>
+                        <div className="flex items-center gap-2 md:gap-4">
+                            <Button onClick={() => router.push("/login")}>{"Login"}</Button>
+                            <Button onClick={() => router.push("/signup")}>
+                                <span>{"Get started "}</span><span className="hidden lg:inline">{"for free"}</span>
+                            </Button>
                         </div>
                     )}
                     <button

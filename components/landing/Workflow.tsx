@@ -7,11 +7,11 @@ const WorkflowFeatures = () => {
     const [activeFeatureIdx, setActiveFeatureIdx] = useState<number>(0);
 
     return (
-        <section className="py-10">
+        <section className="py-5 md:py-10">
             <H2 className="text-center max-w-[97vw] mx-auto">{"Powerful Features to Elevate Your Workflow"}</H2>
             <P className="text-center my-4 max-w-[85%] md:max-w-[40%] mx-auto">{"Explore advanced tools that help you make smarter decisions, track progress, and manage your tasks with ease. Stay organized and in control with features designed to enhance your productivity"}</P>
 
-            <div className="flex items-center justify-center [@media(min-width:1760px)]:justify-between gap-12 px-20 my-20 flex-wrap">
+            <div className="flex items-center justify-center [@media(min-width:1760px)]:justify-between gap-12 md:px-20 my-20 flex-wrap">
                 {workflowFeatures.map((feature, idx) => (
                     <div
                         key={idx}

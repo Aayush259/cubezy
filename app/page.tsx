@@ -1,4 +1,9 @@
 import { Metadata } from "next"
+import Header from "@/components/landing/Header"
+import Hero from "@/components/landing/Hero"
+import Features from "@/components/landing/Features"
+import WorkflowFeatures from "@/components/landing/Workflow"
+import Testimonials from "@/components/landing/Testimonials"
 
 export const metadata: Metadata = {
     title: "Cubezy",
@@ -7,8 +12,16 @@ export const metadata: Metadata = {
 
 export default function Home() {
     return (
-        <div className="h-screen flex flex-row overflow-hidden font-[family-name:var(--font-geist-sans)] select-none">
-            Landing
+        <div className="bg-black">
+            <div className="max-w-[2000px] mx-auto">
+                <div className="relative">
+                    <Header />
+                    <Hero />
+                    <Features />
+                    <WorkflowFeatures />
+                    <Testimonials />
+                </div>
+            </div>
         </div>
     )
 }
