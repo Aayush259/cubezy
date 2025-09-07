@@ -112,3 +112,21 @@ body {
 button, a {
     cursor: pointer;
 }
+
+.link {
+    width: fit-content;
+    transition-duration: 0.2s;
+    background-size: 0 5px;
+    background-image: linear-gradient(180deg, currentColor 25%, transparent 0);
+    background-repeat: no-repeat;
+    background-position-y: bottom;
+    background-position-x: right;
+    transition: background-size 0.3s;
+}
+
+.link:hover {
+    background-image: linear-gradient(180deg, currentColor 25%, transparent 0);
+    background-size: 100% 5px;
+    background-position-x: left;
+    background-position-y: bottom;
+}

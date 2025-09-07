@@ -5,6 +5,7 @@ import Features from "@/components/landing/Features"
 import WorkflowFeatures from "@/components/landing/Workflow"
 import Testimonials from "@/components/landing/Testimonials"
 import Faq from "@/components/landing/Faq"
+import Footer from "@/components/landing/Footer"
 
 export const metadata: Metadata = {
     title: "Cubezy",
@@ -22,6 +23,7 @@ export default function Home() {
                     <WorkflowFeatures />
                     <Testimonials />
                     <Faq />
+                    <Footer />
                 </div>
             </div>
         </div>

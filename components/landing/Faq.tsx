@@ -1,11 +1,11 @@
 "use client"
-import { IoAddOutline } from "react-icons/io5"
-import { CgMathMinus } from "react-icons/cg";
-import Section from "../ui/Section"
 import { P } from "../ui/Text"
 import { useState } from "react"
-import { faqs } from "@/lib/data";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils"
+import { faqs } from "@/lib/data"
+import Section from "../ui/Section"
+import { IoAddOutline } from "react-icons/io5"
+import { CgMathMinus } from "react-icons/cg"
 
 const Faq = () => {
     const [activeFaqIdxs, setActiveFaqIdxs] = useState<number[]>([])

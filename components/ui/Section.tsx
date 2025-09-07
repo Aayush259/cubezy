@@ -1,6 +1,6 @@
 "use client"
-import { cn } from "@/lib/utils"
 import { H2, P } from "./Text"
+import { cn } from "@/lib/utils"
 
 interface SectionProps {
     title: string

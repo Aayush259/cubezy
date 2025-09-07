@@ -1,7 +1,7 @@
 "use client"
+import Section from "../ui/Section"
 import { testimonials } from "@/lib/data"
 import { InfiniteMovingCards } from "../ui/InfiniteMovingCard"
-import Section from "../ui/Section"
 
 const Testimonials = () => {
     return (

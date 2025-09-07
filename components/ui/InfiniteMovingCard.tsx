@@ -1,7 +1,7 @@
 "use client"
+import { P } from "./Text"
 import { cn } from "@/lib/utils"
 import { useEffect, useRef, useState } from "react"
-import { P } from "./Text"
 
 export const InfiniteMovingCards = ({
     items,

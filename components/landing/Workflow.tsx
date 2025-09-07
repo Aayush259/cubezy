@@ -1,8 +1,8 @@
 "use client"
-import { useState } from 'react';
-import { P, P2 } from '../ui/Text'
-import { workflowFeatures } from '@/lib/data'
-import Section from '../ui/Section';
+import { useState } from "react"
+import { P, P2 } from "../ui/Text"
+import Section from "../ui/Section"
+import { workflowFeatures } from "@/lib/data"
 
 const WorkflowFeatures = () => {
     const [activeFeatureIdx, setActiveFeatureIdx] = useState<number>(0);
