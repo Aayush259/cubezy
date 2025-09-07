@@ -4,6 +4,7 @@ import Hero from "@/components/landing/Hero"
 import Features from "@/components/landing/Features"
 import WorkflowFeatures from "@/components/landing/Workflow"
 import Testimonials from "@/components/landing/Testimonials"
+import Faq from "@/components/landing/Faq"
 
 export const metadata: Metadata = {
     title: "Cubezy",
@@ -20,6 +21,7 @@ export default function Home() {
                     <Features />
                     <WorkflowFeatures />
                     <Testimonials />
+                    <Faq />
                 </div>
             </div>
         </div>

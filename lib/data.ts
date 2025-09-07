@@ -115,3 +115,26 @@ export const testimonials = [
         title: "Moby-Dick",
     }
 ]
+
+export const faqs = [
+    {
+        question: "What is Cubezy?",
+        answer: "Cubezy is a modern and intuitive chat application designed to facilitate seamless communication and connection among users. It offers a range of features to enhance your messaging experience."
+    },
+    {
+        question: "How do I create an account?",
+        answer: "To create an account, simply click on the 'Sign Up' button on the homepage and fill in the required information, including your email address and password. Follow the prompts to complete the registration process."
+    },
+    {
+        question: "Is Cubezy free to use?",
+        answer: "Yes, Cubezy offers a free plan with essential features for personal use. We also have premium plans with additional features for businesses and teams."
+    },
+    {
+        question: "Can I use Cubezy on my mobile device?",
+        answer: "Absolutely! Cubezy is designed to be responsive and works seamlessly on both desktop and mobile devices. You can access it through your web browser or download our mobile app from the App Store or Google Play."
+    },
+    {
+        question: "How do I reset my password?",
+        answer: "If you've forgotten your password, click on the 'Forgot Password' link on the login page. Enter your registered email address, and we'll send you instructions to reset your password."
+    }
+]
