@@ -24,7 +24,7 @@ export default function LoginForm() {
 
     useEffect(() => {
         if (isLoggedIn && user) {
-            router.push("/")
+            router.push("/chat")
         }
     }, [])
 

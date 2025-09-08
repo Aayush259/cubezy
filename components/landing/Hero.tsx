@@ -43,6 +43,7 @@ export default function Hero() {
                                     alt={`Avatar ${idx}`}
                                     width={50}
                                     height={50}
+                                    priority={true}
                                     className="rounded-full border-2 border-white"
                                     style={{ zIndex: arr.length - idx }}
                                 />
@@ -70,6 +71,7 @@ export default function Hero() {
                             alt="Girl using phone"
                             width={667}
                             height={747}
+                            priority={true}
                             className="!w-full !h-auto sm:!w-[60vw] lg:max-h-none lg:!min-h-[50vh] [@media(min-width:1900px)]:!min-h-[calc(100vh-130px)] block lg:static absolute left-1/2 -translate-x-1/2 lg:translate-x-0 bottom-0"
                         />
 
@@ -79,9 +81,10 @@ export default function Hero() {
                                 alt="Ronald"
                                 width={60}
                                 height={60}
+                                priority={true}
                                 className="rounded-full"
                             />
-                            <p className="text-sm lg:text-lg text-gray-600">
+                            <p className="text-sm lg:text-lg text-gray-800 lg:text-gray-600">
                                 {"One of the best platform I have ever used."}
                             </p>
                         </div>
@@ -93,9 +96,10 @@ export default function Hero() {
                                 alt="Jenny"
                                 width={60}
                                 height={60}
+                                priority={true}
                                 className="rounded-full"
                             />
-                            <p className="text-sm lg:text-lg text-gray-600">
+                            <p className="text-sm lg:text-lg text-gray-800 lg:text-gray-600">
                                 {"I commented on Figma, I want to add some fancy icons. Do you have any icon set?"}
                             </p>
                         </div>

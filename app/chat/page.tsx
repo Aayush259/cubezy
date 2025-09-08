@@ -8,8 +8,7 @@ import DeleteMessageWindow from "@/components/dialogs/DeleteMessageWindow"
 import ForwardMessageWindow from "@/components/dialogs/ForwardMessageWindow"
 
 export const metadata: Metadata = {
-    title: "Cubezy",
-    description: "Cubezy - A modern and intuitive chat application for seamless communication and connection."
+    title: "Chat",
 }
 
 export default function Home() {

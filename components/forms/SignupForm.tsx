@@ -23,7 +23,7 @@ export default function SignupForm() {
 
     useEffect(() => {
         if (isLoggedIn && user) {
-            router.push("/")
+            router.push("/chat")
         }
     }, [])
 

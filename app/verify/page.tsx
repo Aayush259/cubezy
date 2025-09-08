@@ -3,7 +3,7 @@ import { Metadata } from "next"
 import OTPForm from "@/components/forms/OTPForm"
 
 export const metadata: Metadata = {
-    title: "Cubezy - Verification",
+    title: "Verify",
     description: "Verify your account to start using Cubezy",
 }
 

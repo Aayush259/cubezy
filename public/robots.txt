@@ -1,0 +1,10 @@
+# *
+User-agent: *
+Disallow: /api/
+Allow: /
+
+# Host
+Host: https://cubezy.in
+
+# Sitemaps
+Sitemap: https://cubezy.in/sitemap.xml

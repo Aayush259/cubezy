@@ -2,14 +2,12 @@
 import Link from "next/link"
 import Image from "next/image"
 import { navLinks } from "@/lib/data"
-import { Button } from "../ui/Button"
+import { ButtonLink } from "../ui/Button"
 import { useSelector } from "react-redux"
 import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
 import { RootState } from "@/lib/store/store"
 
 const Header = () => {
-    const router = useRouter()
     const [hamActive, setHamActive] = useState<boolean>(false)
     const { isLoggedIn, user } = useSelector((state: RootState) => state.user)
 
@@ -29,7 +27,7 @@ const Header = () => {
         <header className="w-full sticky top-0 left-0 px-3 md:px-10 py-4 border-b border-gray-800 backdrop-blur-lg z-50">
             <div className="flex items-center justify-between gap-4">
                 <Link href="/" className="flex items-center gap-1 md:gap-2 text-xl md:text-3xl font-semibold system-font">
-                    <Image src="/icons/logo.png" alt="Cubezy" width={56} height={56} className="!w-10 md:!w-14 !h-auto" />
+                    <Image src="/icons/logo.png" alt="Logo" width={56} height={56} className="!w-10 md:!w-14 !h-auto" />
                     {"Cubezy"}
                 </Link>
 
@@ -43,17 +41,18 @@ const Header = () => {
 
                 <div className="flex items-center gap-4">
                     {isLoggedIn && user ? (
-                        <Button onClick={() => router.push("/chat")}>{"Go to Chat"}</Button>
+                        <ButtonLink href="/chat">{"Go to Chat"}</ButtonLink>
                     ) : (
                         <div className="flex items-center gap-2 md:gap-4">
-                            <Button onClick={() => router.push("/login")}>{"Login"}</Button>
-                            <Button onClick={() => router.push("/signup")}>
+                            <ButtonLink href="/login">{"Login"}</ButtonLink>
+                            <ButtonLink href="/register">
                                 <span>{"Get started "}</span><span className="hidden lg:inline">{"for free"}</span>
-                            </Button>
+                            </ButtonLink>
                         </div>
                     )}
                     <button
                         className="z-30 h-full flex flex-col items-center justify-center sm:hover:opacity-75 lg:hidden duration-300"
+                        aria-label="Toggle Menu"
                         onClick={() => setHamActive(!hamActive)}
                     >
                         <div
