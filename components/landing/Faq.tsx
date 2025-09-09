@@ -33,7 +33,7 @@ const Faq = () => {
                                 {faq.question}
                             </P>
 
-                            <button>
+                            <button aria-label="Toggle Answer">
                                 {activeFaqIdxs.includes(idx) ? <CgMathMinus size={25} /> : <IoAddOutline size={25} />}
                             </button>
                         </div>

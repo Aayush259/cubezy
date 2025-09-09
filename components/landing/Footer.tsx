@@ -1,14 +1,12 @@
 "use client"
 import Link from "next/link"
 import { H2, P } from "../ui/Text"
-import { Button } from "../ui/Button"
 import { MdMail } from "react-icons/md"
+import { ButtonLink } from "../ui/Button"
 import { useSelector } from "react-redux"
-import { useRouter } from "next/navigation"
 import { RootState } from "@/lib/store/store"
 
 const Footer = () => {
-    const router = useRouter()
     const { isLoggedIn, user } = useSelector((state: RootState) => state.user)
 
     return (
@@ -23,13 +21,13 @@ const Footer = () => {
                     </H2>
 
                     {isLoggedIn && user ? (
-                        <Button onClick={() => router.push("/chat")}>
+                        <ButtonLink href="/chat">
                             {"Go to chat"}
-                        </Button>
+                        </ButtonLink>
                     ) : (
-                        <Button onClick={() => router.push("/login")}>
+                        <ButtonLink href="/login">
                             {"Get started"}
-                        </Button>
+                        </ButtonLink>
                     )}
                 </div>
 
